@@ -1,4 +1,4 @@
-# 🚀 ChatCore.AI - Kurumsal AI Chat Sistemi
+# ChatCore.AI - Kurumsal AI Chat Sistemi
 
 **Şirket içi bilgilere dayalı AI destekli sohbet platformu. Çalışanlar, projeler, departmanlar ve prosedürler hakkında anlık ve doğru yanıtlar.**
 
@@ -7,20 +7,20 @@
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.32.0+-red.svg)](https://streamlit.io)
 [![AI](https://img.shields.io/badge/AI-Enabled-orange.svg)](https://github.com/langchain-ai/langchain)
 
-## 🎯 Neden ChatCore.AI?
+## Neden ChatCore.AI?
 
 **Kurumsal verilerinizi AI ile güçlendirin!** ChatCore.AI, şirket içi bilgilere 7/24 erişim sağlayan, RAG (Retrieval-Augmented Generation) teknolojisi destekli profesyonel bir chat sistemidir. Çalışanlar, projeler, departmanlar ve prosedürler hakkında anlık ve doğru yanıtlar alın.
 
-### 🏆 Ana Avantajlar
+### Ana Avantajlar
 
-- ⚡ **Hızlı Kurulum**: 2 komut ile çalışır hale gelin (`kurulum.bat` → `baslat.bat`)
-- 🤖 **Çoklu AI Desteği**: Gemini, OpenAI, Azure, Ollama - hangisini isterseniz
-- 💰 **Ücretsiz Kullanım**: Gemini ücretsiz katmanı veya tamamen yerel Ollama
-- 🔒 **Güvenli**: JWT authentication, input validation, rate limiting
-- 📊 **RAG Teknolojisi**: Şirket verilerinize dayalı %100 doğru yanıtlar
-- 🔄 **Otomatik Fallback**: AI provider çalışmazsa otomatik yedek devreye girer
-- 💾 **Kalıcı Oturum**: Sayfa yenileme sonrası sohbet geçmişiniz korunur
-- 📈 **Ölçeklenebilir**: Küçük şirketlerden büyük holdinglere kadar
+- **Hızlı Kurulum**: 2 komut ile çalışır hale gelin (`kurulum.bat` → `baslat.bat`)
+- **Çoklu AI Desteği**: Gemini, OpenAI, Azure, Ollama - hangisini isterseniz
+- **Ücretsiz Kullanım**: Gemini ücretsiz katmanı veya tamamen yerel Ollama
+- **Güvenli**: JWT authentication, input validation, rate limiting
+- **RAG Teknolojisi**: Şirket verilerinize dayalı %100 doğru yanıtlar
+- **Otomatik Fallback**: AI provider çalışmazsa otomatik yedek devreye girer
+- **Kalıcı Oturum**: Sayfa yenileme sonrası sohbet geçmişiniz korunur
+- **Ölçeklenebilir**: Küçük şirketlerden büyük holdinglere kadar
 
 ### ✨ Ne Kadar Hızlı?
 
