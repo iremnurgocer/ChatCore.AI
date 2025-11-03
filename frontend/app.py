@@ -15,6 +15,7 @@ st.set_page_config(
     page_title=f"{COMPANY_NAME} AI Chat",
     layout="wide",
     initial_sidebar_state="expanded",
+    menu_items=None  # Menü öğelerini devre dışı bırak (URL değişikliğini önler)
 )
 
 # Yardımcı Fonksiyonlar
@@ -108,82 +109,84 @@ def api_mark_procedure_viewed(token: str, procedure_id: int):
         return False
 
 def verify_token(token: str):
-    """Token geçerliliğini kontrol eder"""
+    """Token geçerliliğini kontrol eder - Sadece 401 durumunda False döner"""
     # Token gerektiren bir endpoint'i test et
     url = f"{BACKEND_URL}/api/employees"
     try:
         r = requests.get(
             url,
             headers={"Authorization": f"Bearer {token}"},
-            timeout=3  # Timeout'u kısalttık
+            timeout=2  # Timeout'u kısalttık (sayfa yenileme hızlı olmalı)
         )
         # 200 dönerse token geçerli
         if r.status_code == 200:
             return True
-        # 401 dönerse token geçersiz
+        # SADECE 401 dönerse token geçersiz - diğer tüm durumlarda True döndür
         elif r.status_code == 401:
             return False
-        # Diğer durumlarda (500, vb.) token'ı geçerli kabul et (backend sorunu olabilir)
+        # Diğer durumlarda (500, 404, vb.) token'ı geçerli kabul et (backend sorunu olabilir)
+        # Sayfa yenileme sırasında backend henüz başlamamış olabilir
         return True
     except requests.exceptions.ConnectionError:
         # Backend'e bağlanılamıyorsa token'ı geçerli kabul et (backend çalışmıyor olabilir)
+        # Sayfa yenileme sırasında backend henüz hazır olmayabilir
         return True
     except requests.exceptions.Timeout:
         # Timeout olursa token'ı geçerli kabul et (backend yavaş olabilir)
         return True
     except Exception:
-        # Diğer hatalarda token'ı geçerli kabul et (backend sorunu olabilir)
+        # Diğer tüm hatalarda token'ı geçerli kabul et (backend sorunu olabilir)
+        # Sayfa yenileme sırasında backend henüz hazır olmayabilir
         return True
 
 def ensure_state():
     """Session state'i başlatır ve token doğrular"""
-    # Mesajları koru - eğer zaten varsa silme
-    existing_messages = st.session_state.get("messages", [])
+    # İlk yükleme için varsayılan değerler - MEVCUT DEĞERLERİ KORU
+    if "token" not in st.session_state:
+        st.session_state["token"] = None
+    if "username" not in st.session_state:
+        st.session_state["username"] = None
+    if "messages" not in st.session_state:
+        st.session_state["messages"] = []
+    if "token_verified" not in st.session_state:
+        st.session_state["token_verified"] = False
+    if "token_check_time" not in st.session_state:
+        st.session_state["token_check_time"] = None
     
-    for k, v in [
-        ("token", None),
-        ("username", None),
-        ("messages", []),
-        ("token_verified", False),
-        ("token_check_time", None),
-    ]:
-        if k not in st.session_state:
-            st.session_state[k] = v
-    
-    # Mesajları geri yükle - sayfa yenileme sırasında korunması için
-    if existing_messages and not st.session_state.get("messages"):
-        st.session_state["messages"] = existing_messages
-    
-    # Token varsa ve daha önce doğrulanmışsa, sadece belirli aralıklarla kontrol et
+    # Token varsa kontrol et
     if st.session_state.get("token"):
-        # Eğer token hiç doğrulanmamışsa, ilk seferde doğrula
-        # Ama sayfa yenileme sırasında çok sık kontrol etme
         import time
         current_time = time.time()
-        last_check = st.session_state.get("token_check_time", 0)
+        last_check = st.session_state.get("token_check_time")
         
-        # Sadece 15 dakikada bir kontrol et (token kontrolünü azalt)
-        # İlk yüklemede token_verified False ise, backend'e bağlanmayı dene ama başarısız olursa token'ı tut
-        if st.session_state.get("token_verified") is False and last_check == 0:
-            # İlk kontrol - token'ı doğrula ama başarısız olursa bile token'ı tut
+        # Eğer token hiç doğrulanmamışsa ve zaman damgası yoksa, doğrula
+        # Ama başarısız olursa bile token'ı SİLME (backend geçici olarak çalışmıyor olabilir)
+        if st.session_state.get("token_verified") is False and last_check is None:
+            # İlk kontrol - token'ı doğrula
             token_valid = verify_token(st.session_state["token"])
             if token_valid:
                 st.session_state["token_verified"] = True
                 st.session_state["token_check_time"] = current_time
-            # Başarısız olsa bile token'ı tut (backend geçici olarak çalışmıyor olabilir)
-        elif st.session_state.get("token_verified") and (current_time - last_check) > 900:  # 15 dakika
-            # Periyodik kontrol - sadece token daha önce doğrulanmışsa
+            # Başarısız olsa bile token'ı koru (sayfa yenileme sırasında backend başlamamış olabilir)
+            # Token sadece AÇIKÇA 401 döndüğünde silinecek (verify_token içinde False dönerse)
+        
+        # Token daha önce doğrulanmışsa ve 15 dakikadan fazla geçtiyse, tekrar kontrol et
+        elif st.session_state.get("token_verified") is True and last_check and (current_time - last_check) > 900:
+            # Periyodik kontrol - token daha önce doğrulanmışsa
             token_valid = verify_token(st.session_state["token"])
-            if not token_valid:
-                # Token gerçekten geçersizse sil
+            # Sadece AÇIKÇA geçersizse (401) temizle
+            if token_valid is False:
+                # Token gerçekten geçersizse temizle (sadece 401 durumunda)
                 st.session_state["token"] = None
                 st.session_state["username"] = None
                 st.session_state["messages"] = []
                 st.session_state["token_verified"] = False
+                st.session_state["token_check_time"] = None
             else:
-                # Token geçerli, zamanı güncelle
+                # Token geçerli veya belirsiz (backend sorunu), zamanı güncelle
                 st.session_state["token_check_time"] = current_time
-        # Token zaten doğrulanmışsa ve süresi dolmamışsa hiçbir şey yapma
+        
+        # Token doğrulanmışsa ve süresi dolmamışsa hiçbir şey yapma
 
 def add_message(role, content):
     """Geçmişe mesaj ekler"""
@@ -211,8 +214,52 @@ def check_new_procedures():
         
         st.session_state["procedure_check_time"] = current_time
 
+# URL parametrelerini temizle (sayfa yenileme sonrası session kaybını önler)
+# Streamlit widget'ları URL'de query parametreleri oluşturabilir, bunları temizle
+try:
+    # Streamlit 1.28+ için
+    if hasattr(st, 'query_params') and st.query_params:
+        # Query parametrelerini temizle - URL'deki ?param=value gibi parametreleri kaldır
+        st.experimental_set_query_params({}) if hasattr(st, 'experimental_set_query_params') else None
+except:
+    # Eski Streamlit versiyonları için
+    pass
+
 # UI
 ensure_state()
+
+# Conversation yönetimi - aktif conversation ID'yi backend'den al
+if st.session_state.get("token") and "active_conversation_id" not in st.session_state:
+    try:
+        r = requests.get(
+            f"{BACKEND_URL}/api/conversations",
+            headers={"Authorization": f"Bearer {st.session_state['token']}"},
+            timeout=5
+        )
+        if r.status_code == 200:
+            data = r.json()
+            st.session_state["active_conversation_id"] = data.get("active_conversation_id")
+            # Aktif conversation'ın mesajlarını yükle
+            convs = data.get("conversations", [])
+            active_conv = next((c for c in convs if c.get("conversation_id") == st.session_state["active_conversation_id"]), None)
+            if active_conv and active_conv.get("message_count", 0) > 0:
+                # Mesajları backend'den al
+                r2 = requests.get(
+                    f"{BACKEND_URL}/api/sessions/{st.session_state['username']}",
+                    headers={"Authorization": f"Bearer {st.session_state['token']}"},
+                    timeout=10
+                )
+                if r2.status_code == 200:
+                    data2 = r2.json()
+                    messages = data2.get("messages", [])
+                    # LLM formatını Streamlit formatına çevir
+                    for msg in messages:
+                        st.session_state["messages"].append({
+                            "role": msg.get("role"),
+                            "content": msg.get("content")
+                        })
+    except:
+        pass  # İlk yükleme başarısız olursa devam et
 
 # Yeni prosedür bildirimi kontrolü (giriş yapılmışsa)
 if st.session_state.get("token"):
@@ -323,6 +370,90 @@ with st.sidebar:
     
     st.divider()
     
+    # Yeni Sohbet butonu
+    if st.button("➕ Yeni Sohbet", use_container_width=True, type="primary"):
+        # Yeni conversation oluştur
+        try:
+            r = requests.post(
+                f"{BACKEND_URL}/api/conversations/new",
+                headers={"Authorization": f"Bearer {st.session_state['token']}"},
+                timeout=10
+            )
+            if r.status_code == 200:
+                st.session_state["messages"] = []  # Mesajları temizle
+                st.success("Yeni sohbet başlatıldı!")
+                st.rerun()
+        except Exception as e:
+            st.error(f"Sohbet oluşturulamadı: {e}")
+    
+    st.divider()
+    
+    # Geçmiş Sohbetler
+    st.markdown("### 💬 Geçmiş Sohbetler")
+    
+    # Conversation'ları getir
+    try:
+        r = requests.get(
+            f"{BACKEND_URL}/api/conversations",
+            headers={"Authorization": f"Bearer {st.session_state['token']}"},
+            timeout=10
+        )
+        if r.status_code == 200:
+            data = r.json()
+            conversations = data.get("conversations", [])
+            active_conv_id = data.get("active_conversation_id")
+            
+            # Conversation listesi göster
+            if conversations:
+                for conv in conversations[:10]:  # İlk 10'u göster
+                    conv_id = conv.get("conversation_id")
+                    title = conv.get("title", "Başlıksız")
+                    is_active = conv.get("is_active", False)
+                    msg_count = conv.get("message_count", 0)
+                    
+                    # Aktif conversation'ı vurgula
+                    if is_active:
+                        label = f"🔵 {title} ({msg_count})"
+                    else:
+                        label = f"{title} ({msg_count})"
+                    
+                    # Conversation butonu
+                    if st.button(label, key=f"conv_{conv_id}", use_container_width=True):
+                        # Conversation'ı değiştir
+                        try:
+                            r = requests.post(
+                                f"{BACKEND_URL}/api/conversations/{conv_id}/switch",
+                                headers={"Authorization": f"Bearer {st.session_state['token']}"},
+                                timeout=10
+                            )
+                            if r.status_code == 200:
+                                # Yeni conversation'ın mesajlarını yükle
+                                st.session_state["messages"] = []
+                                # Mesajları backend'den al
+                                r2 = requests.get(
+                                    f"{BACKEND_URL}/api/sessions/{st.session_state['username']}",
+                                    headers={"Authorization": f"Bearer {st.session_state['token']}"},
+                                    timeout=10
+                                )
+                                if r2.status_code == 200:
+                                    data = r2.json()
+                                    messages = data.get("messages", [])
+                                    # LLM formatını Streamlit formatına çevir
+                                    for msg in messages:
+                                        st.session_state["messages"].append({
+                                            "role": msg.get("role"),
+                                            "content": msg.get("content")
+                                        })
+                                st.rerun()
+                        except:
+                            st.error("Sohbet değiştirilemedi")
+            else:
+                st.caption("Henüz sohbet yok")
+    except:
+        st.caption("Sohbetler yüklenemedi")
+    
+    st.divider()
+    
     # Yeni prosedür bildirimi
     new_procedures = st.session_state.get("new_procedures_notification", [])
     if new_procedures:
@@ -389,16 +520,18 @@ if "example_question" in st.session_state:
             else:
                 st.markdown(response or "")
                 add_message("assistant", response or "")
+    
     st.rerun()
 
 # Chat input - her zaman en altta görünür olmalı
-# Streamlit otomatik olarak sayfanın en altına yerleştirir
-user_prompt = st.chat_input("Mesajınızı yazın...")
+# Sabit key kullanarak URL değişikliğini minimize et
+user_prompt = st.chat_input("Mesajınızı yazın...", key="main_chat_input")
 
 # Kullanıcı mesajını işle
 if user_prompt:
     # Mesajı session state'e ekle
     add_message("user", user_prompt)
+    
     # Kullanıcı mesajını göster
     with st.chat_message("user"):
         st.markdown(user_prompt)
@@ -413,7 +546,9 @@ if user_prompt:
             else:
                 st.markdown(response or "")
                 add_message("assistant", response or "")
+    
     # Sayfayı yenile - örnek soruların kaybolması için
+    # use_container_width=False ile URL değişikliğini minimize et
     st.rerun()
 
 # Footer

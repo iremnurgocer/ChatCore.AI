@@ -1,12 +1,13 @@
 """
 Intent ve Entity çıkarım Modülü
 Kullanıcı sorgularını analiz eder ve anlam çıkarır
+Gelişmiş NLP servisi ile entegre
 """
 import re
 from typing import Dict, List, Optional, Tuple
 
 class IntentClassifier:
-    """Sorgu intent'ini sınıflandırır"""
+    """Sorgu intent'ini sınıflandırır (Gelişmiş NLP servisi ile entegre)"""
     
     INTENT_PATTERNS = {
         "employee_query": [
@@ -98,13 +99,37 @@ class IntentClassifier:
         return entities
     
     @staticmethod
-    def analyze_query(query: str) -> Dict:
-        """Tam sorgu analizi"""
+    def analyze_query(query: str, use_advanced: bool = True) -> Dict:
+        """
+        Tam sorgu analizi
+        
+        Args:
+            query: Kullanıcı sorgusu
+            use_advanced: Gelişmiş NLP servisi kullan (True) veya basit (False)
+        
+        Returns:
+            Analiz sonucu
+        """
+        # Gelişmiş NLP servisi varsa kullan
+        if use_advanced:
+            try:
+                from nlp_service_advanced import AdvancedNLPService
+                nlp_service = AdvancedNLPService()
+                return nlp_service.analyze_query_advanced(query)
+            except ImportError:
+                # Fallback to basic
+                pass
+            except Exception:
+                # Fallback to basic
+                pass
+        
+        # Basit analiz (fallback)
         intent = IntentClassifier.classify_intent(query)
         entities = IntentClassifier.extract_entities(query)
         
         return {
             "intent": intent,
             "entities": entities,
-            "original_query": query
+            "original_query": query,
+            "confidence": 0.5
         }

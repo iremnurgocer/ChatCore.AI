@@ -56,9 +56,32 @@ exit /b 1
 
 :python_found
 
+REM .env dosyasi kontrolu
+echo .env dosyasi kontrol ediliyor...
+if not exist "backend\.env" (
+    echo.
+    echo [UYARI] .env dosyasi bulunamadi!
+    echo.
+    echo Once kurulum.bat dosyasini calistirin.
+    echo.
+    pause
+    exit /b 1
+)
+
+REM Virtual environment kontrolu
+if not exist "backend\venv\Scripts\activate.bat" (
+    echo.
+    echo [UYARI] Virtual environment bulunamadi!
+    echo.
+    echo Once kurulum.bat dosyasini calistirin.
+    echo.
+    pause
+    exit /b 1
+)
+
 REM Backend'i baslat
 echo [1/2] Backend baslatiliyor (Port 8000)...
-start "ChatCore Backend" cmd /k "cd /d %~dp0backend && if exist venv\Scripts\activate.bat (call venv\Scripts\activate.bat && %PYTHON_CMD% -m uvicorn main:app --reload --host 0.0.0.0 --port 8000) else (echo [HATA] Virtual environment bulunamadi! Kurulum.bat calistirin && pause)"
+start "ChatCore Backend" cmd /k "cd /d %~dp0backend && call venv\Scripts\activate.bat && %PYTHON_CMD% -m uvicorn main:app --reload --host 0.0.0.0 --port 8000"
 
 REM Backend'in baslamasi ve hazir olmasi icin bekle
 echo Backend'in hazir olmasi bekleniyor...
@@ -68,7 +91,7 @@ echo.
 
 REM Frontend'i baslat
 echo [2/2] Frontend baslatiliyor (Port 8501)...
-start "ChatCore Frontend" cmd /k "cd /d %~dp0 && if exist backend\venv\Scripts\activate.bat (call backend\venv\Scripts\activate.bat && cd frontend && %PYTHON_CMD% -m streamlit run app.py --server.headless true) else (echo [HATA] Virtual environment bulunamadi! Kurulum.bat calistirin && pause)"
+start "ChatCore Frontend" cmd /k "cd /d %~dp0 && call backend\venv\Scripts\activate.bat && cd frontend && %PYTHON_CMD% -m streamlit run app.py --server.headless true"
 
 timeout /t 2 /nobreak >nul
 

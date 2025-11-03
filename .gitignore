@@ -55,6 +55,10 @@ backend/logs/
 *.sqlite
 *.sqlite3
 
+# TinyDB (Session ve Chat History)
+backend/data/sessions.json
+*.json.bak
+
 # Jupyter Notebook
 .ipynb_checkpoints
 

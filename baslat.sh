@@ -47,10 +47,22 @@ if [ -z "$PYTHON_CMD" ]; then
     exit 1
 fi
 
+# .env dosyası kontrolü
+if [ ! -f "backend/.env" ]; then
+    echo ""
+    echo "[UYARI] .env dosyası bulunamadı!"
+    echo ""
+    echo "Önce kurulum.sh dosyasını çalıştırın."
+    echo ""
+    read -p "Devam etmek için Enter'a basın..."
+    exit 1
+fi
+
 # Virtual environment kontrolü
 if [ ! -d "backend/venv" ]; then
     echo ""
-    echo "[HATA] Virtual environment bulunamadı!"
+    echo "[UYARI] Virtual environment bulunamadı!"
+    echo ""
     echo "Önce kurulum.sh dosyasını çalıştırın."
     echo ""
     read -p "Devam etmek için Enter'a basın..."

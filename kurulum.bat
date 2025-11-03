@@ -203,10 +203,17 @@ echo.
 
 REM Bagimlilik dogrulama
 echo [5/6] Bagimliliklar dogrulanıyor...
-%PYTHON_CMD% -c "import fastapi; import streamlit; import langchain; import openai; print('OK - Tüm ana bagimliliklar yuklu!')" 2>nul
+%PYTHON_CMD% -c "import fastapi; import streamlit; import langchain; import openai; import tinydb; print('OK - Tüm ana bagimliliklar yuklu!')" 2>nul
 if errorlevel 1 (
     echo UYARI: Bazı bagimliliklar eksik olabilir.
     echo Tekrar yuklemek icin kurulum.bat dosyasini calistirin.
+    echo.
+    echo Eksik paketleri kontrol ediliyor...
+    %PYTHON_CMD% -c "import tinydb" 2>nul
+    if errorlevel 1 (
+        echo TinyDB eksik, yukleniyor...
+        %PYTHON_CMD% -m pip install "tinydb>=4.8.0" --quiet --no-warn-script-location
+    )
 ) else (
     echo Tüm ana bagimliliklar dogrulandi ve hazir!
 )
@@ -333,7 +340,29 @@ echo ========================================
 echo KURULUM TAMAMLANDI!
 echo ========================================
 echo.
-echo Simdi baslat.bat dosyasini calistirarak servisleri baslatabilirsiniz.
+echo ONEMLI ADIMLAR:
+echo.
+echo 1. API KEY EKLEME (Gerekli):
+echo    - backend\.env dosyasini acin
+echo    - GEMINI_API_KEY=your-gemini-api-key-here satirini bulun
+echo    - your-gemini-api-key-here yerine API anahtarinizi yapistirin
+echo    - Dosyayi kaydedin (Ctrl+S)
+echo.
+echo    API Key almak icin:
+echo    https://makersuite.google.com/app/apikey
+echo.
+echo 2. SERVISLERI BASLATMA:
+echo    - baslat.bat dosyasina cift tiklayin
+echo    - Backend ve Frontend otomatik baslar
+echo    - Tarayicinizda: http://localhost:8501
+echo    - Giris: admin / 1234
+echo.
+echo NOT: Eger farkli bir AI saglayici kullanmak istiyorsaniz:
+echo      - kurulum_openai.bat (OpenAI icin)
+echo      - kurulum_azure.bat (Azure OpenAI icin)
+echo      - kurulum_ollama.bat (Ollama icin)
+echo.
+echo Detayli bilgi icin README.md dosyasina bakin.
 echo.
 pause
 

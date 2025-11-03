@@ -118,6 +118,9 @@ def get_vector_store(force_reload: bool = False):
             embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
         else:
             # Free alternative
+            if SentenceTransformerEmbeddings is None:
+                print("Uyarı: SentenceTransformerEmbeddings kullanılamıyor, embeddings oluşturulamadı")
+                return None, None
             embeddings = SentenceTransformerEmbeddings(
                 model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
             )
@@ -164,16 +167,21 @@ def get_vector_store(force_reload: bool = False):
         print(f"Uyarı: Vector store oluşturma hatası: {e}")
         return None, None
 
-def ask_ai(prompt: str, conversation_history: Optional[List] = None) -> str:
+def ask_ai(prompt: str, conversation_history: Optional[List] = None, use_advanced_rag: bool = None, 
+           use_cache: bool = True, use_fallback: bool = None) -> str:
     """
-    AI sorguları için ana giriş noktası
+    AI sorguları için ana giriş noktası (Gelişmiş RAG, Cache ve Fallback desteği ile)
 
     İstekleri yapılandırmaya göre uygun AI sağlayıcıya yönlendirir.
     Çoklu sağlayıcı desteği: OpenAI, Azure, Gemini, Ollama, Hugging Face, Local.
+    Tüm sağlayıcılar için gelişmiş RAG, cache ve fallback desteği.
 
     Args:
         prompt: Kullanıcı sorgusu veya mesajı
         conversation_history: Context için önceki mesajların opsiyonel listesi
+        use_advanced_rag: Gelişmiş RAG kullan (hybrid search, re-ranking)
+        use_cache: Response cache kullan
+        use_fallback: Model fallback mekanizması kullan
 
     Returns:
         AI tarafından üretilmiş yanıt string olarak
@@ -181,37 +189,107 @@ def ask_ai(prompt: str, conversation_history: Optional[List] = None) -> str:
     if not prompt or not prompt.strip():
         return "Lütfen bir soru veya metin girin."
     
+    # Performans yapılandırması (hızlı mod varsayılan)
+    try:
+        from performance_config import ADVANCED_RAG_ENABLED, FALLBACK_ENABLED
+        if use_advanced_rag is None:
+            use_advanced_rag = ADVANCED_RAG_ENABLED
+        if use_fallback is None:
+            use_fallback = FALLBACK_ENABLED
+    except ImportError:
+        # Varsayılan değerler (hızlı mod)
+        if use_advanced_rag is None:
+            use_advanced_rag = False
+        if use_fallback is None:
+            use_fallback = False
+    
     start_time = time.time()
 
+    # Cache kontrolü
+    if use_cache:
+        try:
+            from ai_cache import get_ai_cache
+            from ai_service import AI_PROVIDER
+            
+            cache = get_ai_cache()
+            # Conversation context hash (son 2 mesaj)
+            context_hash = ""
+            if conversation_history:
+                last_messages = conversation_history[-2:] if len(conversation_history) >= 2 else conversation_history
+                context_str = "|".join([m.get('content', '')[:50] for m in last_messages if isinstance(m, dict)])
+                import hashlib
+                context_hash = hashlib.md5(context_str.encode()).hexdigest()
+            
+            cached_response = cache.get(prompt, AI_PROVIDER, context_hash)
+            if cached_response:
+                print(f"Cache hit - Yanıt cache'den döndü")
+                return cached_response
+        except Exception as e:
+            print(f"Cache kontrolü hatası (devam ediliyor): {e}")
+
     try:
-        if AI_PROVIDER == "OPENAI":
-            if not OPENAI_API_KEY:
-                return "OpenAI API key not found."
-            return ask_openai_langchain(prompt, conversation_history)
-
-        elif AI_PROVIDER == "AZURE":
-            if not AZURE_OPENAI_API_KEY or not AZURE_OPENAI_ENDPOINT:
-                return "Azure API credentials missing."
-            return ask_azure(prompt, conversation_history)
+        response = None
+        provider_used = AI_PROVIDER
         
-        elif AI_PROVIDER == "GEMINI":
-            if not GEMINI_API_KEY:
-                return "Gemini API key not found. Please set GEMINI_API_KEY environment variable."
-            return ask_gemini(prompt, conversation_history)
+        try:
+            if AI_PROVIDER == "OPENAI":
+                if not OPENAI_API_KEY:
+                    raise Exception("OpenAI API key not found.")
+                response = ask_openai_with_rag(prompt, conversation_history, use_advanced_rag)
+
+            elif AI_PROVIDER == "AZURE":
+                if not AZURE_OPENAI_API_KEY or not AZURE_OPENAI_ENDPOINT:
+                    raise Exception("Azure API credentials missing.")
+                response = ask_azure_with_rag(prompt, conversation_history, use_advanced_rag)
+            
+            elif AI_PROVIDER == "GEMINI":
+                if not GEMINI_API_KEY:
+                    raise Exception("Gemini API key not found.")
+                response = ask_gemini_with_rag(prompt, conversation_history, use_advanced_rag)
+            
+            elif AI_PROVIDER == "OLLAMA":
+                response = ask_ollama_with_rag(prompt, conversation_history, use_advanced_rag)
+
+            elif AI_PROVIDER == "HUGGINGFACE":
+                if not HUGGINGFACE_API_KEY:
+                    raise Exception("Hugging Face API key missing.")
+                response = ask_huggingface_with_rag(prompt, use_advanced_rag)
+
+            elif AI_PROVIDER == "LOCAL":
+                response = ask_local_with_rag(prompt, use_advanced_rag)
+
+            else:
+                response = f"Unknown AI_PROVIDER value: {AI_PROVIDER}"
         
-        elif AI_PROVIDER == "OLLAMA":
-            return ask_ollama(prompt, conversation_history)
-
-        elif AI_PROVIDER == "HUGGINGFACE":
-            if not HUGGINGFACE_API_KEY:
-                return "Hugging Face API key missing."
-            return ask_huggingface(prompt)
-
-        elif AI_PROVIDER == "LOCAL":
-            return ask_local(prompt)
-
-        else:
-            return f"Unknown AI_PROVIDER value: {AI_PROVIDER}"
+        except Exception as e:
+            print(f"Primary provider hatası ({AI_PROVIDER}): {e}")
+            response = None
+        
+        # Fallback mekanizması
+        if (not response or len(response.strip()) < 10 or response.startswith("Error") or 
+            response.startswith("Hata")) and use_fallback:
+            try:
+                from ai_fallback import AIFallback
+                fallback_response, fallback_provider = AIFallback.try_with_fallback(
+                    prompt, conversation_history, AI_PROVIDER, str(e) if 'e' in locals() else ""
+                )
+                if fallback_response:
+                    response = fallback_response
+                    provider_used = fallback_provider
+                    print(f"Fallback başarılı: {fallback_provider} kullanıldı")
+            except Exception as fallback_error:
+                print(f"Fallback hatası: {fallback_error}")
+        
+        # Cache'e kaydet
+        if response and use_cache:
+            try:
+                from ai_cache import get_ai_cache
+                cache = get_ai_cache()
+                cache.set(prompt, provider_used, response, context_hash)
+            except:
+                pass
+        
+        return response if response else "Yanıt alınamadı. Lütfen tekrar deneyin."
 
     except Exception as e:
         print(f"AI servis hatası: {e}")
@@ -219,6 +297,101 @@ def ask_ai(prompt: str, conversation_history: Optional[List] = None) -> str:
     finally:
         elapsed = time.time() - start_time
         print(f"Yanıt süresi: {elapsed:.2f}s")
+
+def ask_openai_with_rag(prompt: str, conversation_history: Optional[List] = None, use_advanced_rag: bool = True) -> str:
+    """
+    OpenAI GPT with Advanced RAG (Retrieval-Augmented Generation)
+    
+    Uses advanced RAG service with hybrid search, multi-query, and re-ranking.
+    Falls back to basic RAG or direct OpenAI call if needed.
+    
+    Args:
+        prompt: User query
+        conversation_history: Previous conversation messages
+        use_advanced_rag: Use advanced RAG (hybrid search, re-ranking)
+        
+    Returns:
+        AI response based on retrieved company data
+    """
+    try:
+        vector_store, embeddings = get_vector_store()
+        
+        if vector_store is None:
+            return ask_openai_direct(prompt, conversation_history)
+        
+        # RAG servisi kullan (optimize - hızlı mod)
+        context = ""
+        if use_advanced_rag:
+            try:
+                from rag_service import get_rag_service
+                rag_service = get_rag_service(vector_store, embeddings)
+                # Hızlı mod: k=3, hybrid=False (daha hızlı)
+                context = rag_service.retrieve_context(prompt, k=3, use_hybrid=False)
+            except ImportError:
+                # Fallback to basic RAG
+                use_advanced_rag = False
+            except Exception as e:
+                print(f"Gelişmiş RAG hatası (fallback): {e}")
+                use_advanced_rag = False
+        
+        # Basit RAG fallback (optimize - daha az document)
+        if not context or not use_advanced_rag:
+            docs = vector_store.similarity_search(prompt, k=3)  # 5->3 (daha hızlı)
+            if docs:
+                context_parts = []
+                for doc in docs:
+                    try:
+                        data = json.loads(doc.page_content)
+                        doc_type = doc.metadata.get("type", "data")
+                        if doc_type == "employees":
+                            context_parts.append(f"Çalışan: {data.get('name', 'N/A')} - {data.get('department', 'N/A')}, {data.get('position', 'N/A')}")
+                        elif doc_type == "projects":
+                            context_parts.append(f"Proje: {data.get('name', 'N/A')} - {data.get('status', 'N/A')}, {data.get('department', 'N/A')}")
+                        elif doc_type == "departments":
+                            context_parts.append(f"Departman: {data.get('name', 'N/A')} - {data.get('director', 'N/A')}")
+                        else:
+                            context_parts.append(doc.page_content[:200])
+                    except:
+                        context_parts.append(doc.page_content[:200])
+                context = "\n\n".join(context_parts)
+        
+        # LLM model
+        llm = ChatOpenAI(
+            model="gpt-3.5-turbo",
+            temperature=0.3,
+            openai_api_key=OPENAI_API_KEY
+        )
+        
+        # Conversation history için mesaj formatı
+        messages = []
+        
+        # System prompt
+        system_msg = f"""{SYSTEM_PROMPT}
+
+Şirket Bilgileri (Sadece bu bilgilere göre cevap verin):
+{context}""" if context else SYSTEM_PROMPT
+        
+        messages.append({"role": "system", "content": system_msg})
+        
+        # Conversation history
+        if conversation_history:
+            recent_history = conversation_history[-5:] if len(conversation_history) > 5 else conversation_history
+            valid_history = [
+                m for m in recent_history 
+                if isinstance(m, dict) and "role" in m and "content" in m
+            ]
+            messages.extend(valid_history)
+        
+        # User query
+        messages.append({"role": "user", "content": prompt})
+        
+        # LLM invoke
+        response = llm.invoke(messages)
+        return response.content.strip()
+        
+    except Exception as e:
+        print(f"OpenAI RAG hatası: {e}")
+        return ask_openai_direct(prompt, conversation_history)
 
 def ask_openai_langchain(prompt: str, conversation_history: Optional[List] = None) -> str:
     """
@@ -247,8 +420,8 @@ def ask_openai_langchain(prompt: str, conversation_history: Optional[List] = Non
             openai_api_key=OPENAI_API_KEY
         )
         
-        # Context retrieval
-        docs = vector_store.similarity_search(prompt, k=3)
+        # Context retrieval (optimize - hızlı)
+        docs = vector_store.similarity_search(prompt, k=3)  # Zaten optimize edilmiş
         context = "\n\n".join([doc.page_content for doc in docs])
         
         # Prompt template
@@ -263,7 +436,7 @@ Answer (based only on provided information, professional and clear):"""
         
         response = llm.invoke(prompt_template)
         return response.content.strip()
-        
+
     except Exception as e:
         print(f"LangChain/OpenAI hatas�: {e}")
         return ask_openai_direct(prompt, conversation_history)
@@ -312,19 +485,46 @@ def ask_openai_direct(prompt: str, conversation_history: Optional[List] = None) 
     except Exception as e:
         return f"OpenAI response error: {e}"
 
-def ask_azure(prompt: str, conversation_history: Optional[List] = None) -> str:
+def ask_azure_with_rag(prompt: str, conversation_history: Optional[List] = None, use_advanced_rag: bool = True) -> str:
     """
-    Azure OpenAI service integration
+    Azure OpenAI with Advanced RAG
     
     Args:
         prompt: User query
         conversation_history: Previous conversation messages
+        use_advanced_rag: Use advanced RAG
         
     Returns:
-        Azure OpenAI generated response
+        Azure OpenAI generated response with company context
     """
     try:
         from openai import AzureOpenAI
+        
+        # RAG context al
+        context = ""
+        try:
+            vector_store, embeddings = get_vector_store()
+            if vector_store:
+                if use_advanced_rag:
+                    try:
+                        from rag_service import get_rag_service
+                        rag_service = get_rag_service(vector_store, embeddings)
+                        context = rag_service.retrieve_context(prompt, k=5, use_hybrid=True)
+                    except:
+                        # Basic RAG fallback
+                        docs = vector_store.similarity_search(prompt, k=3)
+                        if docs:
+                            from rag_service import AdvancedRAGService
+                            rag_temp = AdvancedRAGService(vector_store, embeddings)
+                            context = rag_temp.format_context_for_ai(docs, prompt)
+                else:
+                    docs = vector_store.similarity_search(prompt, k=5)
+                    if docs:
+                        from rag_service import AdvancedRAGService
+                        rag_temp = AdvancedRAGService(vector_store, embeddings)
+                        context = rag_temp.format_context_for_ai(docs, prompt)
+        except Exception as e:
+            print(f"RAG context alınamadı (devam ediliyor): {e}")
         
         client = AzureOpenAI(
             api_key=AZURE_OPENAI_API_KEY,
@@ -332,7 +532,14 @@ def ask_azure(prompt: str, conversation_history: Optional[List] = None) -> str:
             azure_endpoint=AZURE_OPENAI_ENDPOINT
         )
         
-        messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+        system_msg = SYSTEM_PROMPT
+        if context:
+            system_msg = f"""{SYSTEM_PROMPT}
+
+Şirket Bilgileri (Sadece bu bilgilere göre cevap verin):
+{context}"""
+        
+        messages = [{"role": "system", "content": system_msg}]
         if conversation_history:
             recent_history = conversation_history[-5:] if len(conversation_history) > 5 else conversation_history
             valid_history = [
@@ -346,7 +553,7 @@ def ask_azure(prompt: str, conversation_history: Optional[List] = None) -> str:
             model=AZURE_OPENAI_DEPLOYMENT,
             messages=messages,
             temperature=0.5,
-            max_tokens=400
+            max_tokens=600
         )
 
         if not response.choices or len(response.choices) == 0:
@@ -358,14 +565,18 @@ def ask_azure(prompt: str, conversation_history: Optional[List] = None) -> str:
         print(f"Azure OpenAI hatası: {e}")
         return f"Azure response error: {e}"
 
-def ask_gemini(prompt: str, conversation_history: Optional[List] = None) -> str:
+def ask_azure(prompt: str, conversation_history: Optional[List] = None) -> str:
+    """Backward compatibility wrapper"""
+    return ask_azure_with_rag(prompt, conversation_history, use_advanced_rag=True)
+
+def ask_gemini_with_rag(prompt: str, conversation_history: Optional[List] = None, use_advanced_rag: bool = True) -> str:
     """
-    Google Gemini API integration (free tier available)
-    RAG (Retrieval-Augmented Generation) desteği ile - şirket verilerini kullanır.
+    Google Gemini API with Advanced RAG
     
     Args:
         prompt: User query
-        conversation_history: Previous messages for context (last 3 used)
+        conversation_history: Previous messages for context
+        use_advanced_rag: Use advanced RAG (hybrid search, re-ranking)
         
     Returns:
         Gemini generated response with company data context
@@ -374,58 +585,30 @@ def ask_gemini(prompt: str, conversation_history: Optional[List] = None) -> str:
         if not GEMINI_API_KEY or GEMINI_API_KEY == "your-gemini-api-key-here":
             return "Gemini API key bulunamadı. Lütfen backend/.env dosyasında GEMINI_API_KEY'i ayarlayın."
         
-        # RAG: Vector store'dan şirket verilerini çek
+        # Gelişmiş RAG context al
         company_context = ""
         try:
             vector_store, embeddings = get_vector_store()
             if vector_store is not None:
-                # Benzer dökümanları bul (en fazla 5)
-                docs = vector_store.similarity_search(prompt, k=5)
-                if docs:
-                    # JSON formatındaki verileri okuyucu için düzenle
-                    context_parts = []
-                    for doc in docs:
-                        try:
-                            # JSON'ı parse et ve okunabilir formata çevir
-                            import json
-                            data = json.loads(doc.page_content)
-                            doc_type = doc.metadata.get("type", "data")
-                            
-                            # Tipine göre formatla
-                            if doc_type == "employees":
-                                context_parts.append(
-                                    f"Çalışan: {data.get('name', 'N/A')} - "
-                                    f"Departman: {data.get('department', 'N/A')}, "
-                                    f"Pozisyon: {data.get('position', 'N/A')}, "
-                                    f"Lokasyon: {data.get('location', 'N/A')}, "
-                                    f"Projeler: {', '.join(data.get('projects', []))}"
-                                )
-                            elif doc_type == "projects":
-                                context_parts.append(
-                                    f"Proje: {data.get('name', 'N/A')} - "
-                                    f"Durum: {data.get('status', 'N/A')}, "
-                                    f"Departman: {data.get('department', 'N/A')}, "
-                                    f"Yönetici: {data.get('project_manager', 'N/A')}, "
-                                    f"Lokasyon: {data.get('location', 'N/A')}, "
-                                    f"Bütçe: {data.get('budget', 'N/A')}"
-                                )
-                            elif doc_type == "departments":
-                                context_parts.append(
-                                    f"Departman: {data.get('name', 'N/A')} - "
-                                    f"Direktör: {data.get('director', 'N/A')}, "
-                                    f"Çalışan Sayısı: {data.get('employee_count', 'N/A')}, "
-                                    f"Bütçe: {data.get('budget_2024', 'N/A')}, "
-                                    f"Lokasyon: {data.get('location', 'N/A')}"
-                                )
-                            else:
-                                # Genel format
-                                context_parts.append(doc.page_content)
-                        except Exception:
-                            # JSON parse edilemezse ham içeriği kullan
-                            context_parts.append(doc.page_content[:200])
-                    
-                    if context_parts:
-                        company_context = "\n\n".join(context_parts)
+                if use_advanced_rag:
+                    try:
+                        from rag_service import get_rag_service
+                        rag_service = get_rag_service(vector_store, embeddings)
+                        company_context = rag_service.retrieve_context(prompt, k=3, use_hybrid=False)
+                    except Exception as e:
+                        print(f"Gelişmiş RAG hatası (fallback): {e}")
+                        # Basic RAG fallback
+                        docs = vector_store.similarity_search(prompt, k=3)
+                        if docs:
+                            from rag_service import AdvancedRAGService
+                            rag_temp = AdvancedRAGService(vector_store, embeddings)
+                            company_context = rag_temp.format_context_for_ai(docs, prompt)
+                else:
+                    docs = vector_store.similarity_search(prompt, k=5)
+                    if docs:
+                        from rag_service import AdvancedRAGService
+                        rag_temp = AdvancedRAGService(vector_store, embeddings)
+                        company_context = rag_temp.format_context_for_ai(docs, prompt)
         except Exception as e:
             print(f"RAG context alınamadı (devam ediliyor): {e}")
         
@@ -569,23 +752,64 @@ Yanıt (sadece yukarıdaki şirket verilerine göre, açık ve profesyonel):"""
         
         return f"Gemini hatası: {error_msg[:200]}\n\nÇözüm: Ollama kullanın (tamamen ücretsiz, yerel): AI_PROVIDER=OLLAMA"
 
-def ask_ollama(prompt: str, conversation_history: Optional[List] = None) -> str:
+def ask_gemini(prompt: str, conversation_history: Optional[List] = None) -> str:
+    """Backward compatibility wrapper"""
+    return ask_gemini_with_rag(prompt, conversation_history, use_advanced_rag=True)
+
+def ask_ollama_with_rag(prompt: str, conversation_history: Optional[List] = None, use_advanced_rag: bool = True) -> str:
     """
-    Ollama local model integration (free, runs offline)
+    Ollama local model with Advanced RAG (free, runs offline)
     
     Requires Ollama server to be running locally. Ideal for privacy-sensitive deployments.
     
     Args:
         prompt: User query
-        conversation_history: Not currently used for Ollama
+        conversation_history: Previous conversation messages
+        use_advanced_rag: Use advanced RAG
         
     Returns:
-        Ollama model generated response
+        Ollama model generated response with company context
     """
     try:
+        # RAG context al
+        company_context = ""
+        try:
+            vector_store, embeddings = get_vector_store()
+            if vector_store:
+                if use_advanced_rag:
+                    try:
+                        from rag_service import get_rag_service
+                        rag_service = get_rag_service(vector_store, embeddings)
+                        company_context = rag_service.retrieve_context(prompt, k=3, use_hybrid=False)
+                    except:
+                        docs = vector_store.similarity_search(prompt, k=3)
+                        if docs:
+                            from rag_service import AdvancedRAGService
+                            rag_temp = AdvancedRAGService(vector_store, embeddings)
+                            company_context = rag_temp.format_context_for_ai(docs, prompt)
+                else:
+                    docs = vector_store.similarity_search(prompt, k=5)
+                    if docs:
+                        from rag_service import AdvancedRAGService
+                        rag_temp = AdvancedRAGService(vector_store, embeddings)
+                        company_context = rag_temp.format_context_for_ai(docs, prompt)
+        except Exception as e:
+            print(f"RAG context alınamadı (devam ediliyor): {e}")
+        
         url = f"{OLLAMA_BASE_URL}/api/generate"
         
-        full_prompt = f"{SYSTEM_PROMPT}\n\nUser Question: {prompt}"
+        # Context ile prompt hazırla
+        if company_context:
+            full_prompt = f"""{SYSTEM_PROMPT}
+
+Şirket Bilgileri (Sadece bu bilgilere göre cevap verin):
+{company_context}
+
+Soru: {prompt}
+
+Yanıt (sadece yukarıdaki şirket verilerine göre):"""
+        else:
+            full_prompt = f"{SYSTEM_PROMPT}\n\nSoru: {prompt}"
         
         if conversation_history:
             recent_history = conversation_history[-3:] if len(conversation_history) > 3 else conversation_history
@@ -595,7 +819,7 @@ def ask_ollama(prompt: str, conversation_history: Optional[List] = None) -> str:
                 if isinstance(m, dict)
             ])
             if history_text:
-                full_prompt = f"{full_prompt}\n\nPrevious Conversation:\n{history_text}"
+                full_prompt = f"{full_prompt}\n\nÖnceki Konuşma:\n{history_text}"
         
         payload = {
             "model": OLLAMA_MODEL,
@@ -603,11 +827,11 @@ def ask_ollama(prompt: str, conversation_history: Optional[List] = None) -> str:
             "stream": False
         }
         
-        response = requests.post(url, json=payload, timeout=120)  # Ollama yavaş olabilir
+        response = requests.post(url, json=payload, timeout=60)  # 120->60 (daha hızlı yanıt)
         
         if response.status_code != 200:
             error_msg = response.text if hasattr(response, 'text') else "Unknown error"
-            return f"Ollama hatası: Ollama sunucusunun çalıştığından emin olun.\n\nKurulum:\n1. https://ollama.ai adresinden Ollama'yı indirin\n2. Model indirin: ollama pull {OLLAMA_MODEL}\n3. Ollama'yı başlatın: ollama serve\n\nDetaylar için OLLAMA_KURULUM.md dosyasına bakın."
+            return f"Ollama hatası: Ollama sunucusunun çalıştığından emin olun.\n\nKurulum:\n1. https://ollama.ai adresinden Ollama'yı indirin\n2. Model indirin: ollama pull {OLLAMA_MODEL}\n3. Ollama'yı başlatın: ollama serve\n\nDetaylar için KURULUM_OLLAMA.md dosyasına bakın."
         
         data = response.json()
         response_text = data.get("response", "Response not available").strip()
@@ -618,25 +842,66 @@ def ask_ollama(prompt: str, conversation_history: Optional[List] = None) -> str:
         return response_text
         
     except requests.exceptions.ConnectionError:
-        return f"Ollama'ya bağlanılamadı. Ollama sunucusunun çalıştığından emin olun ({OLLAMA_BASE_URL}).\n\nKurulum:\n1. https://ollama.ai adresinden Ollama'yı indirin\n2. PowerShell'de: ollama pull {OLLAMA_MODEL}\n3. Ollama'yı başlatın: ollama serve\n\nDetaylar: OLLAMA_KURULUM.md"
+        return f"Ollama'ya bağlanılamadı. Ollama sunucusunun çalıştığından emin olun ({OLLAMA_BASE_URL}).\n\nKurulum:\n1. https://ollama.ai adresinden Ollama'yı indirin\n2. PowerShell'de: ollama pull {OLLAMA_MODEL}\n3. Ollama'yı başlatın: ollama serve\n\nDetaylar: KURULUM_OLLAMA.md"
     except Exception as e:
         print(f"Ollama hatası: {e}")
-        return f"Ollama hatası: {str(e)}\n\nOllama kurulumu için OLLAMA_KURULUM.md dosyasına bakın."
+        return f"Ollama hatası: {str(e)}\n\nOllama kurulumu için KURULUM_OLLAMA.md dosyasına bakın."
 
-def ask_huggingface(prompt: str) -> str:
+def ask_ollama(prompt: str, conversation_history: Optional[List] = None) -> str:
+    """Backward compatibility wrapper"""
+    return ask_ollama_with_rag(prompt, conversation_history, use_advanced_rag=True)
+
+def ask_huggingface_with_rag(prompt: str, use_advanced_rag: bool = True) -> str:
     """
-    Hugging Face Inference API integration
+    Hugging Face Inference API with Advanced RAG
     
     Args:
         prompt: User query
+        use_advanced_rag: Use advanced RAG
         
     Returns:
-        Hugging Face model generated response
+        Hugging Face model generated response with company context
     """
     try:
+        # RAG context al
+        company_context = ""
+        try:
+            vector_store, embeddings = get_vector_store()
+            if vector_store:
+                if use_advanced_rag:
+                    try:
+                        from rag_service import get_rag_service
+                        rag_service = get_rag_service(vector_store, embeddings)
+                        company_context = rag_service.retrieve_context(prompt, k=3, use_hybrid=False)
+                    except:
+                        docs = vector_store.similarity_search(prompt, k=3)
+                        if docs:
+                            from rag_service import AdvancedRAGService
+                            rag_temp = AdvancedRAGService(vector_store, embeddings)
+                            company_context = rag_temp.format_context_for_ai(docs, prompt)
+                else:
+                    docs = vector_store.similarity_search(prompt, k=5)
+                    if docs:
+                        from rag_service import AdvancedRAGService
+                        rag_temp = AdvancedRAGService(vector_store, embeddings)
+                        company_context = rag_temp.format_context_for_ai(docs, prompt)
+        except Exception as e:
+            print(f"RAG context alınamadı (devam ediliyor): {e}")
+        
         url = f"https://api-inference.huggingface.co/models/{HUGGINGFACE_MODEL}"
         headers = {"Authorization": f"Bearer {HUGGINGFACE_API_KEY}"}
-        payload = {"inputs": f"{SYSTEM_PROMPT}\n\nQuestion: {prompt}"}
+        
+        if company_context:
+            full_prompt = f"""{SYSTEM_PROMPT}
+
+Şirket Bilgileri:
+{company_context}
+
+Soru: {prompt}"""
+        else:
+            full_prompt = f"{SYSTEM_PROMPT}\n\nSoru: {prompt}"
+        
+        payload = {"inputs": full_prompt}
 
         response = requests.post(url, headers=headers, json=payload, timeout=30)
         if response.status_code != 200:
@@ -653,25 +918,66 @@ def ask_huggingface(prompt: str) -> str:
         print(f"HuggingFace hatası: {e}")
         return f"Hugging Face response error: {e}"
 
-def ask_local(prompt: str) -> str:
+def ask_huggingface(prompt: str) -> str:
+    """Backward compatibility wrapper"""
+    return ask_huggingface_with_rag(prompt, use_advanced_rag=True)
+
+def ask_local_with_rag(prompt: str, use_advanced_rag: bool = True) -> str:
     """
-    Local transformer model using Hugging Face transformers library
+    Local transformer model with Advanced RAG
     
     Runs completely offline. Requires model to be downloaded first.
     May be slow on CPU-only systems.
     
     Args:
         prompt: User query
+        use_advanced_rag: Use advanced RAG
         
     Returns:
-        Locally generated response
+        Locally generated response with company context
     """
     try:
+        # RAG context al
+        company_context = ""
+        try:
+            vector_store, embeddings = get_vector_store()
+            if vector_store:
+                if use_advanced_rag:
+                    try:
+                        from rag_service import get_rag_service
+                        rag_service = get_rag_service(vector_store, embeddings)
+                        company_context = rag_service.retrieve_context(prompt, k=3, use_hybrid=False)
+                    except:
+                        docs = vector_store.similarity_search(prompt, k=3)
+                        if docs:
+                            from rag_service import AdvancedRAGService
+                            rag_temp = AdvancedRAGService(vector_store, embeddings)
+                            company_context = rag_temp.format_context_for_ai(docs, prompt)
+                else:
+                    docs = vector_store.similarity_search(prompt, k=5)
+                    if docs:
+                        from rag_service import AdvancedRAGService
+                        rag_temp = AdvancedRAGService(vector_store, embeddings)
+                        company_context = rag_temp.format_context_for_ai(docs, prompt)
+        except Exception as e:
+            print(f"RAG context alınamadı (devam ediliyor): {e}")
+        
         from transformers import pipeline
         generator = pipeline("text-generation", model="dbmdz/bert-base-turkish-cased")
+        
+        if company_context:
+            full_prompt = f"""{SYSTEM_PROMPT}
+
+Şirket Bilgileri:
+{company_context}
+
+Soru: {prompt}"""
+        else:
+            full_prompt = f"{SYSTEM_PROMPT}\n\nSoru: {prompt}"
+        
         output = generator(
-            f"{SYSTEM_PROMPT}\n\nQuestion: {prompt}",
-            max_length=150,
+            full_prompt,
+            max_length=200,
             num_return_sequences=1
         )
         
@@ -691,3 +997,7 @@ def ask_local(prompt: str) -> str:
     except Exception as e:
         print(f"Yerel model hatası: {e}")
         return "Local model could not be run. Internet connection or API key required."
+
+def ask_local(prompt: str) -> str:
+    """Backward compatibility wrapper"""
+    return ask_local_with_rag(prompt, use_advanced_rag=True)

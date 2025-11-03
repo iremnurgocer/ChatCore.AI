@@ -315,9 +315,9 @@ def ask_rag(request: dict, user_id: str = Depends(get_current_user)):
         # Intent ve entity çıkarımı
         analysis = IntentClassifier.analyze_query(query)
 
-        # AI yanıtını al
+        # AI yanıtını al (performans için: advanced_rag=False, fallback=False)
         conversation_history = session_manager.get_conversation_history(user_id)
-        response = ask_ai(query, conversation_history)
+        response = ask_ai(query, conversation_history, use_advanced_rag=False, use_fallback=False)
         
         # Session'a kaydet
         session_manager.add_message(user_id, "user", query)
@@ -381,13 +381,14 @@ def get_stats(user_id: str = Depends(get_current_user)):
 
 @app.get("/api/sessions/{session_id}")
 def get_session(session_id: str, user_id: str = Depends(get_current_user)):
-    """Session bilgilerini getirir"""
+    """Session bilgilerini getirir - aktif conversation'ın mesajlarını döner"""
     if session_id != user_id:
         APILogger.log_security_event("UNAUTHORIZED_ACCESS", f"User {user_id} tried to access session {session_id}", user_id, None)
         raise HTTPException(status_code=403, detail="Access denied")
     
     try:
-        history = session_manager.get_conversation_history(user_id)
+        # Aktif conversation'ın geçmişini getir
+        history = session_manager.get_conversation_history(user_id)  # conversation_id None, aktif conversation'ı kullanır
         context = session_manager.get_context(user_id)
         
         return {
@@ -478,6 +479,103 @@ def get_new_procedures(
     except Exception as e:
         APILogger.log_error("/api/procedures/new", e, user_id, ErrorCategory.DATABASE_ERROR)
         raise HTTPException(status_code=500, detail=f"Failed to retrieve new procedures: {str(e)}")
+
+@app.get("/api/conversations")
+def get_conversations(user_id: str = Depends(get_current_user)):
+    """Kullanıcının tüm conversation'larını getirir"""
+    try:
+        conversations = session_manager.get_user_conversations(user_id)
+        active_conv_id = session_manager.get_active_conversation_id(user_id)
+        
+        # Boş conversation'ları temizle
+        session_manager.cleanup_empty_conversations(user_id)
+        
+        # Her conversation için bilgi hazırla
+        conv_list = []
+        for conv in conversations:
+            conv_list.append({
+                "conversation_id": conv.get("conversation_id"),
+                "title": conv.get("title", "Yeni Sohbet"),
+                "created_at": conv.get("created_at"),
+                "updated_at": conv.get("updated_at"),
+                "message_count": conv.get("message_count", 0),
+                "is_active": conv.get("conversation_id") == active_conv_id
+            })
+        
+        return {
+            "success": True,
+            "conversations": conv_list,
+            "active_conversation_id": active_conv_id,
+            "count": len(conv_list)
+        }
+    except Exception as e:
+        APILogger.log_error("/api/conversations", e, user_id, ErrorCategory.DATABASE_ERROR)
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve conversations: {str(e)}")
+
+@app.post("/api/conversations/new")
+def create_conversation(user_id: str = Depends(get_current_user)):
+    """Yeni conversation oluşturur"""
+    try:
+        conversation_id = session_manager.create_conversation(user_id)
+        session_manager.set_active_conversation(user_id, conversation_id)
+        
+        return {
+            "success": True,
+            "conversation_id": conversation_id,
+            "message": "Yeni sohbet oluşturuldu"
+        }
+    except Exception as e:
+        APILogger.log_error("/api/conversations/new", e, user_id, ErrorCategory.DATABASE_ERROR)
+        raise HTTPException(status_code=500, detail=f"Failed to create conversation: {str(e)}")
+
+@app.post("/api/conversations/{conversation_id}/switch")
+def switch_conversation(conversation_id: str, user_id: str = Depends(get_current_user)):
+    """Aktif conversation'ı değiştirir"""
+    try:
+        # Conversation'ın kullanıcıya ait olduğunu kontrol et
+        conv = session_manager.get_conversation(conversation_id, user_id)
+        if not conv:
+            raise HTTPException(status_code=404, detail="Conversation not found")
+        
+        session_manager.set_active_conversation(user_id, conversation_id)
+        
+        return {
+            "success": True,
+            "conversation_id": conversation_id,
+            "message": "Aktif sohbet değiştirildi"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        APILogger.log_error(f"/api/conversations/{conversation_id}/switch", e, user_id, ErrorCategory.DATABASE_ERROR)
+        raise HTTPException(status_code=500, detail=f"Failed to switch conversation: {str(e)}")
+
+@app.delete("/api/conversations/{conversation_id}")
+def delete_conversation(conversation_id: str, user_id: str = Depends(get_current_user)):
+    """Conversation'ı siler"""
+    try:
+        # Conversation'ın kullanıcıya ait olduğunu kontrol et
+        conv = session_manager.get_conversation(conversation_id, user_id)
+        if not conv:
+            raise HTTPException(status_code=404, detail="Conversation not found")
+        
+        session_manager.delete_conversation(conversation_id, user_id)
+        
+        # Eğer silinen conversation aktifse, yeni bir tane oluştur
+        active_conv_id = session_manager.get_active_conversation_id(user_id)
+        if active_conv_id == conversation_id:
+            new_conv_id = session_manager.create_conversation(user_id)
+            session_manager.set_active_conversation(user_id, new_conv_id)
+        
+        return {
+            "success": True,
+            "message": "Sohbet silindi"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        APILogger.log_error(f"/api/conversations/{conversation_id}", e, user_id, ErrorCategory.DATABASE_ERROR)
+        raise HTTPException(status_code=500, detail=f"Failed to delete conversation: {str(e)}")
 
 @app.post("/api/procedures/{procedure_id}/mark-viewed")
 def mark_procedure_viewed(

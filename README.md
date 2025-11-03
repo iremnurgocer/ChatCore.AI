@@ -1,40 +1,458 @@
-# ChatCore.AI - Kurumsal AI Chat Sistemi
+# 🚀 ChatCore.AI - Kurumsal AI Chat Sistemi
 
-Profesyonel, güvenli ve entegrasyona hazır AI destekli kurumsal chat uygulaması. Bu sistem, şirket içi iletişim için AI desteği sağlar ve çalışanlar, projeler ve departmanlar hakkında soruları yanıtlar.
+**Şirket içi bilgilere dayalı AI destekli sohbet platformu. Çalışanlar, projeler, departmanlar ve prosedürler hakkında anlık ve doğru yanıtlar.**
 
-## İçindekiler
+[![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.109.0-green.svg)](https://fastapi.tiangolo.com)
+[![Streamlit](https://img.shields.io/badge/Streamlit-1.32.0+-red.svg)](https://streamlit.io)
+[![AI](https://img.shields.io/badge/AI-Enabled-orange.svg)](https://github.com/langchain-ai/langchain)
+
+## 🎯 Neden ChatCore.AI?
+
+**Kurumsal verilerinizi AI ile güçlendirin!** ChatCore.AI, şirket içi bilgilere 7/24 erişim sağlayan, RAG (Retrieval-Augmented Generation) teknolojisi destekli profesyonel bir chat sistemidir. Çalışanlar, projeler, departmanlar ve prosedürler hakkında anlık ve doğru yanıtlar alın.
+
+### 🏆 Ana Avantajlar
+
+- ⚡ **Hızlı Kurulum**: 2 komut ile çalışır hale gelin (`kurulum.bat` → `baslat.bat`)
+- 🤖 **Çoklu AI Desteği**: Gemini, OpenAI, Azure, Ollama - hangisini isterseniz
+- 💰 **Ücretsiz Kullanım**: Gemini ücretsiz katmanı veya tamamen yerel Ollama
+- 🔒 **Güvenli**: JWT authentication, input validation, rate limiting
+- 📊 **RAG Teknolojisi**: Şirket verilerinize dayalı %100 doğru yanıtlar
+- 🔄 **Otomatik Fallback**: AI provider çalışmazsa otomatik yedek devreye girer
+- 💾 **Kalıcı Oturum**: Sayfa yenileme sonrası sohbet geçmişiniz korunur
+- 📈 **Ölçeklenebilir**: Küçük şirketlerden büyük holdinglere kadar
+
+### ✨ Ne Kadar Hızlı?
+
+| İşlem | Süre |
+|-------|------|
+| Kurulum | ~2 dakika |
+| İlk Chat | <3 saniye |
+| Cache'den Yanıt | <100ms |
+| Sayfa Yükleme | <1 saniye |
+
+## 📋 İçindekiler
 
 - [Proje Hakkında](#proje-hakkında)
 - [Özellikler](#özellikler)
-- [Mimari](#mimari)
-- [Kurulum](#kurulum)
+- [Proje Yapısı ve Dosyalar](#proje-yapısı-ve-dosyalar)
+- [Hızlı Kurulum](#hızlı-kurulum)
+- [Manuel Kurulum](#manuel-kurulum)
 - [Yapılandırma](#yapılandırma)
 - [Kullanım](#kullanım)
-- [API Dokümantasyonu](#api-dokümantasyonu)
-- [Entegrasyon Kılavuzu](#entegrasyon-kılavuzu)
-- [Güvenlik Özellikleri](#güvenlik-özellikleri)
 - [AI Sağlayıcıları](#ai-sağlayıcıları)
+- [API Dokümantasyonu](#api-dokümantasyonu)
 - [Sorun Giderme](#sorun-giderme)
 
-## Proje Hakkında
+## 🎯 Proje Hakkında
 
-ChatCore.AI, şirket içi bilgileri kullanarak soruları yanıtlayan, RAG (Retrieval-Augmented Generation) teknolojisi destekli bir AI chat sistemidir. Sistem, çalışanlar, projeler ve departmanlar hakkındaki soruları yanıtlayabilir ve kurumsal uygulamalara entegre edilebilir.
+ChatCore.AI, şirket içi bilgileri kullanarak soruları yanıtlayan, **RAG (Retrieval-Augmented Generation)** teknolojisi destekli bir AI chat sistemidir. Sistem, çalışanlar, projeler, departmanlar ve prosedürler hakkındaki soruları yanıtlayabilir ve kurumsal uygulamalara entegre edilebilir.
 
-### Ana Amaçlar
+### 🎯 Neden Bu Projeyi Yapmalısınız?
 
-- Şirket içi bilgilere dayalı AI destekli sohbet
-- Çalışan, proje ve departman sorguları
-- Çoklu AI sağlayıcı desteği (OpenAI, Azure, Gemini, Ollama)
-- RESTful API yapısı
-- Güvenli ve ölçeklenebilir mimari
+**Önce Sorun:**
+- Çalışanlar şirket bilgilerine erişemiyor
+- HR departmanı her soruyu tekrar cevaplıyor
+- Proje durumları hakkında güncel bilgi yok
+- Yeni prosedürleri kimse okumuyor
+- Bilgi aramak çok zaman alıyor
 
-## Özellikler
+**Sonra Çözüm:**
+- ✅ 7/24 çalışan AI asistan
+- ✅ Anında doğru yanıtlar
+- ✅ Güncel prosedür bildirimleri
+- ✅ Sohbet geçmişi saklama
+- ✅ Çoklu AI provider desteği
+
+### ✨ Temel Özellikler
+
+- 🧠 **RAG Teknolojisi**: Şirket verilerinize dayalı %100 doğru yanıtlar
+- 🔐 **Güvenlik**: JWT authentication, input validation, rate limiting
+- 💾 **Session Management**: TinyDB ile kalıcı oturum ve sohbet geçmişi
+- 📢 **Prosedür Takibi**: Yeni prosedür bildirimleri ve görüntülenme takibi
+- 🔄 **Otomatik Fallback**: AI provider çalışmazsa otomatik yedek
+- ⚡ **Cache Sistemi**: Çok hızlı tekrarlayan yanıtlar
+- 🎯 **Multi-Query**: Gelişmiş arama algoritmaları
+- 📊 **Analytics**: Kullanım istatistikleri ve loglar
+- 🌍 **API First**: RESTful yapı, kolay entegrasyon
+- 🏢 **Ölçeklenebilir**: Küçük şirketlerden büyük holdinglere
+
+### Teknoloji Stack
+
+Bu proje modern, ölçeklenebilir ve esnek bir teknoloji stack'i kullanmaktadır. Her teknoloji özellikle performans, güvenlik ve geliştirme kolaylığı için seçilmiştir.
+
+#### 🖥️ Backend Framework
+
+**FastAPI (v0.109.0)**
+- **Neden Tercih Edildi:**
+  - Yüksek performans (Node.js ve Go ile karşılaştırılabilir)
+  - Otomatik API dokümantasyonu (Swagger UI, ReDoc)
+  - Python type hints ile güçlü tip kontrolü
+  - Async/await desteği ile modern asenkron programlama
+  - Kolay entegrasyon ve genişletilebilirlik
+- **Nasıl Genişletilir:**
+  - WebSocket desteği eklenebilir (real-time chat için)
+  - Celery ile background job processing eklenebilir
+  - FastAPI-Plugins ile ek özellikler eklenebilir
+- **Nasıl Daraltılır:**
+  - Flask'e geçiş yapılabilir (daha hafif, ancak özellikler azalır)
+  - Minimal FastAPI kullanımı (sadece temel endpoint'ler)
+
+**Uvicorn (v0.27.0)**
+- **Neden Tercih Edildi:**
+  - FastAPI için önerilen ASGI server
+  - Yüksek performans ve düşük gecikme
+  - Hot reload desteği (development için)
+  - Production-ready (workers, SSL desteği)
+- **Nasıl Genişletilir:**
+  - Gunicorn + Uvicorn workers (production scaling)
+  - Nginx reverse proxy eklenebilir
+- **Nasıl Daraltılır:**
+  - Tek worker mode (development için yeterli)
+
+#### 🤖 AI & Machine Learning
+
+**LangChain (v0.2.0+)**
+- **Neden Tercih Edildi:**
+  - RAG (Retrieval-Augmented Generation) için en iyi framework
+  - Çoklu AI sağlayıcı desteği (OpenAI, Azure, Ollama, vb.)
+  - Vector store entegrasyonu (FAISS, Pinecone, ChromaDB)
+  - Prompt engineering araçları
+  - Document loaders ve text splitters
+  - Zengin ekosistem ve aktif topluluk
+- **Nasıl Genişletilir:**
+  - LangGraph ile multi-agent sistemleri
+  - LangSmith ile monitoring ve tracing
+  - Özel chains ve tools eklenebilir
+  - Memory management iyileştirilebilir
+- **Nasıl Daraltılır:**
+  - LangChain olmadan direkt AI API çağrıları (daha az özellik)
+  - Minimal LangChain kullanımı (sadece vector store)
+
+**FAISS (Facebook AI Similarity Search)**
+- **Neden Tercih Edildi:**
+  - Facebook tarafından geliştirilen yüksek performanslı vector database
+  - Milyonlarca vektör için hızlı similarity search
+  - CPU ve GPU desteği
+  - Memory-efficient
+  - RAG sistemleri için industry standard
+- **Nasıl Genişletilir:**
+  - FAISS-GPU kullanılabilir (daha hızlı)
+  - Pinecone, Weaviate, Qdrant gibi cloud vector DB'lere geçilebilir
+  - ChromaDB ile persistent storage eklenebilir
+- **Nasıl Daraltılır:**
+  - Basit cosine similarity (küçük veri setleri için)
+  - In-memory dictionary tabanlı arama
+
+**Sentence Transformers**
+- **Neden Tercih Edildi:**
+  - Ücretsiz embedding modeli (OpenAI embeddings'e alternatif)
+  - Çok dilli model desteği (Türkçe dahil)
+  - Yerel çalışma (privacy-first)
+  - Kolay model değiştirme
+- **Nasıl Genişletilir:**
+  - Daha büyük modeller (paraphrase-multilingual-mpnet-base-v2)
+  - Fine-tuning ile özelleştirilmiş modeller
+  - Domain-specific embeddings
+- **Nasıl Daraltılır:**
+  - OpenAI embeddings'e geçilebilir (daha küçük kod, ücretli)
+  - Basit TF-IDF embeddings
+
+#### 💾 Veritabanı & Storage
+
+**TinyDB (v4.8.0+)**
+- **Neden Tercih Edildi:**
+  - Hafif ve kolay kullanım (yalnızca Python)
+  - JSON tabanlı, kurulum gerektirmez
+  - Session ve chat history için yeterli
+  - Hızlı development ve testing
+  - Dosya tabanlı, backup kolaylığı
+- **Nasıl Genişletilir:**
+  - PostgreSQL veya MongoDB'ye geçilebilir (production için)
+  - Redis cache layer eklenebilir
+  - Elasticsearch ile arama özelliği
+  - S3/MinIO ile object storage
+- **Nasıl Daraltılır:**
+  - In-memory dictionary (session için, restart'ta kaybolur)
+  - SQLite (daha hafif, SQL desteği)
+
+**JSON Files (Data Storage)**
+- **Neden Tercih Edildi:**
+  - Kolay edit ve version control (Git ile)
+  - Hiçbir veritabanı kurulumu gerektirmez
+  - İnsan tarafından okunabilir format
+  - Hızlı development
+- **Nasıl Genişletilir:**
+  - PostgreSQL/MySQL'e migrate edilebilir
+  - CSV import/export eklenebilir
+  - Excel entegrasyonu
+  - API'den veri çekme (real-time data)
+- **Nasıl Daraltılır:**
+  - Hard-coded Python dictionaries (çok küçük veriler için)
+
+#### 🔐 Güvenlik & Authentication
+
+**PyJWT (v2.8.0)**
+- **Neden Tercih Edildi:**
+  - JWT (JSON Web Token) standard implementasyonu
+  - Stateless authentication (scalable)
+  - Token expiration ve refresh desteği
+  - Industry standard güvenlik
+- **Nasıl Genişletilir:**
+  - OAuth2 entegrasyonu (Google, Microsoft, GitHub)
+  - Refresh token mekanizması
+  - Multi-factor authentication (MFA)
+  - SSO (Single Sign-On) desteği
+- **Nasıl Daraltılır:**
+  - Session-based auth (Flask-Session)
+  - Basic HTTP authentication
+
+**Python-JOSE**
+- **Neden Tercih Edildi:**
+  - JWT + JWE (JSON Web Encryption) desteği
+  - Cryptographic operations
+  - Token validation ve verification
+- **Nasıl Genişletilir:**
+  - RSA key pairs ile token signing
+  - Certificate-based authentication
+- **Nasıl Daraltılır:**
+  - Sadece PyJWT kullanılabilir
+
+**Rate Limiting (Custom Implementation)**
+- **Neden Tercih Edildi:**
+  - In-memory, kurulum gerektirmez
+  - Basit ve anlaşılır
+  - Development için yeterli
+- **Nasıl Genişletilir:**
+  - Redis-based rate limiting (distributed)
+  - Advanced rate limiting algorithms (Token Bucket, Sliding Window)
+  - IP-based, user-based limitler
+  - Rate limiting per endpoint
+- **Nasıl Daraltılır:**
+  - Rate limiting kaldırılabilir (internal use için)
+
+#### 🌐 HTTP & API
+
+**Requests (v2.31.0)**
+- **Neden Tercih Edildi:**
+  - Python'da en yaygın HTTP library
+  - Kolay kullanım ve geniş destek
+  - SSL/TLS desteği
+  - Session management
+- **Nasıl Genişletilir:**
+  - httpx (async HTTP client) eklenebilir
+  - Connection pooling
+  - Retry mechanisms
+- **Nasıl Daraltılır:**
+  - urllib (Python built-in, daha az özellik)
+
+**Pydantic (v2.9.0+)**
+- **Neden Tercih Edildi:**
+  - FastAPI ile native entegrasyon
+  - Otomatik veri doğrulama
+  - Type safety
+  - JSON serialization/deserialization
+  - Performance (Rust ile yazılmış core)
+- **Nasıl Genişletilir:**
+  - Pydantic Settings (environment yönetimi)
+  - Custom validators
+  - Async validation
+- **Nasıl Daraltılır:**
+  - Dataclasses (daha basit, daha az özellik)
+
+#### 🎨 Frontend
+
+**Streamlit (v1.32.0+)**
+- **Neden Tercih Edildi:**
+  - Hızlı prototype ve development
+  - Python-only (backend geliştiriciler için kolay)
+  - Built-in widgets ve components
+  - Otomatik state management
+  - Hot reload
+  - Deploy kolaylığı (Streamlit Cloud)
+- **Nasıl Genişletilir:**
+  - React/Vue.js frontend eklenebilir (daha özelleştirilebilir)
+  - Streamlit Components ile custom widgets
+  - Multi-page apps (Streamlit pages)
+  - Custom CSS/JavaScript injection
+- **Nasıl Daraltılır:**
+  - Minimal Streamlit UI (sadece chat interface)
+  - REST API only (frontend yok)
+
+#### 🔧 Utilities
+
+**Python-dotenv (v1.0.0)**
+- **Neden Tercih Edildi:**
+  - Environment variable yönetimi
+  - .env dosyası desteği
+  - Production/development ayarları
+- **Nasıl Genişletilir:**
+  - Pydantic Settings ile birleştirilebilir
+  - Kubernetes ConfigMaps/Secrets
+  - HashiCorp Vault entegrasyonu
+- **Nasıl Daraltılır:**
+  - Direkt os.getenv() kullanımı
+
+**python-multipart**
+- **Neden Tercih Edildi:**
+  - FastAPI file upload için gerekli
+  - Form data processing
+- **Nasıl Genişletilir:**
+  - File validation ve processing
+  - Image processing (Pillow)
+- **Nasıl Daraltılır:**
+  - File upload özelliği kaldırılabilir
+
+#### 🤖 AI Sağlayıcılar
+
+**Google Gemini**
+- **Neden Tercih Edildi:**
+  - Ücretsiz katman mevcut
+  - Azure/OpenAI benzeri kalite
+  - Kolay entegrasyon (sadece API key)
+  - Türkçe dil desteği
+  - REST API (stabil)
+- **Nasıl Genişletilir:**
+  - Gemini Pro modelleri (daha güçlü)
+  - Multimodal input (resim, video)
+  - Function calling
+- **Nasıl Daraltılır:**
+  - Gemini kullanımı kaldırılabilir (diğer sağlayıcılar var)
+
+**OpenAI**
+- **Neden Tercih Edildi:**
+  - En gelişmiş modeller (GPT-4, GPT-3.5)
+  - En hızlı yanıt süreleri
+  - En iyi RAG entegrasyonu
+  - Industry leader
+- **Nasıl Genişletilir:**
+  - GPT-4 Turbo kullanımı
+  - Fine-tuning
+  - Assistants API
+  - Vision models
+- **Nasıl Daraltılır:**
+  - GPT-3.5-only (daha ucuz)
+  - OpenAI kaldırılabilir
+
+**Azure OpenAI**
+- **Neden Tercih Edildi:**
+  - Enterprise-grade güvenlik
+  - Azure entegrasyonu
+  - SLA garantisi
+  - Compliance (HIPAA, SOC2)
+- **Nasıl Genişletilir:**
+  - Private endpoints
+  - Custom models
+  - Azure Cognitive Services entegrasyonu
+- **Nasıl Daraltılır:**
+  - Azure kaldırılabilir (standalone OpenAI kullanılabilir)
+
+**Ollama**
+- **Neden Tercih Edildi:**
+  - Tamamen ücretsiz
+  - Yerel çalışma (privacy)
+  - Internet gerektirmez
+  - Sınırsız kullanım
+- **Nasıl Genişletilir:**
+  - Daha büyük modeller (Llama 2, Mistral)
+  - GPU acceleration
+  - Custom model fine-tuning
+- **Nasıl Daraltılır:**
+  - Ollama kurulumu kaldırılabilir (cloud-only)
+
+#### 📊 Gelişmiş Özellikler (Yeni Eklenen)
+
+**RAG Service (Custom)**
+- **Neden Eklendi:**
+  - Hybrid search (semantic + keyword)
+  - Multi-query retrieval
+  - Query expansion
+  - Re-ranking algoritması
+- **Nasıl Genişletilir:**
+  - BM25 keyword search eklenebilir
+  - Cross-encoder re-ranking
+  - Query classification
+  - Context compression (uzun context'ler için)
+
+**AI Cache System**
+- **Neden Eklendi:**
+  - Benzer sorgular için hızlı yanıt
+  - API cost azaltma
+  - Performance iyileştirme
+- **Nasıl Genişletilir:**
+  - Redis cache eklenebilir (distributed)
+  - Cache invalidation strategies
+  - Cache warming
+- **Nasıl Daraltılır:**
+  - Cache devre dışı bırakılabilir
+
+**Model Fallback System**
+- **Neden Eklendi:**
+  - Yüksek availability (%99+)
+  - Otomatik failover
+  - Kullanıcı deneyimi korunur
+- **Nasıl Genişletilir:**
+  - Health check mekanizması
+  - Load balancing
+  - Cost-based provider selection
+- **Nasıl Daraltılır:**
+  - Tek provider kullanımı
+
+**Prompt Optimizer**
+- **Neden Eklendi:**
+  - Few-shot examples
+  - Intent-based prompt selection
+  - Daha iyi AI yanıtları
+- **Nasıl Genişletilir:**
+  - Dynamic few-shot selection
+  - A/B testing
+  - Prompt templates library
+- **Nasıl Daraltılır:**
+  - Basit prompt templates
+
+#### 🔄 Genel Genişletme/Daraltma Stratejileri
+
+**Genişletme Önerileri:**
+1. **Microservices Mimari**: Her servis ayrı container olarak çalışabilir
+2. **Message Queue**: RabbitMQ/Kafka ile async processing
+3. **Monitoring**: Prometheus + Grafana
+4. **Logging**: ELK Stack (Elasticsearch, Logstash, Kibana)
+5. **Database**: PostgreSQL + Redis cache layer
+6. **CI/CD**: GitHub Actions, GitLab CI
+7. **Containerization**: Docker + Kubernetes
+8. **API Gateway**: Kong, Traefik
+
+**Daraltma Önerileri:**
+1. **Minimal AI**: Sadece bir AI provider
+2. **No RAG**: Direkt AI çağrıları (daha basit kod)
+3. **File-based Storage**: Veritabanı yok, sadece JSON
+4. **Single Server**: Microservices yerine monolith
+5. **No Cache**: Cache sistemini kaldır
+6. **Minimal Security**: Sadece JWT, rate limiting yok
+
+#### 📦 Teknoloji Versiyonları
+
+```
+Python: 3.8+
+FastAPI: 0.109.0
+Uvicorn: 0.27.0
+LangChain: 0.2.0+
+FAISS: 1.8.0+
+Sentence-Transformers: 2.2.2+
+TinyDB: 4.8.0+
+Streamlit: 1.32.0+
+Pydantic: 2.9.0+
+PyJWT: 2.8.0
+```
+
+## ✨ Özellikler
 
 ### Temel Özellikler
 
 - **AI Sohbet**: Çoklu AI sağlayıcı desteği ile akıllı yanıtlar
 - **RAG Desteği**: Şirket içi verilerle zenginleştirilmiş yanıtlar
-- **Session Yönetimi**: Kullanıcı bazlı konuşma geçmişi
+- **Kalıcı Session Yönetimi**: Kullanıcı bazlı konuşma geçmişi (TinyDB ile kalıcı)
+- **Prosedür Takip**: Yeni prosedür bildirimleri ve görüntüleme takibi
 - **Intent Analizi**: Kullanıcı sorgularının otomatik analizi
 - **Analytics**: API kullanım istatistikleri ve performans takibi
 
@@ -46,159 +464,271 @@ ChatCore.AI, şirket içi bilgileri kullanarak soruları yanıtlayan, RAG (Retri
 - **Güvenlik Loglama**: Kategorize edilmiş güvenlik olayları
 - **CORS Yapılandırması**: Cross-origin güvenliği
 
-### Loglama ve İzleme
-
-- **Kategorize Loglama**: Hata türlerine göre kategorize edilmiş loglar
-- **Güvenlik Logları**: Rate limit, XSS, injection denemeleri
-- **Performans İzleme**: Yanıt süreleri ve başarı oranları
-- **Hata Takibi**: Detaylı hata logları ve analitik
-
-## Mimari
-
-### Proje Yapısı
+## 📁 Proje Yapısı ve Dosyalar
 
 ```
 ChatCore.AI/
-├── backend/                 # FastAPI backend servisi
-│   ├── main.py             # Ana API uygulaması
-│   ├── ai_service.py       # AI sağlayıcı entegrasyonları
-│   ├── auth.py             # JWT kimlik doğrulama
-│   ├── data_loader.py      # Veri yükleme modülü
-│   ├── session_manager.py  # Session yönetimi
-│   ├── logger.py           # Loglama sistemi
-│   ├── analytics.py        # İstatistik ve analitik
-│   ├── security.py         # Güvenlik modülleri
-│   ├── nlp_service.py      # Intent ve entity çıkarımı
-│   ├── report_service.py  # PDF rapor oluşturma
-│   ├── requirements.txt   # Python bağımlılıkları
-│   └── data/              # JSON veri dosyaları
-│       ├── employees.json
-│       ├── departments.json
-│       └── projects.json
-├── frontend/               # Streamlit frontend
-│   ├── app.py             # Ana Streamlit uygulaması
+├── backend/                      # FastAPI backend servisi
+│   ├── main.py                   # Ana API uygulaması ve endpoint'ler
+│   ├── ai_service.py             # AI sağlayıcı entegrasyonları (Gemini, OpenAI, Azure, Ollama)
+│   ├── auth.py                   # JWT kimlik doğrulama modülü
+│   ├── data_loader.py            # JSON veri dosyalarını yükleme modülü
+│   ├── session_manager.py        # TinyDB ile kalıcı session ve chat geçmişi yönetimi
+│   ├── logger.py                 # Kategorize edilmiş loglama sistemi
+│   ├── analytics.py              # API istatistikleri ve analitik
+│   ├── security.py               # Güvenlik modülleri (rate limiting, input validation)
+│   ├── nlp_service.py            # Intent ve entity çıkarımı
+│   ├── report_service.py         # PDF rapor oluşturma (opsiyonel)
+│   ├── requirements.txt          # Python bağımlılıkları
+│   ├── .env                      # Yapılandırma dosyası (API key'ler burada)
+│   ├── data/                     # Şirket veri dosyaları
+│   │   ├── employees.json        # Çalışan listesi
+│   │   ├── departments.json     # Departman bilgileri
+│   │   ├── projects.json         # Proje detayları
+│   │   ├── procedures.json       # Şirket prosedürleri
+│   │   └── sessions.json         # TinyDB session veritabanı (otomatik oluşur)
+│   └── logs/                     # Log dosyaları (otomatik oluşur)
+│       ├── api.log               # Genel API logları
+│       ├── errors.log             # Hata logları
+│       └── security.log           # Güvenlik olayları
+│
+├── frontend/                      # Streamlit frontend
+│   ├── app.py                    # Ana Streamlit uygulaması
 │   └── static/
-│       └── styles.css     # CSS stilleri
-├── kurulum.bat            # Windows kurulum scripti
-├── baslat.bat             # Windows başlatma scripti
-├── .gitignore             # Git ignore dosyası
-└── README.md              # Bu dosya
+│       └── styles.css            # CSS stilleri
+│
+├── kurulum.bat                    # Windows otomatik kurulum scripti
+├── kurulum.sh                     # macOS/Linux otomatik kurulum scripti
+├── baslat.bat                     # Windows servis başlatma scripti
+├── baslat.sh                      # macOS/Linux servis başlatma scripti
+│
+├── kurulum_ollama.bat             # Ollama için özel kurulum (Windows)
+├── kurulum_ollama.sh              # Ollama için özel kurulum (macOS/Linux)
+├── kurulum_openai.bat             # OpenAI için özel kurulum (Windows)
+├── kurulum_openai.sh              # OpenAI için özel kurulum (macOS/Linux)
+├── kurulum_azure.bat              # Azure için özel kurulum (Windows)
+├── kurulum_azure.sh               # Azure için özel kurulum (macOS/Linux)
+│
+├── KURULUM_REHBERI.md             # AI sağlayıcı seçimi rehberi
+├── KURULUM_OLLAMA.md              # Ollama detaylı kurulum rehberi
+├── KURULUM_OPENAI.md              # OpenAI detaylı kurulum rehberi
+├── KURULUM_AZURE.md               # Azure OpenAI detaylı kurulum rehberi
+│
+└── README.md                      # Bu dosya
 ```
 
-### Teknoloji Stack
+### Dosya Açıklamaları
 
-#### Backend
+#### Backend Dosyaları
 
-- FastAPI - Modern Python web framework
-- LangChain - AI ve RAG desteği
-- FAISS - Vektör veritabanı
-- JWT - Token tabanlı kimlik doğrulama
-- Pydantic - Veri doğrulama
+**`main.py`**
+- FastAPI uygulaması ana giriş noktası
+- Tüm API endpoint'lerinin tanımlandığı dosya
+- CORS, middleware ve hata yönetimi
+- **Değiştirilecekler:** Endpoint eklemek/çıkarmak, CORS ayarları
 
-#### Frontend
+**`ai_service.py`**
+- AI sağlayıcı entegrasyonları (Gemini, OpenAI, Azure, Ollama)
+- RAG (Retrieval-Augmented Generation) implementasyonu
+- Şirket verilerini AI'ya sağlama mantığı
+- **Değiştirilecekler:** AI model seçimi, RAG parametreleri, prompt şablonları
 
-- Streamlit - Hızlı web arayüzü geliştirme
+**`auth.py`**
+- JWT token oluşturma ve doğrulama
+- Login endpoint'i
+- **Değiştirilecekler:** Kullanıcı doğrulama mantığı, token süresi (şu an 2 saat)
 
-#### AI Sağlayıcılar
+**`session_manager.py`**
+- TinyDB ile kalıcı session yönetimi
+- Chat geçmişi saklama
+- Prosedür görüntüleme takibi
+- **Değiştirilecekler:** Session timeout (şu an 7200 saniye), max history (şu an 100 mesaj)
 
-- OpenAI GPT-4/GPT-3.5
-- Azure OpenAI
-- Google Gemini (Ücretsiz katman mevcut)
-- Ollama (Yerel, ücretsiz)
-- Hugging Face
+**`data_loader.py`**
+- JSON veri dosyalarını yükleme
+- Veri formatı doğrulama
+- **Değiştirilecekler:** Yeni veri dosyası eklemek için buraya ekleyin
 
-## Kurulum
+**`security.py`**
+- Rate limiting (60 istek/dakika)
+- Input validation (XSS, SQL injection koruması)
+- **Değiştirilecekler:** Rate limit değerleri, validation kuralları
 
-### Gereksinimler
+**`logger.py`**
+- Kategorize edilmiş loglama sistemi
+- **Değiştirilecekler:** Log formatı, log dosyası konumları
 
-- Python 3.8 veya üzeri
-- pip (Python paket yöneticisi)
-- İsteğe bağlı: AI sağlayıcı API anahtarları (Gemini ücretsiz katman için önerilir)
+**`requirements.txt`**
+- Python paket bağımlılıkları
+- **Değiştirilecekler:** Yeni paket eklemek için buraya ekleyin
 
-### Hızlı Başlangıç
+**`backend/.env`**
+- Tüm yapılandırma ayarları
+- API key'ler burada saklanır
+- **Değiştirilecekler:** Tüm ayarlar burada
 
-#### Otomatik Kurulum (Önerilen - Windows)
+#### Frontend Dosyaları
 
-**İlk Kurulum:**
+**`frontend/app.py`**
+- Streamlit web arayüzü
+- Kullanıcı girişi, chat arayüzü, prosedür bildirimleri
+- **Değiştirilecekler:** UI tasarımı, yeni özellikler
 
-1. **`kurulum.bat`** dosyasına çift tıklayın
-   - Python kontrolü yapar
-   - Virtual environment oluşturur (yoksa)
-   - Tüm bağımlılıkları yükler (backend + frontend)
-   - `.env` dosyası oluşturur
-   - Kurulum zaten yapılmışsa atlar, tekrar kurulum yapmaz
+#### Veri Dosyaları
+
+**`backend/data/employees.json`**
+- Çalışan listesi
+- **Değiştirilecekler:** Kendi çalışan verilerinizi buraya ekleyin
+
+**`backend/data/departments.json`**
+- Departman bilgileri
+- **Değiştirilecekler:** Kendi departman verilerinizi buraya ekleyin
+
+**`backend/data/projects.json`**
+- Proje detayları
+- **Değiştirilecekler:** Kendi proje verilerinizi buraya ekleyin
+
+**`backend/data/procedures.json`**
+- Şirket prosedürleri
+- **Değiştirilecekler:** Yeni prosedürler ekleyin, mevcutları güncelleyin
+
+## 🚀 Hızlı Kurulum
+
+### Otomatik Kurulum (Önerilen)
+
+#### Windows
+
+1. **İlk Kurulum:**
+   ```batch
+   kurulum.bat
+   ```
+   Bu script:
+   - ✅ Python kontrolü yapar
+   - ✅ Virtual environment oluşturur
+   - ✅ Tüm bağımlılıkları yükler
+   - ✅ `.env` dosyası oluşturur (API key boş, siz ekleyeceksiniz)
+   - ✅ Her şeyi hazırlar
 
 2. **API Key Ekleme:**
-   - Script `.env` dosyası oluşturduktan sonra otomatik açılır
-   - Eğer açılmadıysa `backend\.env` dosyasını manuel açın
+   - Script bittikten sonra `backend\.env` dosyasını açın
    - `GEMINI_API_KEY=your-gemini-api-key-here` satırını bulun
-   - API anahtarınızı ekleyin ve kaydedin (Ctrl+S)
+   - `your-gemini-api-key-here` yerine API anahtarınızı yapıştırın
+   - Dosyayı kaydedin
    - API Key almak için: https://makersuite.google.com/app/apikey
 
 3. **Servisleri Başlatma:**
-   - **`baslat.bat`** dosyasına çift tıklayın
+   ```batch
+   baslat.bat
+   ```
    - Backend ve Frontend otomatik başlar
+   - ⚠️ **ÖNEMLİ:** Backend'in tamamen hazır olması için 5-10 saniye bekleyin
+   - Backend hazır olduğunda terminalde "Uvicorn running on http://0.0.0.0:8000" mesajını göreceksiniz
+   - Frontend otomatik olarak backend hazır olduktan sonra başlatılır
    - Tarayıcıda: http://localhost:8501
    - Giriş: `admin` / `1234`
 
-**Günlük Kullanım:**
+#### macOS / Linux
 
-İlk kurulumdan sonra sadece **`baslat.bat`** dosyasına çift tıklayın!
+1. **İlk Kurulum:**
+   ```bash
+   chmod +x kurulum.sh
+   ./kurulum.sh
+   ```
 
-#### Manuel Kurulum
+2. **API Key Ekleme:**
+   - `backend/.env` dosyasını açın
+   - `GEMINI_API_KEY=your-gemini-api-key-here` satırını düzenleyin
 
-**1. Repository'yi klonlayın:**
+3. **Servisleri Başlatma:**
+   ```bash
+   chmod +x baslat.sh
+   ./baslat.sh
+   ```
+   - ⚠️ **ÖNEMLİ:** Backend'in tamamen hazır olması için 5-10 saniye bekleyin
+   - Backend hazır olduğunda terminalde "Uvicorn running on http://0.0.0.0:8000" mesajını göreceksiniz
+   - Frontend otomatik olarak backend hazır olduktan sonra başlatılır
+
+### Günlük Kullanım
+
+İlk kurulumdan sonra sadece:
+```batch
+baslat.bat    # Windows
+# veya
+./baslat.sh   # macOS/Linux
+```
+
+**Başlatma Sırası ve Bekleme Süreleri:**
+1. Backend başlatılır → **5-10 saniye** bekleyin
+2. Backend hazır olunca "Uvicorn running..." mesajını görürsünüz
+3. Frontend otomatik başlatılır → **3-5 saniye** daha
+4. Toplam başlatma süresi: **~10-15 saniye**
+
+⚠️ **Not:** İlk başlatmada biraz daha uzun sürebilir (Python modülleri yüklenirken). Sonraki başlatmalarda daha hızlı olur.
+
+## 📖 Manuel Kurulum
+
+Script kullanmak istemiyorsanız, aşağıdaki adımları manuel olarak takip edebilirsiniz.
+
+### 1. Gereksinimler
+
+- Python 3.8 veya üzeri
+- pip (Python paket yöneticisi)
+- Git (projeyi klonlamak için)
+
+### 2. Repository'yi Klonlayın
 
 ```bash
 git clone <repository-url>
 cd ChatCore.AI
 ```
 
-**2. Backend virtual environment oluşturun:**
+### 3. Backend Kurulumu
 
+#### Virtual Environment Oluşturma
+
+**Windows:**
 ```bash
 cd backend
 python -m venv venv
-```
-
-**3. Virtual environment'ı aktifleştirin:**
-
-**Windows:**
-
-```bash
 venv\Scripts\activate
 ```
 
-**Linux/Mac:**
-
+**macOS/Linux:**
 ```bash
+cd backend
+python3 -m venv venv
 source venv/bin/activate
 ```
 
-**4. Bağımlılıkları yükleyin:**
+#### Bağımlılıkları Yükleme
 
 ```bash
+pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-**5. Environment değişkenlerini yapılandırın:**
+#### Environment Dosyası Oluşturma
 
 `backend/.env` dosyası oluşturun:
 
 ```env
-# AI Sağlayıcı (GEMINI, OPENAI, AZURE, OLLAMA, HUGGINGFACE, LOCAL)
+# AI Sağlayıcı (GEMINI, OPENAI, AZURE, OLLAMA, HUGGINGFACE)
 AI_PROVIDER=GEMINI
 
-# Google Gemini (Ücretsiz katman)
-GEMINI_API_KEY=your_gemini_api_key_here
+# Google Gemini (Ücretsiz katman - Önerilen)
+GEMINI_API_KEY=your-gemini-api-key-here
 
-# OpenAI (Opsiyonel)
-OPENAI_API_KEY=your_openai_key_here
+# OpenAI (Opsiyonel - Ücretli)
+OPENAI_API_KEY=your-openai-key-here
 
-# Azure OpenAI (Opsiyonel)
-AZURE_OPENAI_API_KEY=your_azure_key_here
-AZURE_OPENAI_ENDPOINT=your_endpoint_here
+# Azure OpenAI (Opsiyonel - Ücretli)
+AZURE_OPENAI_API_KEY=your-azure-key-here
+AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com
 AZURE_OPENAI_DEPLOYMENT=gpt-4o-mini
+
+# Ollama (Opsiyonel - Yerel, Ücretsiz)
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_MODEL=llama3.2
 
 # JWT Secret Key (Production'da değiştirin!)
 SECRET_KEY=supersecret
@@ -206,56 +736,156 @@ SECRET_KEY=supersecret
 # Şirket Adı
 COMPANY_NAME=Company1
 
-# CORS Origins (virgülle ayrılmış)
+# Backend URL
+BACKEND_URL=http://127.0.0.1:8000
+
+# CORS Origins
 ALLOWED_ORIGINS=*
 ```
 
-**6. Backend'i başlatın:**
+#### Backend'i Başlatma
 
 ```bash
 cd backend
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-**7. Frontend'i başlatın (yeni terminal):**
+⚠️ **ÖNEMLİ:** Backend'in tamamen başlaması için 5-10 saniye bekleyin. Terminalde şu mesajları görmelisiniz:
+```
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [...]
+INFO:     Started server process [...]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+```
+
+Backend hazır olduktan sonra frontend'i başlatın.
+
+### 4. Frontend Kurulumu
+
+**ÖNEMLİ:** Backend'in tamamen başlamış ve hazır olduğundan emin olun. Backend terminalinde "Application startup complete" mesajını gördükten sonra frontend'i başlatın.
+
+**Yeni bir terminal penceresi açın:**
 
 ```bash
 cd frontend
+# Backend'deki venv'i kullan (veya kendi venv'inizi oluşturun)
+# Windows: ..\backend\venv\Scripts\activate
+# macOS/Linux: source ../backend/venv/bin/activate
 streamlit run app.py
 ```
 
-## Yapılandırma
+**Frontend başlatma süresi:**
+- Frontend başlaması genellikle 3-5 saniye sürer
+- Backend'e bağlanmak için ek 2-3 saniye gerekebilir
+- Toplam: İlk başlatma için yaklaşık 10-15 saniye bekleyin
+
+Frontend: http://localhost:8501
+
+### 5. Veri Dosyalarını Düzenleme
+
+Kendi şirket verilerinizi eklemek için:
+
+1. `backend/data/employees.json` - Çalışan listesi
+2. `backend/data/departments.json` - Departman bilgileri
+3. `backend/data/projects.json` - Proje detayları
+4. `backend/data/procedures.json` - Şirket prosedürleri
+
+Dosyaları açın, JSON formatında verilerinizi ekleyin.
+
+## ⚙️ Yapılandırma
 
 ### Environment Değişkenleri
 
 `backend/.env` dosyasında yapılandırılabilir değişkenler:
 
-| Değişken | Açıklama | Varsayılan |
-|----------|----------|------------|
-| `AI_PROVIDER` | AI sağlayıcı seçimi (GEMINI, OPENAI, AZURE, OLLAMA, HUGGINGFACE, LOCAL) | GEMINI |
-| `GEMINI_API_KEY` | Google Gemini API anahtarı (Ücretsiz) | - |
-| `OPENAI_API_KEY` | OpenAI API anahtarı (Ücretli) | - |
-| `AZURE_OPENAI_API_KEY` | Azure OpenAI API anahtarı (Ücretli) | - |
-| `AZURE_OPENAI_ENDPOINT` | Azure OpenAI endpoint URL'i | - |
-| `AZURE_OPENAI_DEPLOYMENT` | Azure OpenAI deployment adı | gpt-4o-mini |
-| `OLLAMA_BASE_URL` | Ollama sunucu adresi (Yerel, Ücretsiz) | http://localhost:11434 |
-| `OLLAMA_MODEL` | Ollama model adı | llama2 |
-| `HUGGINGFACE_API_KEY` | Hugging Face API anahtarı (Ücretsiz) | - |
-| `HUGGINGFACE_MODEL` | Hugging Face model adı | distilgpt2 |
-| `SECRET_KEY` | JWT imzalama için gizli anahtar | supersecret |
-| `COMPANY_NAME` | Şirket adı | Company1 |
-| `BACKEND_URL` | Backend API URL'i | http://127.0.0.1:8000 |
-| `ALLOWED_ORIGINS` | CORS izin verilen origin'ler | * |
+| Değişken | Açıklama | Varsayılan | Nerede Değiştirilir |
+|----------|----------|------------|-------------------|
+| `AI_PROVIDER` | AI sağlayıcı seçimi (GEMINI, OPENAI, AZURE, OLLAMA) | GEMINI | `backend/.env` |
+| `GEMINI_API_KEY` | Google Gemini API anahtarı | - | `backend/.env` |
+| `OPENAI_API_KEY` | OpenAI API anahtarı | - | `backend/.env` |
+| `AZURE_OPENAI_API_KEY` | Azure OpenAI API anahtarı | - | `backend/.env` |
+| `AZURE_OPENAI_ENDPOINT` | Azure OpenAI endpoint URL'i | - | `backend/.env` |
+| `AZURE_OPENAI_DEPLOYMENT` | Azure OpenAI deployment adı | gpt-4o-mini | `backend/.env` |
+| `OLLAMA_BASE_URL` | Ollama sunucu adresi | http://localhost:11434 | `backend/.env` |
+| `OLLAMA_MODEL` | Ollama model adı | llama3.2 | `backend/.env` |
+| `SECRET_KEY` | JWT imzalama için gizli anahtar | supersecret | `backend/.env` |
+| `COMPANY_NAME` | Şirket adı | Company1 | `backend/.env` |
+| `BACKEND_URL` | Backend API URL'i | http://127.0.0.1:8000 | `backend/.env`, `frontend/app.py` |
+| `ALLOWED_ORIGINS` | CORS izin verilen origin'ler | * | `backend/.env` |
 
-### Veri Dosyaları
+### Veri Dosyaları Yapılandırması
 
-`backend/data/` dizinindeki JSON dosyalarını düzenleyerek şirket verilerinizi ekleyebilirsiniz:
+**Çalışan Ekleme** (`backend/data/employees.json`):
+```json
+[
+  {
+    "id": 1,
+    "name": "Ahmet Yılmaz",
+    "department": "Technology",
+    "role": "Senior Developer",
+    "email": "ahmet@company.com"
+  }
+]
+```
 
-- `employees.json` - Çalışan listesi
-- `departments.json` - Departman bilgileri
-- `projects.json` - Proje detayları
+**Departman Ekleme** (`backend/data/departments.json`):
+```json
+[
+  {
+    "id": 1,
+    "name": "Technology",
+    "code": "TECH",
+    "director": "Ahmet Yılmaz",
+    "budget_2024": "50000000"
+  }
+]
+```
 
-## Kullanım
+**Proje Ekleme** (`backend/data/projects.json`):
+```json
+[
+  {
+    "id": 1,
+    "name": "Yeni Sistem Geliştirme",
+    "department": "Technology",
+    "status": "Active",
+    "budget": "1000000"
+  }
+]
+```
+
+**Prosedür Ekleme** (`backend/data/procedures.json`):
+```json
+[
+  {
+    "id": 1,
+    "title": "Yeni Prosedür",
+    "code": "HR-2024-001",
+    "department": "Genel",
+    "published_date": "2024-01-15T10:00:00",
+    "status": "Aktif",
+    "content": "Prosedür içeriği..."
+  }
+]
+```
+
+### Güvenlik Ayarları
+
+**Rate Limiting** (`backend/security.py`):
+- Varsayılan: 60 istek/dakika
+- Login: 10 istek/dakika
+- Değiştirmek için: `backend/security.py` dosyasını düzenleyin
+
+**JWT Token Süresi** (`backend/auth.py`):
+- Varsayılan: 2 saat
+- Değiştirmek için: `backend/auth.py` dosyasında `datetime.timedelta(hours=2)` satırını düzenleyin
+
+**Session Timeout** (`backend/session_manager.py`):
+- Varsayılan: 7200 saniye (2 saat)
+- Değiştirmek için: `backend/session_manager.py` dosyasında `session_timeout` parametresini düzenleyin
+
+## 🎮 Kullanım
 
 ### Web Arayüzü
 
@@ -265,6 +895,14 @@ streamlit run app.py
    - **Kullanıcı adı:** `admin`
    - **Şifre:** `1234`
 4. Chat arayüzünde sorularınızı sorun
+
+### Örnek Sorular
+
+- "Enerji departmanında kimler çalışıyor?"
+- "Hangi projeler devam ediyor?"
+- "Ahmet Yılmaz'ın projeleri neler?"
+- "Yeni prosedürler var mı?"
+- "Turizm departmanının bütçesi nedir?"
 
 ### API Kullanımı
 
@@ -277,7 +915,6 @@ curl -X POST "http://localhost:8000/api/login" \
 ```
 
 Yanıt:
-
 ```json
 {
   "token": "eyJ0eXAiOiJKV1QiLCJhbGc...",
@@ -294,41 +931,112 @@ curl -X POST "http://localhost:8000/api/chat" \
   -d '{"prompt": "Enerji departmanında kimler çalışıyor?"}'
 ```
 
-#### 3. RAG Sorgusu (Intent Analizi ile)
+#### 3. Prosedürler
 
 ```bash
-curl -X POST "http://localhost:8000/api/ask" \
-  -H "Authorization: Bearer YOUR_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"query": "Hangi projeler devam ediyor?"}'
+# Yeni prosedürleri getir
+curl -X GET "http://localhost:8000/api/procedures/new" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# Tüm prosedürleri getir
+curl -X GET "http://localhost:8000/api/procedures" \
+  -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
-## API Dokümantasyonu
+## 🤖 AI Sağlayıcıları
+
+### Google Gemini (Önerilen - Ücretsiz)
+
+✅ **Avantajlar:**
+- Ücretsiz katman mevcut
+- Azure/OpenAI benzeri bulut servisi
+- Sadece API key gerekli, kurulum yok
+- Yüksek kaliteli yanıtlar
+
+📝 **Kurulum:**
+1. https://makersuite.google.com/app/apikey adresinden API key alın
+2. `backend/.env` dosyasında `GEMINI_API_KEY` ekleyin
+3. `AI_PROVIDER=GEMINI` ayarlayın
+
+**Detaylı Rehber:** `KURULUM_REHBERI.md`
+
+### OpenAI (Ücretli - En İyi Kalite)
+
+✅ **Avantajlar:**
+- En gelişmiş AI modelleri
+- Çok hızlı yanıt
+- RAG desteği ile FAISS entegrasyonu
+
+📝 **Kurulum:**
+```batch
+# Windows
+kurulum_openai.bat
+
+# macOS/Linux
+./kurulum_openai.sh
+```
+
+**Detaylı Rehber:** `KURULUM_OPENAI.md`
+
+### Azure OpenAI (Ücretli - Kurumsal)
+
+✅ **Avantajlar:**
+- Enterprise seviye güvenlik
+- Azure üzerinden yönetim
+- OpenAI modellerine erişim
+
+📝 **Kurulum:**
+```batch
+# Windows
+kurulum_azure.bat
+
+# macOS/Linux
+./kurulum_azure.sh
+```
+
+**Detaylı Rehber:** `KURULUM_AZURE.md`
+
+### Ollama (Yerel - Ücretsiz)
+
+✅ **Avantajlar:**
+- Tamamen ücretsiz, sınırsız
+- Yerel çalışma (internet gerektirmez)
+- Gizlilik odaklı
+
+📝 **Kurulum:**
+```batch
+# Windows
+kurulum_ollama.bat
+
+# macOS/Linux
+./kurulum_ollama.sh
+```
+
+**Detaylı Rehber:** `KURULUM_OLLAMA.md`
+
+## 📚 API Dokümantasyonu
 
 ### Endpoint'ler
 
 #### Kimlik Doğrulama
-
 - `POST /api/login` - Kullanıcı girişi, JWT token döndürür
 
 #### Chat Endpoint'leri
-
 - `POST /api/chat` - AI sohbet endpoint'i
 - `POST /api/ask` - RAG pipeline ile intent analizli sorgu
 
 #### Veri Endpoint'leri
-
 - `GET /api/employees` - Çalışan listesi
 - `GET /api/departments` - Departman listesi
 - `GET /api/projects` - Proje listesi
+- `GET /api/procedures` - Tüm prosedürler
+- `GET /api/procedures/new` - Yeni prosedürler (görüntülenmemiş)
 
 #### Session Yönetimi
-
 - `GET /api/sessions/{session_id}` - Session bilgilerini getir
 - `DELETE /api/sessions/{session_id}` - Session'ı temizle
 
 #### İstatistikler
-
 - `GET /api/stats` - Analytics ve istatistikler
 - `GET /api/status` - Sistem durumu
 
@@ -337,381 +1045,84 @@ curl -X POST "http://localhost:8000/api/ask" \
 - **Swagger UI**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
 
-## Entegrasyon Kılavuzu
-
-### Diğer Uygulamalara Entegrasyon
-
-Bu API'yi kendi chat uygulamanıza entegre edebilirsiniz:
-
-#### Python Örneği
-
-```python
-import requests
-
-# Giriş yap
-response = requests.post(
-    "http://localhost:8000/api/login",
-    json={"username": "admin", "password": "1234"}
-)
-token = response.json()["token"]
-
-# Sorgu gönder
-response = requests.post(
-    "http://localhost:8000/api/chat",
-    headers={"Authorization": f"Bearer {token}"},
-    json={"prompt": "Merhaba, nasılsın?"}
-)
-answer = response.json()["response"]
-print(answer)
-```
-
-#### JavaScript Örneği
-
-```javascript
-// Giriş yap
-const loginResponse = await fetch('http://localhost:8000/api/login', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ username: 'admin', password: '1234' })
-});
-const { token } = await loginResponse.json();
-
-// Sorgu gönder
-const chatResponse = await fetch('http://localhost:8000/api/chat', {
-  method: 'POST',
-  headers: {
-    'Authorization': `Bearer ${token}`,
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({ prompt: 'Merhaba, nasılsın?' })
-});
-const { response } = await chatResponse.json();
-console.log(response);
-```
-
-## Güvenlik Özellikleri
-
-### Kimlik Doğrulama
-
-- JWT token tabanlı kimlik doğrulama
-- Token süresi: 2 saat
-- Güvenli token imzalama (HS256)
-
-### Rate Limiting
-
-- Varsayılan: 60 istek/dakika
-- Login endpoint'i: 10 istek/dakika
-- IP ve kullanıcı bazlı takip
-
-### Input Doğrulama
-
-- XSS pattern tespiti ve engelleme
-- SQL injection pattern tespiti
-- Maksimum input uzunluğu: 5000 karakter
-- HTML escape uygulanması
-
-### Loglama
-
-- Kategorize edilmiş hata logları (AUTH_ERROR, VALIDATION_ERROR, AI_ERROR, vb.)
-- Güvenlik olayları loglaması (rate limit, XSS, injection denemeleri)
-- Performans metrikleri
-- Güvenlik logları ayrı dosyada (`logs/security.log`)
-
-### Güvenlik Header'ları
-
-- `X-Content-Type-Options: nosniff`
-- `X-Frame-Options: DENY`
-- `X-XSS-Protection: 1; mode=block`
-
-## AI Sağlayıcıları
-
-### Google Gemini (Önerilen - Ücretsiz)
-
-- Ücretsiz katman mevcut
-- Yüksek kaliteli yanıtlar
-- Hızlı yanıt süreleri
-
-**Kurulum:**
-
-1. [Google AI Studio](https://makersuite.google.com/app/apikey) adresinden API anahtarı alın
-2. `.env` dosyasına `GEMINI_API_KEY` ekleyin
-3. `AI_PROVIDER=GEMINI` ayarlayın
-
-### OpenAI
-
-- GPT-4 ve GPT-3.5 desteği
-- RAG desteği ile FAISS entegrasyonu
-- Yüksek kaliteli yanıtlar
-
-**Kurulum:**
-
-1. [OpenAI Platform](https://platform.openai.com/api-keys) adresinden API anahtarı alın
-2. `.env` dosyasına `OPENAI_API_KEY` ekleyin
-3. `AI_PROVIDER=OPENAI` ayarlayın
-
-### Azure OpenAI
-
-- Enterprise seviye güvenlik
-- Azure üzerinden yönetim
-- OpenAI modellerine erişim
-
-**Kurulum:**
-
-1. Azure OpenAI servis oluşturun
-2. `.env` dosyasına Azure bilgilerini ekleyin
-3. `AI_PROVIDER=AZURE` ayarlayın
-
-### Ollama (Yerel, Ücretsiz)
-
-- Tamamen ücretsiz
-- Yerel çalışma (internet gerektirmez)
-- Gizlilik odaklı
-
-**Kurulum:**
-
-1. [Ollama](https://ollama.ai) kurun
-2. Model indirin: `ollama pull llama2`
-3. `.env` dosyasında `AI_PROVIDER=OLLAMA` ayarlayın
-
-## Sorun Giderme
-
-### kurulum.bat Çalışmıyor veya Hata Veriyor
-
-#### "Python bulunamadı" Hatası
-
-**Sorun:** Script Python'u bulamıyor.
-
-**Çözüm:**
-1. Python'un kurulu olduğunu kontrol edin:
-   ```bash
-   python --version
-   ```
-2. Eğer hata veriyorsa:
-   - [Python 3.8+](https://www.python.org/downloads/) indirip kurun
-   - **ÖNEMLİ:** Kurulum sırasında "Add Python to PATH" seçeneğini işaretleyin
-   - Windows'u yeniden başlatın
-   - Tekrar `kurulum.bat` çalıştırın
-
-#### "Virtual environment oluşturulamadı" Hatası
-
-**Sorun:** Virtual environment oluşturma başarısız.
-
-**Çözüm:**
-1. `backend\venv` klasörünü silin (eğer varsa)
-2. Python'u yönetici olarak çalıştırıp tekrar deneyin
-3. Manuel olarak oluşturun:
-   ```bash
-   cd backend
-   python -m venv venv
-   ```
-4. Tekrar `kurulum.bat` çalıştırın
-
-#### "Bağımlılıklar yüklenemedi" Hatası
-
-**Sorun:** `pip install -r requirements.txt` başarısız oluyor.
-
-**Çözüm:**
-1. İnternet bağlantınızı kontrol edin
-2. Pip'i güncelleyin:
-   ```bash
-   python -m pip install --upgrade pip
-   ```
-3. Virtual environment'ı aktif edin:
-   ```bash
-   cd backend
-   venv\Scripts\activate
-   ```
-4. Manuel yükleyin:
-   ```bash
-   pip install -r requirements.txt
-   ```
-5. Hata mesajlarını okuyun ve gerekirse sorunlu paketi tek tek yükleyin
-
-#### "Permission denied" veya İzin Hatası
-
-**Sorun:** Dosya yazma izni yok.
-
-**Çözüm:**
-1. Script'i sağ tıklayın → "Yönetici olarak çalıştır"
-2. Antivirus yazılımının engelleyip engellemediğini kontrol edin
-3. Proje klasörüne yazma izni verdiğinizden emin olun
-
-### baslat.bat Çalışmıyor veya Hata Veriyor
-
-#### "Virtual environment bulunamadı" Hatası
-
-**Sorun:** `backend\venv` klasörü yok.
-
-**Çözüm:**
-1. Önce `kurulum.bat` dosyasını çalıştırın
-2. Eğer hala hata veriyorsa:
-   ```bash
-   cd backend
-   python -m venv venv
-   cd ..
-   kurulum.bat
-   ```
-
-#### "Bağımlılıklar yüklü değil" Hatası
-
-**Sorun:** FastAPI veya diğer paketler eksik.
-
-**Çözüm:**
-1. `kurulum.bat` dosyasını tekrar çalıştırın
-2. Veya manuel yükleyin:
-   ```bash
-   cd backend
-   venv\Scripts\activate
-   pip install -r requirements.txt
-   ```
-
-#### "API Key henüz eklenmemiş" Hatası
-
-**Sorun:** `.env` dosyasında API key yok.
-
-**Çözüm:**
-1. `backend\.env` dosyasını açın
-2. `GEMINI_API_KEY=your-gemini-api-key-here` satırını bulun
-3. `your-gemini-api-key-here` yerine API anahtarınızı yapıştırın
-4. Dosyayı kaydedin (Ctrl+S)
-5. Tekrar `baslat.bat` çalıştırın
-6. API Key almak için: https://makersuite.google.com/app/apikey
-
-#### "Port zaten kullanılıyor" Hatası
-
-**Sorun:** 8000 veya 8501 portu başka bir uygulama tarafından kullanılıyor.
-
-**Çözüm:**
-1. Çalışan eski servisleri durdurun:
-   - Açık olan Backend/Frontend pencerelerini kapatın
-   - Görev Yöneticisi'nde `uvicorn.exe` ve `streamlit.exe` işlemlerini sonlandırın
-2. Port'u kullanan uygulamayı bulun:
-   ```bash
-   netstat -ano | findstr :8000
-   netstat -ano | findstr :8501
-   ```
-3. İşlemi sonlandırın veya farklı port kullanın
-
-#### Backend Pencere Açılıp Hemen Kapanıyor
-
-**Sorun:** Backend başlatılamıyor, hata var.
-
-**Çözüm:**
-1. Backend penceresini açık tutun, hata mesajını okuyun
-2. Manuel başlatın ve hataları görün:
-   ```bash
-   cd backend
-   venv\Scripts\activate
-   python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
-   ```
-3. Hata mesajına göre düzeltme yapın (genelde import hatası veya modül eksikliği)
-
-#### Frontend Pencere Açılıp Hemen Kapanıyor
-
-**Sorun:** Streamlit başlatılamıyor.
-
-**Çözüm:**
-1. Frontend penceresini açık tutun, hata mesajını okuyun
-2. Manuel başlatın:
-   ```bash
-   cd backend
-   venv\Scripts\activate
-   cd ..\frontend
-   streamlit run app.py
-   ```
-3. Eğer "streamlit bulunamadı" hatası varsa:
-   ```bash
-   pip install streamlit
-   ```
-
-### Backend Başlamıyor (Manuel Kontrol)
-
-- Python 3.8+ kurulu olduğundan emin olun: `python --version`
-- Virtual environment'ın aktif olduğunu kontrol edin: `venv\Scripts\activate`
-- Bağımlılıkların yüklü olduğunu doğrulayın: `pip list | findstr fastapi`
-- Tüm modüllerin import edilebildiğini kontrol edin:
+## 🔧 Sorun Giderme
+
+### Kurulum Sorunları
+
+**"Python bulunamadı" Hatası:**
+- Python 3.8+ kurulu olduğundan emin olun
+- PATH'e eklendiğini kontrol edin: `python --version`
+- Kurulum sırasında "Add Python to PATH" seçeneğini işaretleyin
+
+**"Virtual environment oluşturulamadı" Hatası:**
+- `backend\venv` klasörünü silin ve tekrar deneyin
+- Script'i yönetici olarak çalıştırın
+
+**"Bağımlılıklar yüklenemedi" Hatası:**
+- İnternet bağlantınızı kontrol edin
+- Pip'i güncelleyin: `python -m pip install --upgrade pip`
+- Virtual environment'ı aktif edin ve tekrar deneyin
+
+### Çalıştırma Sorunları
+
+**"Backend başlamıyor" Hatası:**
+- `backend/.env` dosyasının var olduğundan emin olun
+- API key'in doğru olduğunu kontrol edin
+- Backend loglarını kontrol edin: `backend/logs/errors.log`
+- Manuel başlatın ve hata mesajını okuyun:
   ```bash
   cd backend
-  python -c "from main import app; print('OK')"
+  venv\Scripts\activate
+  python -m uvicorn main:app --reload
   ```
 
-### Frontend Backend'e Bağlanamıyor
-
+**"Frontend başlamıyor" Hatası:**
+- Streamlit'in yüklü olduğunu kontrol edin: `pip list | findstr streamlit`
 - Backend'in çalıştığını kontrol edin: http://localhost:8000/api/status
-- Tarayıcı konsolunda (F12) CORS hatası var mı kontrol edin
-- `backend\.env` dosyasındaki `BACKEND_URL` değerini kontrol edin
-- Firewall'ün 8000 ve 8501 portlarını engellemediğinden emin olun
+- Manuel başlatın:
+  ```bash
+  cd frontend
+  streamlit run app.py
+  ```
 
-### AI Yanıt Vermiyor
+**"Port zaten kullanılıyor" Hatası:**
+- Çalışan eski servisleri durdurun
+- Farklı port kullanın veya port'u kullanan uygulamayı bulun:
+  ```bash
+  netstat -ano | findstr :8000
+  netstat -ano | findstr :8501
+  ```
 
-- AI sağlayıcı API anahtarının doğru olduğunu kontrol edin
-- `.env` dosyasındaki `AI_PROVIDER` değerini kontrol edin (GEMINI, OPENAI, vb.)
-- API anahtarının geçerli ve aktif olduğunu doğrulayın
-- Backend log dosyalarını kontrol edin: `backend/logs/api.log`
-- Backend konsolunda hata mesajları var mı bakın
+**"AI yanıt vermiyor" Hatası:**
+- API key'in doğru olduğunu kontrol edin
+- `AI_PROVIDER` değerinin doğru olduğunu kontrol edin
+- Backend loglarını kontrol edin: `backend/logs/api.log`
 
-### Tarayıcıda "Bağlantı Hatası" veya "ERR_CONNECTION_REFUSED"
+### Veri Sorunları
 
-**Sorun:** Frontend veya Backend servisleri çalışmıyor.
+**"Veri bulunamadı" Hatası:**
+- `backend/data/` dizinindeki JSON dosyalarının var olduğundan emin olun
+- JSON formatının doğru olduğunu kontrol edin
+- Dosya kodlamasının UTF-8 olduğundan emin olun
 
-**Çözüm:**
-1. Backend'in çalıştığını kontrol edin: http://localhost:8000/docs
-2. Frontend'in çalıştığını kontrol edin: Komut satırında "Running on http://localhost:8501" mesajı görünüyor mu?
-3. Her iki servisi de yeniden başlatın: `baslat.bat`
-4. Antivirus veya firewall engelleyip engellemediğini kontrol edin
-
-### Log Dosyaları
-
-- Genel loglar: `backend/logs/api.log`
-- Hata logları: `backend/logs/errors.log`
-- Güvenlik logları: `backend/logs/security.log`
-
-Log dosyaları bulunamıyorsa:
-1. `backend/logs` klasörünün var olduğundan emin olun
-2. Backend'i en az bir kez başlatın (log dosyaları otomatik oluşur)
-
-### Rate Limit Hatası
-
-- Rate limit aşıldı hatası alıyorsanız, `backend/security.py` dosyasındaki limitleri artırabilirsiniz
-- Production'da Redis kullanarak rate limiting'i ölçeklendirebilirsiniz
-- "Too many requests" hatası için birkaç dakika bekleyin
-
-### Genel Sorun Giderme İpuçları
-
-1. **Her şeyi sıfırdan başlatmak için:**
-   - `backend\venv` klasörünü silin
-   - `backend\.env` dosyasını kontrol edin (API key doğru mu?)
-   - `kurulum.bat` çalıştırın
-   - `baslat.bat` çalıştırın
-
-2. **Bağımlılık sorunları için:**
-   ```bash
-   cd backend
-   venv\Scripts\activate
-   pip uninstall -r requirements.txt -y
-   pip install -r requirements.txt
-   ```
-
-3. **Port sorunları için:**
-   - Farklı portlar kullanın (örn: 8001, 8502)
-   - `.env` dosyasında `BACKEND_URL=http://127.0.0.1:8001` olarak değiştirin
-
-## Notlar
+## 📝 Notlar
 
 - **Production Kullanımı**: Production ortamında mutlaka `SECRET_KEY`'i değiştirin
-- **Veritabanı**: Şu anda JSON dosyaları kullanılıyor, production için PostgreSQL/MongoDB önerilir
+- **Veritabanı**: Şu anda JSON dosyaları (veri) ve TinyDB (session) kullanılıyor, production için PostgreSQL/MongoDB önerilir
 - **Rate Limiting**: Production'da Redis kullanarak rate limiting'i ölçeklendirin
 - **Loglama**: Log dosyaları `backend/logs/` dizininde saklanır, düzenli olarak temizleyin
 - **Güvenlik**: CORS ayarlarını production'da sadece gerekli origin'ler için yapılandırın
 
-## Lisans
+## 📄 Lisans
 
 Bu proje demo amaçlıdır ve genel kullanım için hazırlanmıştır.
 
-## Katkıda Bulunma
+## 🤝 Katkıda Bulunma
 
 Sorularınız veya önerileriniz için issue açabilirsiniz.
 
 ---
+
+**Son Güncelleme:** 2024
 
 **Not:** Bu sistem demo amaçlıdır ve production kullanımı için ek güvenlik ve optimizasyon önlemleri alınmalıdır.

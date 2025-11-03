@@ -81,7 +81,7 @@ def login(user: dict, request: Request):
     if username == "admin" and password == "1234":
         payload = {
             "sub": username,
-            "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=2)
+            "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=24)  # 24 saat geçerli
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
         
@@ -90,7 +90,7 @@ def login(user: dict, request: Request):
         session_manager.get_or_create_session(username, token=token)
         
         APILogger.log_request("/api/login", "POST", username)
-        return {"token": token, "expires_in": 7200}
+        return {"token": token, "expires_in": 86400}  # 24 saat = 86400 saniye
     else:
         APILogger.log_security_event("LOGIN_FAILED", f"Failed login attempt for username: {username}", None, client_ip)
         APILogger.log_error("/api/login", ValueError("Invalid credentials"), None, ErrorCategory.AUTH_ERROR)

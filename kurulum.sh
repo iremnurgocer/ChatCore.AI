@@ -161,10 +161,17 @@ echo ""
 
 # Bağımlılık doğrulama
 echo "[5/6] Bağımlılıklar doğrulanıyor..."
-$PYTHON_CMD -c "import fastapi; import streamlit; import langchain; import openai; print('OK - Tüm ana bağımlılıklar yüklü!')" 2>/dev/null
+$PYTHON_CMD -c "import fastapi; import streamlit; import langchain; import openai; import tinydb; print('OK - Tüm ana bağımlılıklar yüklü!')" 2>/dev/null
 if [ $? -ne 0 ]; then
     echo "UYARI: Bazı bağımlılıklar eksik olabilir."
     echo "Tekrar yüklemek için kurulum.sh dosyasını çalıştırın."
+    echo ""
+    echo "Eksik paketler kontrol ediliyor..."
+    $PYTHON_CMD -c "import tinydb" 2>/dev/null
+    if [ $? -ne 0 ]; then
+        echo "TinyDB eksik, yükleniyor..."
+        $PYTHON_CMD -m pip install "tinydb>=4.8.0" --quiet
+    fi
 else
     echo "Tüm ana bağımlılıklar doğrulandı ve hazır!"
 fi
@@ -291,7 +298,29 @@ echo "========================================"
 echo "KURULUM TAMAMLANDI!"
 echo "========================================"
 echo ""
-echo "Şimdi baslat.sh dosyasını çalıştırarak servisleri başlatabilirsiniz."
+echo "ÖNEMLİ ADIMLAR:"
+echo ""
+echo "1. API KEY EKLEME (Gerekli):"
+echo "   - backend/.env dosyasını açın"
+echo "   - GEMINI_API_KEY=your-gemini-api-key-here satırını bulun"
+echo "   - your-gemini-api-key-here yerine API anahtarınızı yapıştırın"
+echo "   - Dosyayı kaydedin"
+echo ""
+echo "   API Key almak için:"
+echo "   https://makersuite.google.com/app/apikey"
+echo ""
+echo "2. SERVISLERI BAŞLATMA:"
+echo "   - ./baslat.sh komutunu çalıştırın"
+echo "   - Backend ve Frontend otomatik başlar"
+echo "   - Tarayıcınızda: http://localhost:8501"
+echo "   - Giriş: admin / 1234"
+echo ""
+echo "NOT: Eğer farklı bir AI sağlayıcı kullanmak istiyorsanız:"
+echo "     - ./kurulum_openai.sh (OpenAI için)"
+echo "     - ./kurulum_azure.sh (Azure OpenAI için)"
+echo "     - ./kurulum_ollama.sh (Ollama için)"
+echo ""
+echo "Detaylı bilgi için README.md dosyasına bakın."
 echo ""
 read -p "Devam etmek için Enter'a basın..."
 
