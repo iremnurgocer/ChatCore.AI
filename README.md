@@ -644,7 +644,7 @@ ChatCore.AI/
    chmod +x baslat.sh
    ./baslat.sh
    ```
-   - ⚠️ **ÖNEMLİ:** Backend'in tamamen hazır olması için 5-10 saniye bekleyin
+   - **ÖNEMLİ:** Backend'in tamamen hazır olması için 5-10 saniye bekleyin
    - Backend hazır olduğunda terminalde "Uvicorn running on http://0.0.0.0:8000" mesajını göreceksiniz
    - Frontend otomatik olarak backend hazır olduktan sonra başlatılır
 
@@ -663,9 +663,10 @@ baslat.bat    # Windows
 3. Frontend otomatik başlatılır → **3-5 saniye** daha
 4. Toplam başlatma süresi: **~10-15 saniye**
 
-⚠️ **Not:** İlk başlatmada biraz daha uzun sürebilir (Python modülleri yüklenirken). Sonraki başlatmalarda daha hızlı olur.
 
-## 📖 Manuel Kurulum
+**Not:** İlk başlatmada biraz daha uzun sürebilir (Python modülleri yüklenirken). Sonraki başlatmalarda daha hızlı olur.
+
+## Manuel Kurulum
 
 Script kullanmak istemiyorsanız, aşağıdaki adımları manuel olarak takip edebilirsiniz.
 
@@ -750,7 +751,7 @@ cd backend
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-⚠️ **ÖNEMLİ:** Backend'in tamamen başlaması için 5-10 saniye bekleyin. Terminalde şu mesajları görmelisiniz:
+**ÖNEMLİ:** Backend'in tamamen başlaması için 5-10 saniye bekleyin. Terminalde şu mesajları görmelisiniz:
 ```
 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
 INFO:     Started reloader process [...]
@@ -793,7 +794,7 @@ Kendi şirket verilerinizi eklemek için:
 
 Dosyaları açın, JSON formatında verilerinizi ekleyin.
 
-## ⚙️ Yapılandırma
+## Yapılandırma
 
 ### Environment Değişkenleri
 
@@ -885,7 +886,7 @@ Dosyaları açın, JSON formatında verilerinizi ekleyin.
 - Varsayılan: 7200 saniye (2 saat)
 - Değiştirmek için: `backend/session_manager.py` dosyasında `session_timeout` parametresini düzenleyin
 
-## 🎮 Kullanım
+## Kullanım
 
 ### Web Arayüzü
 
@@ -943,17 +944,17 @@ curl -X GET "http://localhost:8000/api/procedures" \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
-## 🤖 AI Sağlayıcıları
+## AI Sağlayıcıları
 
 ### Google Gemini (Önerilen - Ücretsiz)
 
-✅ **Avantajlar:**
+**Avantajlar:**
 - Ücretsiz katman mevcut
 - Azure/OpenAI benzeri bulut servisi
 - Sadece API key gerekli, kurulum yok
 - Yüksek kaliteli yanıtlar
 
-📝 **Kurulum:**
+**Kurulum:**
 1. https://makersuite.google.com/app/apikey adresinden API key alın
 2. `backend/.env` dosyasında `GEMINI_API_KEY` ekleyin
 3. `AI_PROVIDER=GEMINI` ayarlayın
@@ -962,12 +963,12 @@ curl -X GET "http://localhost:8000/api/procedures" \
 
 ### OpenAI (Ücretli - En İyi Kalite)
 
-✅ **Avantajlar:**
+**Avantajlar:**
 - En gelişmiş AI modelleri
 - Çok hızlı yanıt
 - RAG desteği ile FAISS entegrasyonu
 
-📝 **Kurulum:**
+**Kurulum:**
 ```batch
 # Windows
 kurulum_openai.bat
@@ -980,12 +981,12 @@ kurulum_openai.bat
 
 ### Azure OpenAI (Ücretli - Kurumsal)
 
-✅ **Avantajlar:**
+**Avantajlar:**
 - Enterprise seviye güvenlik
 - Azure üzerinden yönetim
 - OpenAI modellerine erişim
 
-📝 **Kurulum:**
+**Kurulum:**
 ```batch
 # Windows
 kurulum_azure.bat
@@ -998,12 +999,12 @@ kurulum_azure.bat
 
 ### Ollama (Yerel - Ücretsiz)
 
-✅ **Avantajlar:**
+**Avantajlar:**
 - Tamamen ücretsiz, sınırsız
 - Yerel çalışma (internet gerektirmez)
 - Gizlilik odaklı
 
-📝 **Kurulum:**
+**Kurulum:**
 ```batch
 # Windows
 kurulum_ollama.bat
@@ -1014,7 +1015,7 @@ kurulum_ollama.bat
 
 **Detaylı Rehber:** `KURULUM_OLLAMA.md`
 
-## 📚 API Dokümantasyonu
+## API Dokümantasyonu
 
 ### Endpoint'ler
 
@@ -1045,7 +1046,7 @@ kurulum_ollama.bat
 - **Swagger UI**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
 
-## 🔧 Sorun Giderme
+## Sorun Giderme
 
 ### Kurulum Sorunları
 
@@ -1105,7 +1106,7 @@ kurulum_ollama.bat
 - JSON formatının doğru olduğunu kontrol edin
 - Dosya kodlamasının UTF-8 olduğundan emin olun
 
-## 📝 Notlar
+## Notlar
 
 - **Production Kullanımı**: Production ortamında mutlaka `SECRET_KEY`'i değiştirin
 - **Veritabanı**: Şu anda JSON dosyaları (veri) ve TinyDB (session) kullanılıyor, production için PostgreSQL/MongoDB önerilir
@@ -1113,11 +1114,11 @@ kurulum_ollama.bat
 - **Loglama**: Log dosyaları `backend/logs/` dizininde saklanır, düzenli olarak temizleyin
 - **Güvenlik**: CORS ayarlarını production'da sadece gerekli origin'ler için yapılandırın
 
-## 📄 Lisans
+## Lisans
 
 Bu proje demo amaçlıdır ve genel kullanım için hazırlanmıştır.
 
-## 🤝 Katkıda Bulunma
+## Katkıda Bulunma
 
 Sorularınız veya önerileriniz için issue açabilirsiniz.
 
