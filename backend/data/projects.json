@@ -1,0 +1,160 @@
+[
+  {
+    "id": 1,
+    "name": "Solar Power Plant - California",
+    "department": "Energy",
+    "status": "In Progress",
+    "start_date": "2023-01-15",
+    "expected_end_date": "2024-12-31",
+    "budget": "50000000",
+    "spent": "32000000",
+    "progress": 65,
+    "location": "California",
+    "project_manager": "John Doe",
+    "team_members": ["John Doe", "Sarah Brown"],
+    "description": "100 MW capacity solar power plant installation and commissioning project",
+    "milestones": [
+      {
+        "date": "2023-06-30",
+        "title": "Permits and Licenses Completed",
+        "status": "Completed"
+      },
+      {
+        "date": "2024-03-31",
+        "title": "Physical Construction Started",
+        "status": "Completed"
+      },
+      {
+        "date": "2024-09-30",
+        "title": "Equipment Installation",
+        "status": "In Progress"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Wind Farm - Texas",
+    "department": "Energy",
+    "status": "Planning Phase",
+    "start_date": "2024-06-01",
+    "expected_end_date": "2026-06-30",
+    "budget": "85000000",
+    "spent": "5000000",
+    "progress": 12,
+    "location": "Texas",
+    "project_manager": "John Doe",
+    "team_members": ["John Doe"],
+    "description": "150 MW capacity wind energy farm installation project",
+    "milestones": [
+      {
+        "date": "2024-08-31",
+        "title": "Environmental Impact Assessment Approval",
+        "status": "Pending"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Luxury Resort Project - Miami",
+    "department": "Tourism",
+    "status": "In Progress",
+    "start_date": "2022-09-01",
+    "expected_end_date": "2025-05-31",
+    "budget": "120000000",
+    "spent": "85000000",
+    "progress": 72,
+    "location": "Miami",
+    "project_manager": "David Lee",
+    "team_members": ["Jane Smith", "David Lee"],
+    "description": "5-star luxury resort and vacation complex construction project",
+    "milestones": [
+      {
+        "date": "2023-12-31",
+        "title": "Construction Completed",
+        "status": "Completed"
+      },
+      {
+        "date": "2024-12-31",
+        "title": "Interior Design and Furnishing",
+        "status": "In Progress"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Urban Renewal Project - Chicago",
+    "department": "Construction",
+    "status": "In Progress",
+    "start_date": "2023-03-01",
+    "expected_end_date": "2025-08-31",
+    "budget": "300000000",
+    "spent": "180000000",
+    "progress": 58,
+    "location": "Chicago",
+    "project_manager": "Robert Johnson",
+    "team_members": ["Robert Johnson", "Lisa Anderson"],
+    "description": "500-unit urban renewal and renovation project",
+    "milestones": [
+      {
+        "date": "2024-01-31",
+        "title": "Demolition and Cleanup Completed",
+        "status": "Completed"
+      },
+      {
+        "date": "2024-12-31",
+        "title": "Construction 70% Complete",
+        "status": "In Progress"
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "name": "Bridge Project - New York",
+    "department": "Infrastructure",
+    "status": "Completed",
+    "start_date": "2021-01-10",
+    "expected_end_date": "2023-12-31",
+    "actual_end_date": "2023-11-15",
+    "budget": "450000000",
+    "spent": "435000000",
+    "progress": 100,
+    "location": "New York",
+    "project_manager": "Michael Wilson",
+    "team_members": ["Michael Wilson"],
+    "description": "Suspension bridge construction and infrastructure development project",
+    "milestones": [
+      {
+        "date": "2023-11-15",
+        "title": "Project Completed",
+        "status": "Completed"
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "name": "Automation Systems",
+    "department": "Manufacturing",
+    "status": "In Progress",
+    "start_date": "2024-01-15",
+    "expected_end_date": "2024-12-31",
+    "budget": "25000000",
+    "spent": "15000000",
+    "progress": 60,
+    "location": "Detroit",
+    "project_manager": "Emily Davis",
+    "team_members": ["Emily Davis"],
+    "description": "Industrial production line automation systems installation",
+    "milestones": [
+      {
+        "date": "2024-06-30",
+        "title": "Pilot System Installation",
+        "status": "Completed"
+      },
+      {
+        "date": "2024-12-31",
+        "title": "Full-Scale System",
+        "status": "In Progress"
+      }
+    ]
+  }
+]

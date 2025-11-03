@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "name": "Energy",
+    "code": "ENERGY",
+    "director": "John Doe",
+    "location": "New York",
+    "employee_count": 45,
+    "description": "Renewable energy production, energy distribution, and energy efficiency projects",
+    "projects": [
+      "Solar Power Plant - California",
+      "Wind Farm - Texas",
+      "Energy Efficiency Project"
+    ],
+    "budget_2024": "250000000",
+    "status": "Active"
+  },
+  {
+    "id": 2,
+    "name": "Tourism",
+    "code": "TOURISM",
+    "director": "David Lee",
+    "location": "Los Angeles",
+    "employee_count": 120,
+    "description": "Luxury hotel operations, resorts, and tourism consulting services",
+    "projects": [
+      "Luxury Resort Project - Miami",
+      "Cultural Tourism Development",
+      "Customer Satisfaction Program"
+    ],
+    "budget_2024": "180000000",
+    "status": "Active"
+  },
+  {
+    "id": 3,
+    "name": "Construction",
+    "code": "CONSTRUCTION",
+    "director": "Robert Johnson",
+    "location": "Chicago",
+    "employee_count": 200,
+    "description": "Urban renewal, residential and commercial building projects, infrastructure development",
+    "projects": [
+      "Urban Renewal Project - Chicago",
+      "Infrastructure Development - Houston",
+      "Sustainable Building Design"
+    ],
+    "budget_2024": "450000000",
+    "status": "Active"
+  },
+  {
+    "id": 4,
+    "name": "Manufacturing",
+    "code": "MANUFACTURING",
+    "director": "Emily Davis",
+    "location": "Detroit",
+    "employee_count": 85,
+    "description": "Production, automation systems, and industrial solutions",
+    "projects": [
+      "Automation Systems",
+      "Quality Management Project",
+      "Digital Transformation Project"
+    ],
+    "budget_2024": "120000000",
+    "status": "Active"
+  },
+  {
+    "id": 5,
+    "name": "Infrastructure",
+    "code": "INFRASTRUCTURE",
+    "director": "Michael Wilson",
+    "location": "New York",
+    "employee_count": 150,
+    "description": "Bridge, tunnel, road and other infrastructure projects",
+    "projects": [
+      "Bridge Project - New York",
+      "Tunnel Project - Chicago",
+      "Highway Expansion Project"
+    ],
+    "budget_2024": "600000000",
+    "status": "Active"
+  }
+]

@@ -1,10 +1,47 @@
-fastapi
-uvicorn
-openai
-langchain
-langchain-community
-chromadb
-tiktoken
-pydantic
-python-dotenv
-streamlit
+# Temel Framework
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-dotenv==1.0.0
+pydantic>=2.9.0,<3.0.0
+pydantic-core>=2.23.0
+
+# Authentication & Security
+PyJWT==2.8.0
+python-jose[cryptography]==3.3.0
+
+# AI & LLM - Temel
+openai>=1.0.0
+langchain>=0.2.0
+langchain-community>=0.2.0
+langchain-openai>=0.1.0
+langchain-core>=0.2.0
+
+# Google Gemini SDK (Resmi)
+google-generativeai>=0.3.0
+
+# Vector Database (RAG i�in)
+faiss-cpu>=1.8.0
+sentence-transformers>=2.2.2
+
+# HTTP Requests
+requests==2.31.0
+
+# Form Data Processing
+python-multipart==0.0.6
+
+# NoSQL Database (Session & Chat History)
+tinydb>=4.8.0
+
+# Frontend
+streamlit>=1.32.0
+
+# ==========================================
+# OPSIYONEL PAKETLER (Yorum sat�r�n� kald�rarak aktif edebilirsiniz)
+# ==========================================
+
+# Local AI Models (Sadece LOCAL AI provider kullanacaksan�z)
+# transformers>=4.37.0
+# torch>=2.2.0
+
+# PDF Generation (Sadece PDF rapor �zelli�i kullan�lacaksa)
+# reportlab==4.0.7

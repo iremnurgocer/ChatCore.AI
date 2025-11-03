@@ -1,21 +1,37 @@
+"""
+Rapor Servis Modülü
+Chat geçmişi için PDF rapor oluşturma
+"""
 from reportlab.lib.pagesizes import A4
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 import datetime
+from typing import List, Dict, Any
 
-def create_chat_report(chat_history, output_path="chat_report.pdf"):
+def create_chat_report(chat_history: List[Dict[str, str]], output_path: str = "chat_report.pdf") -> str:
+    """
+    Chat geçmişinden PDF rapor oluşturur
+    
+    Args:
+        chat_history: 'role' ve 'content' anahtarlarına sahip mesaj dictionary'lerinin listesi
+        output_path: PDF'in kaydedileceği yol
+        
+    Returns:
+        Oluşturulan PDF dosyasının yolu
+    """
     doc = SimpleDocTemplate(output_path, pagesize=A4)
     styles = getSampleStyleSheet()
     content = []
 
-    content.append(Paragraph("ChatCore.AI Raporu", styles["Title"]))
+    content.append(Paragraph("Chat Raporu", styles["Title"]))
     content.append(Spacer(1, 20))
     content.append(Paragraph(f"Tarih: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}", styles["Normal"]))
     content.append(Spacer(1, 20))
 
     for msg in chat_history:
-        role = "Kullanıcı" if msg["role"] == "user" else "Asistan"
-        content.append(Paragraph(f"<b>{role}:</b> {msg['content']}", styles["Normal"]))
+        role = "Kullanıcı" if msg.get("role") == "user" else "Asistan"
+        content_text = msg.get("content", "")
+        content.append(Paragraph(f"<b>{role}:</b> {content_text}", styles["Normal"]))
         content.append(Spacer(1, 12))
 
     doc.build(content)
