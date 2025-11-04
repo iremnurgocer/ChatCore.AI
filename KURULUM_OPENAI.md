@@ -1,13 +1,13 @@
 # OpenAI Kurulum Rehberi
 
-## 📋 Gereksinimler
+## Gereksinimler
 
 - **OpenAI Hesabı**: Ücretsiz hesap oluşturulabilir
 - **API Key**: OpenAI Platform'dan alınmalı
 - **İnternet Bağlantı**: Sürekli gerekli (bulut servisi)
 - **Kredi Kartı**: API kullanımı için gerekli (ücretsiz kredi mevcut)
 
-## 🚀 Hızlı Kurulum
+## Hızlı Kurulum
 
 ### Windows
 
@@ -22,7 +22,7 @@ chmod +x kurulum_openai.sh
 ./kurulum_openai.sh
 ```
 
-## 📝 Adım Adım Kurulum
+## Adım Adım Kurulum
 
 ### 1. OpenAI Hesabı Oluştur
 
@@ -38,7 +38,7 @@ chmod +x kurulum_openai.sh
 3. Kredi kartı bilgilerinizi girin
 4. **İyi haber:** OpenAI size **$5 ücretsiz kredi** verir!
 
-**⚠️ NOT:** Ücretsiz kredi bitene kadar ücretlendirilmezsiniz. Kredi bittiğinde otomatik ücretlendirme yapılır, bu yüzden limit koymanızı öneririz.
+**NOT:** Ücretsiz kredi bitene kadar ücretlendirilmezsiniz. Kredi bittiğinde otomatik ücretlendirme yapılır, bu yüzden limit koymanızı öneririz.
 
 ### 3. API Key Oluştur
 
@@ -55,7 +55,7 @@ chmod +x kurulum_openai.sh
 2. **HEMEN KOPYALAYIN!** Bu key'i bir daha göremeyeceksiniz
 3. Güvenli bir yere kaydedin
 
-**⚠️ ÖNEMLİ:** API Key'inizi kimseyle paylaşmayın! Key çalınırsa:
+**ÖNEMLİ:** API Key'inizi kimseyle paylaşmayın! Key çalınırsa:
 - Key'i hemen silin
 - Yeni bir key oluşturun
 - Eski key'i kullanan uygulamaları güncelleyin
@@ -83,7 +83,7 @@ AI_PROVIDER=OPENAI
 OPENAI_API_KEY=sk-proj-abc123def456ghi789jkl012mno345pqr678stu901vwx234yz
 ```
 
-**⚠️ ÖNEMLİ:**
+**ÖNEMLİ:**
 - API Key'in başında `sk-` veya `sk-proj-` olmalı
 - Key'de boşluk olmamalı
 - Tırnak işareti kullanmayın
@@ -97,12 +97,12 @@ OPENAI_MODEL=gpt-4o-mini
 ```
 
 **Popüler Modeller:**
-- `gpt-4o-mini` - Hızlı, ekonomik, önerilen ✅
+- `gpt-4o-mini` - Hızlı, ekonomik, önerilen
 - `gpt-4o` - En iyi kalite, orta hız
 - `gpt-4-turbo` - Yüksek kalite, hızlı
 - `gpt-3.5-turbo` - Ekonomik, hızlı
 
-## ✅ Kurulumu Test Et
+## Kurulumu Test Et
 
 ### 1. Backend'i Başlat
 ```batch
@@ -132,7 +132,7 @@ Başarılı ise `"ai_provider": "OPENAI"` görürsünüz.
 2. API kullanımınızı görüntüleyin
 3. Kalan kredinizi kontrol edin
 
-## 🔧 Sorun Giderme
+## Sorun Giderme
 
 ### "Invalid API Key" Hatası
 - API Key'i doğru kopyaladığınızdan emin olun
@@ -169,7 +169,7 @@ OpenAI kullanım başına ücretlendirir:
 - **gpt-4-turbo**: $10 / 1M input tokens, $30 / 1M output tokens
 - **gpt-3.5-turbo**: $0.50 / 1M input tokens, $1.50 / 1M output tokens
 
-**💡 İpucu:** Başlangıç için `gpt-4o-mini` hem hızlı hem de en ekonomiktir.
+**İpucu:** Başlangıç için `gpt-4o-mini` hem hızlı hem de en ekonomiktir.
 
 ### Ücretsiz Deneme
 - Hesap açtığınızda **$5 ücretsiz kredi** verilir
@@ -181,20 +181,20 @@ OpenAI kullanım başına ücretlendirir:
 - Aylık hafif kullanım: ~$5 - $20
 - Aylık yoğun kullanım: ~$50 - $200
 
-## 🎯 Avantajlar
+## Avantajlar
 
-✅ **En İyi Kalite** - En gelişmiş AI modelleri  
-✅ **Hızlı** - Düşük gecikme süresi  
-✅ **Kolay Kurulum** - Sadece API key yeterli  
-✅ **Güvenilir** - Yüksek uptime  
+- **En İyi Kalite** - En gelişmiş AI modelleri  
+- **Hızlı** - Düşük gecikme süresi  
+- **Kolay Kurulum** - Sadece API key yeterli  
+- **Güvenilir** - Yüksek uptime  
 
-## ⚠️ Dezavantajlar
+## Dezavantajlar
 
-⚠️ **Ücretli** - Kullanım başına ücret  
-⚠️ **İnternet Gerekli** - Offline çalışmaz  
-⚠️ **Rate Limits** - Aşırı kullanımda limit  
+- **Ücretli** - Kullanım başına ücret  
+- **İnternet Gerekli** - Offline çalışmaz  
+- **Rate Limits** - Aşırı kullanımda limit  
 
-## 📚 Ek Kaynaklar
+## Ek Kaynaklar
 
 - [OpenAI Platform Dokümantasyon](https://platform.openai.com/docs)
 - [API Keys Yönetimi](https://platform.openai.com/api-keys)

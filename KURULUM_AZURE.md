@@ -1,13 +1,13 @@
 # Azure OpenAI Kurulum Rehberi
 
-## 📋 Gereksinimler
+## Gereksinimler
 
 - **Azure Hesabı**: Ücretsiz deneme hesabı yeterli
 - **Azure OpenAI Kaynağı**: Azure Portal'da oluşturulmalı
 - **İnternet Bağlantı**: Sürekli gerekli (bulut servisi)
 - **API Key**: Azure Portal'dan alınmalı
 
-## 🚀 Hızlı Kurulum
+## Hızlı Kurulum
 
 ### Windows
 
@@ -22,7 +22,7 @@ chmod +x kurulum_azure.sh
 ./kurulum_azure.sh
 ```
 
-## 📝 Adım Adım Kurulum
+## Adım Adım Kurulum
 
 ### 1. Azure Hesabı Oluştur
 
@@ -69,7 +69,7 @@ chmod +x kurulum_azure.sh
 2. **KEY 1** veya **KEY 2** altındaki değeri kopyalayın
 3. **ENDPOINT** değerini de kopyalayın
 
-**⚠️ ÖNEMLİ:** API Key'i güvenli bir yere kaydedin. Daha sonra göremeyeceksiniz!
+**ÖNEMLİ:** API Key'i güvenli bir yere kaydedin. Daha sonra göremeyeceksiniz!
 
 ### 4. Model Deployment Oluştur
 
@@ -88,7 +88,7 @@ chmod +x kurulum_azure.sh
 4. "Create" butonuna tıklayın
 5. Deployment oluşturulması 1-3 dakika sürebilir
 
-**⚠️ NOT:** Deployment ismini not edin, `.env` dosyasında kullanacaksınız!
+**NOT:** Deployment ismini not edin, `.env` dosyasında kullanacaksınız!
 
 ### 5. Proje Yapılandırması
 
@@ -109,7 +109,7 @@ AZURE_OPENAI_ENDPOINT=https://chatcore-openai.openai.azure.com/
 AZURE_OPENAI_DEPLOYMENT=gpt-4o-mini
 ```
 
-**⚠️ ÖNEMLİ:**
+**ÖNEMLİ:**
 - `AZURE_OPENAI_ENDPOINT` değerinin sonunda `/` olmamalı (script bunu ekler)
 - Deployment adı büyük-küçük harf duyarlıdır
 
@@ -122,7 +122,7 @@ https://YOUR-RESOURCE-NAME.openai.azure.com
 
 Eğer farklı bir format görüyorsanız, doğru endpoint'i kullanın.
 
-## ✅ Kurulumu Test Et
+## Kurulumu Test Et
 
 ### 1. Backend'i Başlat
 ```batch
@@ -147,7 +147,7 @@ Başarılı ise `"ai_provider": "AZURE"` görürsünüz.
 3. Herhangi bir soru sorun
 4. AI yanıt vermelidir
 
-## 🔧 Sorun Giderme
+## Sorun Giderme
 
 ### "Invalid API Key" Hatası
 - API Key'i doğru kopyaladığınızdan emin olun
@@ -183,27 +183,27 @@ Azure OpenAI ücretlendirmesi kullanıma göre yapılır:
 - **gpt-35-turbo**: $0.50 / 1M input tokens, $1.50 / 1M output tokens
 - **gpt-4**: $30 / 1M input tokens, $60 / 1M output tokens
 
-**💡 İpucu:** Başlangıç için `gpt-4o-mini` hem hızlı hem de ekonomiktir.
+**İpucu:** Başlangıç için `gpt-4o-mini` hem hızlı hem de ekonomiktir.
 
 ### Ücretsiz Deneme
 - Azure hesabı açtığınızda **$200 kredi** verilir
 - Bu kredi 30 gün geçerlidir
 - Normal kullanım için yeterlidir
 
-## 🎯 Avantajlar
+## Avantajlar
 
-✅ **Kurumsal Kalite** - Enterprise özellikler  
-✅ **Yüksek Güvenlik** - Azure güvenlik standartları  
-✅ **Ölçeklenebilir** - Yüksek trafik için uygun  
-✅ **Azure Entegrasyonu** - Diğer Azure servisleriyle entegre  
+- **Kurumsal Kalite** - Enterprise özellikler  
+- **Yüksek Güvenlik** - Azure güvenlik standartları  
+- **Ölçeklenebilir** - Yüksek trafik için uygun  
+- **Azure Entegrasyonu** - Diğer Azure servisleriyle entegre  
 
-## ⚠️ Dezavantajlar
+## Dezavantajlar
 
-⚠️ **Ücretli** - Kullanım başına ücret  
-⚠️ **Azure Hesabı Gerekli** - Kurulum biraz karmaşık  
-⚠️ **İnternet Gerekli** - Offline çalışmaz  
+- **Ücretli** - Kullanım başına ücret  
+- **Azure Hesabı Gerekli** - Kurulum biraz karmaşık  
+- **İnternet Gerekli** - Offline çalışmaz  
 
-## 📚 Ek Kaynaklar
+## Ek Kaynaklar
 
 - [Azure OpenAI Dokümantasyon](https://learn.microsoft.com/azure/ai-services/openai/)
 - [Fiyatlandırma](https://azure.microsoft.com/pricing/details/cognitive-services/openai-service/)

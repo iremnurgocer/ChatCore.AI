@@ -1,6 +1,6 @@
 # ChatCore.AI - Kurulum Rehberi
 
-## 🎯 Hızlı Başlangıç
+## Hızlı Başlangıç
 
 ### 1. Genel Kurulum
 Önce projeyi kurun:
@@ -19,20 +19,20 @@ Hangi AI servisini kullanmak istiyorsunuz?
 
 | Servis | Fiyat | Kurulum | Kalite | Hız | Önerilen |
 |--------|-------|---------|--------|-----|----------|
-| **Gemini** | Ücretsiz | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ✅ Başlangıç için |
-| **Ollama** | Ücretsiz | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ✅ Yerel kullanım |
-| **OpenAI** | Ücretli | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ✅ En iyi kalite |
-| **Azure** | Ücretli | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ✅ Kurumsal |
+| **Gemini** | Ücretsiz | 5/5 | 4/5 | 4/5 | Başlangıç için |
+| **Ollama** | Ücretsiz | 3/5 | 4/5 | 3/5 | Yerel kullanım |
+| **OpenAI** | Ücretli | 5/5 | 5/5 | 5/5 | En iyi kalite |
+| **Azure** | Ücretli | 4/5 | 5/5 | 5/5 | Kurumsal |
 
-## 📚 Detaylı Kurulum Rehberleri
+## Detaylı Kurulum Rehberleri
 
-### 🟢 Ücretsiz Seçenekler
+### Ücretsiz Seçenekler
 
 #### Google Gemini (Önerilen - Ücretsiz)
-- ✅ Azure/OpenAI benzeri bulut servisi
-- ✅ Sadece API key gerekli
-- ✅ Günlük sorgu limiti var ama yeterli
-- ✅ Kurulum gerektirmez
+- Azure/OpenAI benzeri bulut servisi
+- Sadece API key gerekli
+- Günlük sorgu limiti var ama yeterli
+- Kurulum gerektirmez
 
 **Kurulum:**
 ```batch
@@ -46,10 +46,10 @@ kurulum.bat  # Gemini varsayılan olarak gelir
 **Detaylı Rehber:** `KURULUM_GEMINI.md` (henüz oluşturulmadı)
 
 #### Ollama (Yerel - Ücretsiz)
-- ✅ Tamamen ücretsiz, sınırsız
-- ✅ Verileriniz dışarı gitmiyor
-- ⚠️ Model indirme gerekir (2-4GB)
-- ⚠️ Yerel kaynak gerektirir
+- Tamamen ücretsiz, sınırsız
+- Verileriniz dışarı gitmiyor
+- NOT: Model indirme gerekir (2-4GB)
+- NOT: Yerel kaynak gerektirir
 
 **Kurulum:**
 ```batch
@@ -63,13 +63,13 @@ chmod +x kurulum_ollama.sh
 
 **Detaylı Rehber:** [KURULUM_OLLAMA.md](KURULUM_OLLAMA.md)
 
-### 🔵 Ücretli Seçenekler
+### Ücretli Seçenekler
 
 #### OpenAI
-- ✅ En iyi AI kalitesi
-- ✅ Çok hızlı
-- ✅ Kolay kurulum
-- ⚠️ Kullanım başına ücret
+- En iyi AI kalitesi
+- Çok hızlı
+- Kolay kurulum
+- NOT: Kullanım başına ücret
 
 **Kurulum:**
 ```batch
@@ -84,11 +84,11 @@ chmod +x kurulum_openai.sh
 **Detaylı Rehber:** [KURULUM_OPENAI.md](KURULUM_OPENAI.md)
 
 #### Azure OpenAI
-- ✅ Kurumsal kalite
-- ✅ Yüksek güvenlik
-- ✅ Azure entegrasyonu
-- ⚠️ Kullanım başına ücret
-- ⚠️ Azure hesabı gerekli
+- Kurumsal kalite
+- Yüksek güvenlik
+- Azure entegrasyonu
+- NOT: Kullanım başına ücret
+- NOT: Azure hesabı gerekli
 
 **Kurulum:**
 ```batch
@@ -102,7 +102,7 @@ chmod +x kurulum_azure.sh
 
 **Detaylı Rehber:** [KURULUM_AZURE.md](KURULUM_AZURE.md)
 
-## 🚀 Servisleri Başlatma
+## Servisleri Başlatma
 
 Hangi platform kullanıyorsanız kullanın, servisleri başlatmak için:
 
@@ -115,7 +115,7 @@ chmod +x baslat.sh
 ./baslat.sh
 ```
 
-## 🔄 AI Sağlayıcı Değiştirme
+## AI Sağlayıcı Değiştirme
 
 AI sağlayıcınızı değiştirmek için:
 
@@ -129,7 +129,7 @@ AI sağlayıcınızı değiştirmek için:
    baslat.bat  # veya ./baslat.sh
    ```
 
-## ❓ Hangi Servisi Seçmeliyim?
+## Hangi Servisi Seçmeliyim?
 
 ### Benim için en uygun servis nedir?
 
@@ -156,7 +156,7 @@ AI sağlayıcınızı değiştirmek için:
 - Offline çalışabilir
 - Tamamen yerel
 
-## 🔧 Sorun Giderme
+## Sorun Giderme
 
 ### Hangi servisi kullanıyorum?
 `backend/.env` dosyasını açın ve `AI_PROVIDER` değerine bakın:
@@ -175,19 +175,19 @@ AI_PROVIDER=GEMINI  # veya OLLAMA, OPENAI, AZURE
 2. Backend'i yeniden başlatın
 3. Test edin
 
-## 📖 Ek Dokümantasyon
+## Ek Dokümantasyon
 
 - [Ollama Kurulum](KURULUM_OLLAMA.md)
 - [OpenAI Kurulum](KURULUM_OPENAI.md)
 - [Azure OpenAI Kurulum](KURULUM_AZURE.md)
 
-## 💡 İpuçları
+## İpuçları
 
 1. **Başlangıç için Gemini önerilir** - Ücretsiz ve kolay
 2. **Yerel kullanım için Ollama** - Gizlilik ve sınırsız
 3. **Üretim için OpenAI/Azure** - En iyi kalite ve hız
 
-## 🆘 Yardım
+## Yardım
 
 Sorun yaşıyorsanız:
 1. İlgili servisin kurulum rehberini okuyun

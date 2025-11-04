@@ -160,15 +160,13 @@ def get_vector_store(force_reload: bool = False):
         if employees_path.exists():
             _data_cache_timestamp = employees_path.stat().st_mtime
 
-        print("Vector store cache güncellendi")
         return vector_store, embeddings
         
     except Exception as e:
-        print(f"Uyarı: Vector store oluşturma hatası: {e}")
         return None, None
 
 def ask_ai(prompt: str, conversation_history: Optional[List] = None, use_advanced_rag: bool = None, 
-           use_cache: bool = True, use_fallback: bool = None) -> str:
+           use_cache: bool = True, use_fallback: bool = None, user_id: str = None) -> str:
     """
     AI sorguları için ana giriş noktası (Gelişmiş RAG, Cache ve Fallback desteği ile)
 
@@ -182,6 +180,7 @@ def ask_ai(prompt: str, conversation_history: Optional[List] = None, use_advance
         use_advanced_rag: Gelişmiş RAG kullan (hybrid search, re-ranking)
         use_cache: Response cache kullan
         use_fallback: Model fallback mekanizması kullan
+        user_id: Kullanıcı ID (kullanıcı bazlı cache için)
 
     Returns:
         AI tarafından üretilmiş yanıt string olarak
@@ -220,12 +219,11 @@ def ask_ai(prompt: str, conversation_history: Optional[List] = None, use_advance
                 import hashlib
                 context_hash = hashlib.md5(context_str.encode()).hexdigest()
             
-            cached_response = cache.get(prompt, AI_PROVIDER, context_hash)
+            # Kullanıcı ID ile cache kontrolü
+            cached_response = cache.get(prompt, AI_PROVIDER, user_id or "", context_hash)
             if cached_response:
-                print(f"Cache hit - Yanıt cache'den döndü")
                 return cached_response
         except Exception as e:
-            print(f"Cache kontrolü hatası (devam ediliyor): {e}")
 
     try:
         response = None
@@ -262,7 +260,6 @@ def ask_ai(prompt: str, conversation_history: Optional[List] = None, use_advance
                 response = f"Unknown AI_PROVIDER value: {AI_PROVIDER}"
         
         except Exception as e:
-            print(f"Primary provider hatası ({AI_PROVIDER}): {e}")
             response = None
         
         # Fallback mekanizması
@@ -276,27 +273,23 @@ def ask_ai(prompt: str, conversation_history: Optional[List] = None, use_advance
                 if fallback_response:
                     response = fallback_response
                     provider_used = fallback_provider
-                    print(f"Fallback başarılı: {fallback_provider} kullanıldı")
+                    pass
             except Exception as fallback_error:
-                print(f"Fallback hatası: {fallback_error}")
+                pass
         
         # Cache'e kaydet
         if response and use_cache:
             try:
                 from ai_cache import get_ai_cache
                 cache = get_ai_cache()
-                cache.set(prompt, provider_used, response, context_hash)
+                cache.set(prompt, provider_used, response, user_id or "", context_hash)
             except:
                 pass
         
         return response if response else "Yanıt alınamadı. Lütfen tekrar deneyin."
 
     except Exception as e:
-        print(f"AI servis hatası: {e}")
         return f"Hata: {str(e)}"
-    finally:
-        elapsed = time.time() - start_time
-        print(f"Yanıt süresi: {elapsed:.2f}s")
 
 def ask_openai_with_rag(prompt: str, conversation_history: Optional[List] = None, use_advanced_rag: bool = True) -> str:
     """
@@ -331,7 +324,6 @@ def ask_openai_with_rag(prompt: str, conversation_history: Optional[List] = None
                 # Fallback to basic RAG
                 use_advanced_rag = False
             except Exception as e:
-                print(f"Gelişmiş RAG hatası (fallback): {e}")
                 use_advanced_rag = False
         
         # Basit RAG fallback (optimize - daha az document)
@@ -390,7 +382,6 @@ def ask_openai_with_rag(prompt: str, conversation_history: Optional[List] = None
         return response.content.strip()
         
     except Exception as e:
-        print(f"OpenAI RAG hatası: {e}")
         return ask_openai_direct(prompt, conversation_history)
 
 def ask_openai_langchain(prompt: str, conversation_history: Optional[List] = None) -> str:
@@ -438,7 +429,6 @@ Answer (based only on provided information, professional and clear):"""
         return response.content.strip()
 
     except Exception as e:
-        print(f"LangChain/OpenAI hatas�: {e}")
         return ask_openai_direct(prompt, conversation_history)
 
 def ask_openai_direct(prompt: str, conversation_history: Optional[List] = None) -> str:
@@ -524,7 +514,7 @@ def ask_azure_with_rag(prompt: str, conversation_history: Optional[List] = None,
                         rag_temp = AdvancedRAGService(vector_store, embeddings)
                         context = rag_temp.format_context_for_ai(docs, prompt)
         except Exception as e:
-            print(f"RAG context alınamadı (devam ediliyor): {e}")
+            pass
         
         client = AzureOpenAI(
             api_key=AZURE_OPENAI_API_KEY,
@@ -562,7 +552,6 @@ def ask_azure_with_rag(prompt: str, conversation_history: Optional[List] = None,
         return response.choices[0].message.content.strip() if response.choices[0].message.content else ""
 
     except Exception as e:
-        print(f"Azure OpenAI hatası: {e}")
         return f"Azure response error: {e}"
 
 def ask_azure(prompt: str, conversation_history: Optional[List] = None) -> str:
@@ -596,7 +585,6 @@ def ask_gemini_with_rag(prompt: str, conversation_history: Optional[List] = None
                         rag_service = get_rag_service(vector_store, embeddings)
                         company_context = rag_service.retrieve_context(prompt, k=3, use_hybrid=False)
                     except Exception as e:
-                        print(f"Gelişmiş RAG hatası (fallback): {e}")
                         # Basic RAG fallback
                         docs = vector_store.similarity_search(prompt, k=3)
                         if docs:
@@ -610,7 +598,7 @@ def ask_gemini_with_rag(prompt: str, conversation_history: Optional[List] = None
                         rag_temp = AdvancedRAGService(vector_store, embeddings)
                         company_context = rag_temp.format_context_for_ai(docs, prompt)
         except Exception as e:
-            print(f"RAG context alınamadı (devam ediliyor): {e}")
+            pass
         
         # REST API kullan (Postman örneğine göre - daha güvenilir)
         # URL formatı: https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={API_KEY}
@@ -744,7 +732,6 @@ Yanıt (sadece yukarıdaki şirket verilerine göre, açık ve profesyonel):"""
 
     except Exception as e:
         error_msg = str(e)
-        print(f"Gemini hatası: {error_msg}")
         
         # Bağlantı hatası
         if "Connection" in error_msg or "timeout" in error_msg.lower():
@@ -794,7 +781,7 @@ def ask_ollama_with_rag(prompt: str, conversation_history: Optional[List] = None
                         rag_temp = AdvancedRAGService(vector_store, embeddings)
                         company_context = rag_temp.format_context_for_ai(docs, prompt)
         except Exception as e:
-            print(f"RAG context alınamadı (devam ediliyor): {e}")
+            pass
         
         url = f"{OLLAMA_BASE_URL}/api/generate"
         
@@ -844,7 +831,6 @@ Yanıt (sadece yukarıdaki şirket verilerine göre):"""
     except requests.exceptions.ConnectionError:
         return f"Ollama'ya bağlanılamadı. Ollama sunucusunun çalıştığından emin olun ({OLLAMA_BASE_URL}).\n\nKurulum:\n1. https://ollama.ai adresinden Ollama'yı indirin\n2. PowerShell'de: ollama pull {OLLAMA_MODEL}\n3. Ollama'yı başlatın: ollama serve\n\nDetaylar: KURULUM_OLLAMA.md"
     except Exception as e:
-        print(f"Ollama hatası: {e}")
         return f"Ollama hatası: {str(e)}\n\nOllama kurulumu için KURULUM_OLLAMA.md dosyasına bakın."
 
 def ask_ollama(prompt: str, conversation_history: Optional[List] = None) -> str:
@@ -886,7 +872,7 @@ def ask_huggingface_with_rag(prompt: str, use_advanced_rag: bool = True) -> str:
                         rag_temp = AdvancedRAGService(vector_store, embeddings)
                         company_context = rag_temp.format_context_for_ai(docs, prompt)
         except Exception as e:
-            print(f"RAG context alınamadı (devam ediliyor): {e}")
+            pass
         
         url = f"https://api-inference.huggingface.co/models/{HUGGINGFACE_MODEL}"
         headers = {"Authorization": f"Bearer {HUGGINGFACE_API_KEY}"}
@@ -915,7 +901,6 @@ Soru: {prompt}"""
         else:
             return str(data) if data else "Hugging Face returned empty response"
     except Exception as e:
-        print(f"HuggingFace hatası: {e}")
         return f"Hugging Face response error: {e}"
 
 def ask_huggingface(prompt: str) -> str:
@@ -960,7 +945,7 @@ def ask_local_with_rag(prompt: str, use_advanced_rag: bool = True) -> str:
                         rag_temp = AdvancedRAGService(vector_store, embeddings)
                         company_context = rag_temp.format_context_for_ai(docs, prompt)
         except Exception as e:
-            print(f"RAG context alınamadı (devam ediliyor): {e}")
+            pass
         
         from transformers import pipeline
         generator = pipeline("text-generation", model="dbmdz/bert-base-turkish-cased")
@@ -995,7 +980,6 @@ Soru: {prompt}"""
         
         return text.strip()
     except Exception as e:
-        print(f"Yerel model hatası: {e}")
         return "Local model could not be run. Internet connection or API key required."
 
 def ask_local(prompt: str) -> str:

@@ -142,7 +142,7 @@ class RateLimiter:
 
 # Global rate limiter instance'ları
 default_rate_limiter = RateLimiter(max_requests=60, window_seconds=60)
-strict_rate_limiter = RateLimiter(max_requests=10, window_seconds=60)  # Login için
+strict_rate_limiter = RateLimiter(max_requests=20, window_seconds=60)  # Login için (artırıldı: 10 -> 20)
 
 def rate_limit(max_requests: int = 60, window_seconds: int = 60):
     """Rate limiting decorator'ı"""

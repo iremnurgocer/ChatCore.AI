@@ -166,9 +166,17 @@ class SessionManager:
     
     def clear_session(self, user_id: str):
         """Session'ı temizler - TinyDB'den siler"""
+        # Session'ı temizle
         self.sessions_table.remove(self.Query.user_id == user_id)
         # Chat geçmişini de temizle
         self.chat_history_table.remove(self.Query.user_id == user_id)
+        # Conversation'ları da temizle
+        self.conversations_table.remove(self.Query.user_id == user_id)
+    
+    def session_exists(self, user_id: str) -> bool:
+        """Session var mı kontrol et"""
+        result = self.sessions_table.search(self.Query.user_id == user_id)
+        return len(result) > 0
     
     def get_session_by_token(self, token: str) -> Optional[Dict]:
         """Token'a göre session'ı getirir"""
@@ -216,7 +224,19 @@ class SessionManager:
     # ========== CONVERSATION MANAGEMENT ==========
     
     def create_conversation(self, user_id: str, title: Optional[str] = None) -> str:
-        """Yeni conversation oluşturur - benzersiz ID döner"""
+        """
+        Yeni conversation oluşturur - benzersiz ID döner
+        
+        Her kullanıcı için tamamen izole conversation'lar oluşturur.
+        ChatGPT gibi her conversation ayrı bir sohbet gibi çalışır.
+        
+        Args:
+            user_id: Kullanıcı ID (conversation'ın sahibi)
+            title: Conversation başlığı (opsiyonel, ilk mesajdan otomatik oluşturulur)
+            
+        Returns:
+            Conversation ID (8 karakterlik benzersiz ID)
+        """
         conversation_id = str(uuid.uuid4())[:8]  # Kısa ID (8 karakter)
         now_iso = datetime.now().isoformat()
         
@@ -226,7 +246,7 @@ class SessionManager:
         
         conversation = {
             "conversation_id": conversation_id,
-            "user_id": user_id,
+            "user_id": user_id,  # Her conversation bir kullanıcıya ait
             "title": title,
             "created_at": now_iso,
             "updated_at": now_iso,
@@ -234,6 +254,7 @@ class SessionManager:
         }
         
         self.conversations_table.insert(conversation)
+        
         return conversation_id
     
     def cleanup_empty_conversations(self, user_id: str):
@@ -254,14 +275,49 @@ class SessionManager:
         conversations = sorted(conversations, key=lambda x: x.get("updated_at", ""), reverse=True)
         return conversations
     
-    def get_conversation(self, conversation_id: str, user_id: str) -> Optional[Dict]:
-        """Belirli bir conversation'ı getirir"""
-        result = self.conversations_table.search(
-            (self.Query.conversation_id == conversation_id) & (self.Query.user_id == user_id)
-        )
+    def get_conversation_owner(self, conversation_id: str) -> Optional[str]:
+        """Conversation'ın sahibi olan user_id'yi döndürür"""
+        result = self.conversations_table.search(self.Query.conversation_id == conversation_id)
         if result:
-            return result[0]
+            return result[0].get("user_id")
         return None
+    
+    def get_user_token_from_conversation(self, conversation_id: str) -> Optional[str]:
+        """Conversation ID'den user_id ve token'ı al"""
+        owner_id = self.get_conversation_owner(conversation_id)
+        if not owner_id:
+            return None
+        
+        # User'ın session'ını al
+        session = self.get_or_create_session(owner_id)
+        token = session.get("token")
+        return token if token else None
+    
+    def get_conversation(self, conversation_id: str, user_id: str = None) -> Optional[Dict]:
+        """
+        Conversation bilgilerini getirir - KULLANICI İZOLASYONU ile
+        
+        Args:
+            conversation_id: Conversation ID
+            user_id: Kullanıcı ID (GÜVENLİK: Conversation'ın sahibi olmalı)
+            
+        Returns:
+            Conversation dictionary'si veya None (kullanıcıya ait değilse)
+        """
+        result = self.conversations_table.search(self.Query.conversation_id == conversation_id)
+        if not result:
+            return None
+        
+        conversation = result[0]
+        
+        # GÜVENLİK: user_id belirtilmişse, conversation'ın kullanıcıya ait olduğunu kontrol et
+        if user_id:
+            conv_owner = conversation.get("user_id")
+            if conv_owner != user_id:
+                # Conversation ba�ka bir kullan�c�ya ait - eri�im reddedildi
+                return None
+        
+        return conversation
     
     def update_conversation_title(self, conversation_id: str, user_id: str, title: str):
         """Conversation başlığını güncelle (ilk mesajdan)"""
@@ -305,19 +361,32 @@ class SessionManager:
                 )
     
     def get_conversation_history_by_id(self, conversation_id: str, user_id: str, limit: Optional[int] = None) -> List[Dict]:
-        """Conversation ID'ye göre geçmişi getirir"""
+        """
+        Belirli bir conversation'ın mesaj geçmişini getirir - KULLANICI İZOLASYONU ile
+        
+        Args:
+            conversation_id: Conversation ID
+            user_id: Kullanıcı ID (GÜVENLİK: Conversation'ın sahibi olmalı)
+            limit: Maksimum mesaj sayısı
+            
+        Returns:
+            Mesaj listesi (LLM formatında)
+        """
+        # GÜVENLİK: Conversation'ın kullanıcıya ait olduğunu kontrol et
+        conv = self.get_conversation(conversation_id, user_id)
+        if not conv:
+            return []  # Bo� liste d�nd�r (g�venlik i�in)
+        
+        # Conversation'a ait mesajları getir
         messages = self.chat_history_table.search(
-            (self.Query.conversation_id == conversation_id) & (self.Query.user_id == user_id)
+            (self.Query.conversation_id == conversation_id) & 
+            (self.Query.user_id == user_id)
         )
         
-        # Timestamp'e göre sırala
         messages = sorted(messages, key=lambda x: x.get("timestamp", ""))
-        
-        # Limit varsa son N mesajı al
         if limit:
             messages = messages[-limit:]
         
-        # LLM formatına dönüştür
         history = []
         for msg in messages:
             history.append({

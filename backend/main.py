@@ -4,7 +4,7 @@ Profesyonel, güvenli ve entegrasyona hazır chat uygulamaları için API
 """
 import time
 import os
-from fastapi import FastAPI, HTTPException, Depends, Header, Request
+from fastapi import FastAPI, HTTPException, Depends, Header, Request, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from typing import Optional
@@ -52,6 +52,10 @@ async def log_requests(request: Request, call_next):
     """Tüm istekleri loglar ve yanıt süresini ölçer"""
     start_time = time.time()
     
+    # Login endpoint'ine gelen istekleri logla
+    if request.url.path == "/api/login":
+        pass  # Login endpoint kendi loglarını yapıyor
+    
     response = await call_next(request)
     
     process_time = time.time() - start_time
@@ -59,6 +63,10 @@ async def log_requests(request: Request, call_next):
     # Token'dan user_id çıkar
     user_id = None
     ip_address = request.client.host if request.client else "unknown"
+    
+    # Login endpoint'ine gelen yanıtı logla
+    if request.url.path == "/api/login":
+        pass  # Login endpoint kendi loglarını yapıyor
     
     try:
         auth_header = request.headers.get("Authorization")
@@ -78,8 +86,9 @@ async def log_requests(request: Request, call_next):
         # Token doğrulama başarısız, user_id olmadan devam et
         pass
 
-    # Rate limiting kontrolü (status endpoint hariç)
-    if request.url.path != "/api/status":
+    # Rate limiting kontrolü (status ve login endpoint'leri hariç)
+    # Login endpoint'i kendi rate limiting'ini yapıyor (strict_rate_limiter)
+    if request.url.path not in ["/api/status", "/api/login"]:
         identifier = ip_address
         if hasattr(request.state, 'user_id'):
             identifier = f"{identifier}:{request.state.user_id}"
@@ -202,6 +211,44 @@ def get_employees(user_id: str = Depends(get_current_user)):
         analytics.record_error("/api/employees", type(e).__name__, str(e))
         raise HTTPException(status_code=500, detail=f"Failed to load data: {str(e)}")
 
+@app.get("/api/navigator")
+def get_navigator_info(request: Request, user_id: str = Depends(get_current_user)):
+    """Navigator bilgilerini getirir (user agent, platform, oscpu vb.)"""
+    try:
+        import platform
+        
+        # User-Agent header'ından bilgi al
+        user_agent = request.headers.get("User-Agent", "")
+        
+        # OS bilgisi
+        os_name = platform.system()
+        os_version = platform.version()
+        os_arch = platform.machine()
+        
+        # oscpu formatı: Windows NT 10.0; Win64; x64 gibi
+        if os_name == "Windows":
+            if "64" in os_arch:
+                oscpu = f"Windows NT {os_version.split('.')[0]}.{os_version.split('.')[1] if '.' in os_version else '0'}; Win64; x64"
+            else:
+                oscpu = f"Windows NT {os_version.split('.')[0]}.{os_version.split('.')[1] if '.' in os_version else '0'}; Win32"
+        elif os_name == "Linux":
+            oscpu = f"Linux {os_arch}"
+        elif os_name == "Darwin":
+            oscpu = f"Intel Mac OS X {os_version}"
+        else:
+            oscpu = f"{os_name} {os_version}"
+        
+        return {
+            "success": True,
+            "oscpu": oscpu,
+            "platform": platform.platform(),
+            "user_agent": user_agent,
+            "language": request.headers.get("Accept-Language", "en-US")
+        }
+    except Exception as e:
+        APILogger.log_error("/api/navigator", e, user_id, ErrorCategory.CONFIG_ERROR)
+        raise HTTPException(status_code=500, detail=f"Failed to get navigator info: {str(e)}")
+
 @app.get("/api/departments")
 def get_departments(user_id: str = Depends(get_current_user)):
     """Departman listesini getirir"""
@@ -250,11 +297,18 @@ def get_projects(user_id: str = Depends(get_current_user)):
 
 @app.post("/api/chat")
 def chat(request: dict, user_id: str = Depends(get_current_user)):
-    """Ana chat endpoint'i - AI sohbeti"""
+    """
+    Ana chat endpoint'i - AI sohbeti
+    
+    Her kullanıcı için izole conversation'lar yönetir.
+    ChatGPT gibi her conversation ayrı bir sohbet olarak çalışır.
+    """
     start_time = time.time()
     
     prompt = request.get("prompt", "")
-    if not prompt:
+    conversation_id = request.get("conversation_id")  # URL'den gelen conversation ID
+    
+    if not prompt or not prompt.strip():
         APILogger.log_error("/api/chat", ValueError("Empty prompt"), user_id, ErrorCategory.VALIDATION_ERROR)
         raise HTTPException(status_code=400, detail="Prompt cannot be empty")
 
@@ -267,15 +321,37 @@ def chat(request: dict, user_id: str = Depends(get_current_user)):
         raise
     
     try:
-        # Session'dan konuşma geçmişini al
-        conversation_history = session_manager.get_conversation_history(user_id)
-
-        # AI yanıtını al
-        response = ask_ai(prompt, conversation_history)
+        # Conversation ID varsa onu kullan, yoksa aktif conversation'ı kullan
+        if conversation_id:
+            # Conversation'ın kullanıcıya ait olduğunu kontrol et
+            conv = session_manager.get_conversation(conversation_id, user_id)
+            if not conv:
+                # Conversation bulunamad� veya kullan�c�ya ait de�il, yeni olu�tur
+                conversation_id = session_manager.create_conversation(user_id)
+                session_manager.set_active_conversation(user_id, conversation_id)
+            else:
+                # Conversation bulundu ve kullanıcıya ait, aktif yap
+                session_manager.set_active_conversation(user_id, conversation_id)
+        else:
+            # Conversation ID yoksa aktif conversation'ı kullan
+            conversation_id = session_manager.get_active_conversation_id(user_id)
+            if not conversation_id:
+                # Aktif conversation da yoksa yeni olu�tur
+                conversation_id = session_manager.create_conversation(user_id)
+                session_manager.set_active_conversation(user_id, conversation_id)
         
-        # Session'a kaydet
-        session_manager.add_message(user_id, "user", prompt)
-        session_manager.add_message(user_id, "assistant", response)
+        # Conversation ge�mi�ini al
+        conversation_history = session_manager.get_conversation_history(user_id, conversation_id=conversation_id)
+
+        # AI yanıtını al (user_id ile kullanıcı bazlı cache)
+        response = ask_ai(prompt, conversation_history, user_id=user_id)
+        
+        # Session'a kaydet (conversation_id ile)
+        session_manager.add_message(user_id, "user", prompt, conversation_id=conversation_id)
+        session_manager.add_message(user_id, "assistant", response, conversation_id=conversation_id)
+        
+        # Son aktivite zamanını güncelle
+        session_manager.update_last_activity(user_id)
         
         # Log
         response_time = time.time() - start_time
@@ -285,6 +361,7 @@ def chat(request: dict, user_id: str = Depends(get_current_user)):
             "success": True,
             "response": response,
             "user_id": user_id,
+            "conversation_id": conversation_id,
             "timestamp": datetime.now().isoformat()
         }
         
@@ -315,9 +392,9 @@ def ask_rag(request: dict, user_id: str = Depends(get_current_user)):
         # Intent ve entity çıkarımı
         analysis = IntentClassifier.analyze_query(query)
 
-        # AI yanıtını al (performans için: advanced_rag=False, fallback=False)
+        # AI yanıtını al (performans için: advanced_rag=False, fallback=False, user_id ile kullanıcı bazlı cache)
         conversation_history = session_manager.get_conversation_history(user_id)
-        response = ask_ai(query, conversation_history, use_advanced_rag=False, use_fallback=False)
+        response = ask_ai(query, conversation_history, use_advanced_rag=False, use_fallback=False, user_id=user_id)
         
         # Session'a kaydet
         session_manager.add_message(user_id, "user", query)
@@ -380,24 +457,36 @@ def get_stats(user_id: str = Depends(get_current_user)):
         raise HTTPException(status_code=500, detail=f"Failed to retrieve statistics: {str(e)}")
 
 @app.get("/api/sessions/{session_id}")
-def get_session(session_id: str, user_id: str = Depends(get_current_user)):
-    """Session bilgilerini getirir - aktif conversation'ın mesajlarını döner"""
+def get_session(session_id: str, user_id: str = Depends(get_current_user), conversation_id: Optional[str] = Query(None)):
+    """Session bilgilerini getirir - conversation_id belirtilmişse onun mesajlarını, yoksa aktif conversation'ın mesajlarını döner"""
     if session_id != user_id:
         APILogger.log_security_event("UNAUTHORIZED_ACCESS", f"User {user_id} tried to access session {session_id}", user_id, None)
         raise HTTPException(status_code=403, detail="Access denied")
     
     try:
-        # Aktif conversation'ın geçmişini getir
-        history = session_manager.get_conversation_history(user_id)  # conversation_id None, aktif conversation'ı kullanır
+        # Conversation ID belirtilmişse onun mesajlarını getir, yoksa aktif conversation'ı kullan
+        if conversation_id:
+            # Conversation'ın kullanıcıya ait olduğunu kontrol et
+            conv = session_manager.get_conversation(conversation_id, user_id)
+            if not conv:
+                raise HTTPException(status_code=404, detail="Conversation not found")
+            history = session_manager.get_conversation_history(user_id, conversation_id=conversation_id)
+        else:
+            # Aktif conversation'ın geçmişini getir
+            history = session_manager.get_conversation_history(user_id)  # conversation_id None, aktif conversation'ı kullanır
+        
         context = session_manager.get_context(user_id)
         
         return {
             "success": True,
             "session_id": user_id,
+            "conversation_id": conversation_id or session_manager.get_active_conversation_id(user_id),
             "message_count": len(history),
             "messages": history,
             "context": context
         }
+    except HTTPException:
+        raise
     except Exception as e:
         APILogger.log_error(f"/api/sessions/{session_id}", e, user_id, ErrorCategory.DATABASE_ERROR)
         raise HTTPException(status_code=500, detail=f"Failed to retrieve session: {str(e)}")
@@ -482,7 +571,12 @@ def get_new_procedures(
 
 @app.get("/api/conversations")
 def get_conversations(user_id: str = Depends(get_current_user)):
-    """Kullanıcının tüm conversation'larını getirir"""
+    """
+    Kullanıcının tüm conversation'larını getirir
+    
+    Her kullanıcı sadece kendi conversation'larını görür.
+    ChatGPT gibi her conversation ayrı bir sohbet olarak gösterilir.
+    """
     try:
         conversations = session_manager.get_user_conversations(user_id)
         active_conv_id = session_manager.get_active_conversation_id(user_id)
@@ -514,7 +608,12 @@ def get_conversations(user_id: str = Depends(get_current_user)):
 
 @app.post("/api/conversations/new")
 def create_conversation(user_id: str = Depends(get_current_user)):
-    """Yeni conversation oluşturur"""
+    """
+    Yeni conversation oluşturur - ChatGPT gibi her kullanıcı için ayrı conversation'lar
+    
+    Her kullanıcı kendi conversation'larını görür ve yönetir.
+    Conversation'lar kullanıcı bazlı izole edilmiştir.
+    """
     try:
         conversation_id = session_manager.create_conversation(user_id)
         session_manager.set_active_conversation(user_id, conversation_id)
@@ -549,6 +648,65 @@ def switch_conversation(conversation_id: str, user_id: str = Depends(get_current
     except Exception as e:
         APILogger.log_error(f"/api/conversations/{conversation_id}/switch", e, user_id, ErrorCategory.DATABASE_ERROR)
         raise HTTPException(status_code=500, detail=f"Failed to switch conversation: {str(e)}")
+
+@app.get("/api/conversation/{conversation_id}/restore")
+def restore_session_from_conversation(conversation_id: str):
+    """
+    Conversation ID'den session'ı restore eder (token gerektirmez - public endpoint)
+    
+    GÜVENLİK NOTU: Bu endpoint sadece aktif session varsa çalışmalı.
+    Logout sonrası conversation'lar silindiği için restore çalışmamalı.
+    """
+    try:
+        # Conversation'ın sahibini bul
+        owner_id = session_manager.get_conversation_owner(conversation_id)
+        if not owner_id:
+            # Conversation bulunamadı (silinmiş veya hiç oluşturulmamış)
+            raise HTTPException(status_code=404, detail="Conversation not found")
+        
+        # Session var mı kontrol et - eğer session yoksa logout yapılmış demektir
+        if not session_manager.session_exists(owner_id):
+            raise HTTPException(status_code=401, detail="Session expired, please login")
+        
+        # Mevcut session'ı al (yeni oluşturma!)
+        result = session_manager.sessions_table.search(session_manager.Query.user_id == owner_id)
+        if not result:
+            raise HTTPException(status_code=401, detail="Session expired, please login")
+        
+        session = result[0]
+        token = session.get("token")
+        
+        if not token:
+            raise HTTPException(status_code=401, detail="Session expired, please login")
+        
+        # Token'ı verify et
+        try:
+            from auth import verify_token as verify_token_func
+            payload = verify_token_func(token)
+            if payload:
+                # Conversation'ın hala kullanıcıya ait olduğunu kontrol et
+                conv = session_manager.get_conversation(conversation_id, owner_id)
+                if not conv:
+                    raise HTTPException(status_code=404, detail="Conversation not found")
+                
+                return {
+                    "success": True,
+                    "user_id": owner_id,
+                    "token": token,
+                    "conversation_id": conversation_id
+                }
+        except HTTPException:
+            raise
+        except:
+            # Token geçersiz, login gerekli
+            raise HTTPException(status_code=401, detail="Session expired, please login")
+        
+        raise HTTPException(status_code=401, detail="Invalid session")
+    except HTTPException:
+        raise
+    except Exception as e:
+        APILogger.log_error(f"/api/conversation/{conversation_id}/restore", e, None, ErrorCategory.DATABASE_ERROR)
+        raise HTTPException(status_code=500, detail=f"Failed to restore session: {str(e)}")
 
 @app.delete("/api/conversations/{conversation_id}")
 def delete_conversation(conversation_id: str, user_id: str = Depends(get_current_user)):

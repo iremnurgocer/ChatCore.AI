@@ -36,7 +36,6 @@ class AICache:
                 # Expired entries'i temizle
                 self._cleanup_expired()
             except Exception as e:
-                print(f"Cache yüklenemedi: {e}")
                 self._cache = {}
         else:
             self._cache = {}
@@ -47,15 +46,16 @@ class AICache:
             with open(self.cache_file, 'w', encoding='utf-8') as f:
                 json.dump(self._cache, f, ensure_ascii=False, indent=2)
         except Exception as e:
-            print(f"Cache kaydedilemedi: {e}")
+            pass
     
-    def _generate_key(self, prompt: str, provider: str, conversation_context: str = "") -> str:
+    def _generate_key(self, prompt: str, provider: str, user_id: str = "", conversation_context: str = "") -> str:
         """
         Cache key oluştur
         
         Args:
             prompt: Kullanıcı sorgusu
             provider: AI sağlayıcı adı
+            user_id: Kullanıcı ID (kullanıcı bazlı cache için)
             conversation_context: Conversation history hash
             
         Returns:
@@ -67,8 +67,35 @@ class AICache:
         if len(normalized_prompt) > 100:
             normalized_prompt = normalized_prompt[:100]
         
-        key_string = f"{provider}:{normalized_prompt}:{conversation_context}"
+        key_string = f"{user_id}:{provider}:{normalized_prompt}:{conversation_context}"
         return hashlib.md5(key_string.encode('utf-8')).hexdigest()
+    
+    def _get_data_timestamp(self) -> Dict[str, float]:
+        """Veri dosyalarının modification time'larını al"""
+        data_dir = Path(__file__).parent / "data"
+        timestamps = {}
+        
+        data_files = ["employees.json", "departments.json", "projects.json", "procedures.json"]
+        for filename in data_files:
+            file_path = data_dir / filename
+            if file_path.exists():
+                timestamps[filename] = file_path.stat().st_mtime
+            else:
+                timestamps[filename] = 0.0
+        
+        return timestamps
+    
+    def _is_data_updated(self, cached_timestamps: Dict[str, float]) -> bool:
+        """Veri dosyaları cache'den sonra güncellenmiş mi kontrol et"""
+        current_timestamps = self._get_data_timestamp()
+        
+        # Herhangi bir dosya değişmişse True döndür
+        for filename, cached_time in cached_timestamps.items():
+            current_time = current_timestamps.get(filename, 0.0)
+            if current_time > cached_time:
+                return True
+        
+        return False
     
     def _cleanup_expired(self):
         """Süresi dolmuş cache entry'lerini temizle"""
@@ -89,25 +116,34 @@ class AICache:
         if expired_keys:
             self._save_cache()
     
-    def get(self, prompt: str, provider: str, conversation_context: str = "") -> Optional[str]:
+    def get(self, prompt: str, provider: str, user_id: str = "", conversation_context: str = "") -> Optional[str]:
         """
         Cache'den yanıt al
         
         Args:
             prompt: Kullanıcı sorgusu
             provider: AI sağlayıcı
+            user_id: Kullanıcı ID (kullanıcı bazlı cache için)
             conversation_context: Conversation history hash
             
         Returns:
-            Cached yanıt veya None
+            Cached yanıt veya None (veri güncellenmişse de None döner)
         """
-        key = self._generate_key(prompt, provider, conversation_context)
+        key = self._generate_key(prompt, provider, user_id, conversation_context)
         
         if key in self._cache:
             entry = self._cache[key]
             try:
                 cached_time = datetime.fromisoformat(entry['timestamp'])
                 if datetime.now() - cached_time < self.ttl:
+                    # Veri güncellenmiş mi kontrol et
+                    cached_data_timestamps = entry.get('data_timestamps', {})
+                    if cached_data_timestamps and self._is_data_updated(cached_data_timestamps):
+                        # Veri güncellenmiş, cache'i kullanma
+                        del self._cache[key]
+                        self._save_cache()
+                        return None
+                    
                     # Cache hit - usage counter'ı artır
                     entry['usage_count'] = entry.get('usage_count', 0) + 1
                     self._save_cache()
@@ -121,7 +157,7 @@ class AICache:
         
         return None
     
-    def set(self, prompt: str, provider: str, response: str, conversation_context: str = ""):
+    def set(self, prompt: str, provider: str, response: str, user_id: str = "", conversation_context: str = ""):
         """
         Cache'e yanıt kaydet
         
@@ -129,16 +165,22 @@ class AICache:
             prompt: Kullanıcı sorgusu
             provider: AI sağlayıcı
             response: AI yanıtı
+            user_id: Kullanıcı ID (kullanıcı bazlı cache için)
             conversation_context: Conversation history hash
         """
-        key = self._generate_key(prompt, provider, conversation_context)
+        key = self._generate_key(prompt, provider, user_id, conversation_context)
+        
+        # Veri dosyalarının timestamp'lerini kaydet
+        data_timestamps = self._get_data_timestamp()
         
         self._cache[key] = {
             'response': response,
             'timestamp': datetime.now().isoformat(),
             'provider': provider,
+            'user_id': user_id,
             'prompt_preview': prompt[:50],
-            'usage_count': 0
+            'usage_count': 0,
+            'data_timestamps': data_timestamps  # Veri güncelleme kontrolü için
         }
         
         # Cache boyutunu kontrol et (max 1000 entry)

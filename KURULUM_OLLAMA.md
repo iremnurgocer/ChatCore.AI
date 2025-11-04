@@ -1,13 +1,13 @@
 # Ollama Kurulum Rehberi
 
-## 📋 Gereksinimler
+## Gereksinimler
 
 - **İşletim Sistemi**: Windows, macOS, Linux
 - **RAM**: En az 8GB (16GB önerilir)
 - **Disk Alanı**: 2-4GB (model boyutuna göre)
 - **İnternet Bağlantı**: İlk kurulum için gerekli (model indirme)
 
-## 🚀 Hızlı Kurulum
+## Hızlı Kurulum
 
 ### Windows
 
@@ -22,7 +22,7 @@ chmod +x kurulum_ollama.sh
 ./kurulum_ollama.sh
 ```
 
-## 📝 Adım Adım Kurulum
+## Adım Adım Kurulum
 
 ### 1. Ollama'yi İndir ve Kur
 
@@ -93,7 +93,7 @@ OLLAMA_MODEL=llama3.2
 
 **Not:** `OLLAMA_MODEL` değerini indirdiğiniz modele göre değiştirin.
 
-## ✅ Kurulumu Test Et
+## Kurulumu Test Et
 
 ### 1. Backend'i Başlat
 ```batch
@@ -118,7 +118,7 @@ Başarılı ise `"ai_provider": "OLLAMA"` görürsünüz.
 3. Herhangi bir soru sorun
 4. AI yanıt vermelidir
 
-## 🔧 Sorun Giderme
+## Sorun Giderme
 
 ### Ollama başlamıyor
 **Windows:**
@@ -145,29 +145,29 @@ ollama serve
 - RAM'inizi kontrol edin (en az 8GB önerilir)
 - GPU varsa Ollama GPU kullanımını etkinleştirin
 
-## 📊 Model Karşılaştırması
+## Model Karşılaştırması
 
 | Model | Boyut | RAM | Hız | Kalite |
 |-------|-------|-----|-----|--------|
-| mistral | 4.1GB | 8GB | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
-| llama3.2 | 2.0GB | 8GB | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
-| llama3 | 4.7GB | 16GB | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
-| codellama | 3.8GB | 16GB | ⭐⭐⭐ | ⭐⭐⭐⭐ |
+| mistral | 4.1GB | 8GB | 5/5 | 4/5 |
+| llama3.2 | 2.0GB | 8GB | 4/5 | 4/5 |
+| llama3 | 4.7GB | 16GB | 3/5 | 5/5 |
+| codellama | 3.8GB | 16GB | 3/5 | 4/5 |
 
-## 🎯 Avantajlar
+## Avantajlar
 
-✅ **Tamamen Ücretsiz** - Sorgu limiti yok  
-✅ **Gizlilik** - Verileriniz dışarı gitmiyor  
-✅ **Offline Çalışma** - İnternet gerektirmez (model indirildikten sonra)  
-✅ **Sınırsız Kullanım** - Aylık/gsünlük limit yok  
+- **Tamamen Ücretsiz** - Sorgu limiti yok  
+- **Gizlilik** - Verileriniz dışarı gitmiyor  
+- **Offline Çalışma** - İnternet gerektirmez (model indirildikten sonra)  
+- **Sınırsız Kullanım** - Aylık/günlük limit yok  
 
-## ⚠️ Dezavantajlar
+## Dezavantajlar
 
-⚠️ **Model İndirme Gerekli** - İlk kurulumda 2-4GB indirme  
-⚠️ **Yerel Kaynak Gerektirir** - Bilgisayarınızın gücüne bağlı  
-⚠️ **Azure/OpenAI kadar hızlı olmayabilir** - CPU'ya bağlı  
+- **Model İndirme Gerekli** - İlk kurulumda 2-4GB indirme  
+- **Yerel Kaynak Gerektirir** - Bilgisayarınızın gücüne bağlı  
+- **Azure/OpenAI kadar hızlı olmayabilir** - CPU'ya bağlı  
 
-## 📚 Ek Kaynaklar
+## Ek Kaynaklar
 
 - [Ollama Resmi Dokümantasyon](https://ollama.ai/docs)
 - [Model Listesi](https://ollama.ai/library)
