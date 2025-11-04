@@ -718,9 +718,13 @@ Bu proje demo amaçlıdır ve genel kullanım için hazırlanmıştır.
 Sorularınız veya önerileriniz için issue açabilirsiniz.
 
 ---
+
 <img width="1227" height="672" alt="ChatCore AI_1" src="https://github.com/user-attachments/assets/36043071-932c-4ef1-b1bc-92667e63710c" />
+
 ---
+
 <img width="1410" height="786" alt="ChatCore AI_2" src="https://github.com/user-attachments/assets/6a408abb-6503-41be-8970-0aaea300828d" />
+
 ---
 
 
