@@ -1,6 +1,19 @@
+# -*- coding: utf-8 -*-
 """
 Veri Yükleme Modülü
-Data dizinindeki JSON veri dosyalarını yükler ve parse eder
+
+Bu modül data dizinindeki JSON veri dosyalarını yükler ve parse eder.
+Çalışanlar, departmanlar, projeler ve prosedürler gibi şirket verilerini okur.
+
+Ne İşe Yarar:
+- JSON veri dosyalarını yükleme
+- Veri parse etme ve doğrulama
+- Hata yönetimi (dosya bulunamazsa, JSON geçersizse)
+- Birden fazla dosyayı tek seferde yükleme
+
+Kullanım:
+- load_json_data() - Tüm veri dosyalarını yükle
+- load_json_data("employees.json") - Belirli bir dosyayı yükle
 """
 import json
 from pathlib import Path

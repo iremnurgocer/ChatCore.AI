@@ -1,5 +1,21 @@
+# -*- coding: utf-8 -*-
 """
 Kimlik Doğrulama Modülü - JWT Token Yönetimi
+
+Bu modül kullanıcı girişi ve çıkışı işlemlerini yönetir. JWT token oluşturma,
+doğrulama ve şifre hash'leme işlemlerini gerçekleştirir.
+
+Ne İşe Yarar:
+- Kullanıcı login/logout işlemleri
+- JWT token oluşturma ve doğrulama
+- Şifre hash'leme ve güvenli saklama (PBKDF2-HMAC-SHA256)
+- Rate limiting ile brute force koruması
+- Session oluşturma ve yönetimi
+
+Kullanım:
+- Login endpoint: POST /api/login
+- Logout endpoint: POST /api/logout
+- Token doğrulama: verify_token() fonksiyonu
 """
 from fastapi import APIRouter, HTTPException, Request, Depends, Header
 from typing import Optional, Tuple

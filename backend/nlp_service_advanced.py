@@ -1,5 +1,20 @@
+# -*- coding: utf-8 -*-
 """
-Gelişmiş NLP Servisi - AI tabanlı intent classification ve entity extraction
+Gelişmiş NLP Servisi - AI Tabanlı Intent Classification ve Entity Extraction
+
+Bu modül gelişmiş NLP teknikleri kullanarak kullanıcı sorgularını analiz eder.
+AI tabanlı intent classification ve entity extraction yapar.
+
+Ne İşe Yarar:
+- AI tabanlı intent classification
+- Entity extraction (isim, departman, proje vb.)
+- Query understanding ve semantic analysis
+- Gelişmiş NLP işlemleri
+
+Kullanım:
+- analyze_query() - Sorguyu gelişmiş NLP ile analiz et
+- classify_intent() - Intent'i AI ile sınıflandır
+- extract_entities() - Entity'leri çıkar
 """
 import re
 import json

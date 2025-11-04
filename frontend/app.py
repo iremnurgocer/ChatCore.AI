@@ -1,15 +1,30 @@
+# -*- coding: utf-8 -*-
 """
-ChatCore.AI - Kurumsal AI Chat Frontend Uygulaması
+ChatCore.AI - Kurumsal AI Chat Frontend UygulamasÄ±
 
-Bu modül Streamlit kullanarak kullanıcı dostu bir web arayüzü sağlar.
-ChatGPT benzeri conversation yönetimi, oturum kontrolü ve güvenli authentication içerir.
+Bu modÃ¼l Streamlit kullanarak kullanÄ±cÄ± dostu bir web arayÃ¼zÃ¼ saÄŸlar.
+ChatGPT benzeri conversation yÃ¶netimi, oturum kontrolÃ¼ ve gÃ¼venli authentication iÃ§erir.
 
-Özellikler:
-- JWT tabanlı kimlik doğrulama
-- ChatGPT benzeri conversation yönetimi
-- URL bazlı conversation ID yönetimi
-- Gerçek zamanlı chat arayüzü
-- Sidebar ile geçmiş sohbet yönetimi
+Ne Ä°ÅŸe Yarar:
+- Web arayÃ¼zÃ¼ saÄŸlama (Streamlit ile)
+- KullanÄ±cÄ± login/logout iÅŸlemleri
+- ChatGPT benzeri conversation yÃ¶netimi
+- URL bazlÄ± conversation ID yÃ¶netimi
+- GerÃ§ek zamanlÄ± chat arayÃ¼zÃ¼
+- Sidebar ile geÃ§miÅŸ sohbet yÃ¶netimi
+- Backend API ile iletiÅŸim
+
+KullanÄ±m:
+- Frontend'i baÅŸlatmak iÃ§in: streamlit run app.py
+- TarayÄ±cÄ±da: http://localhost:8501
+- GiriÅŸ: admin / 1234
+
+Ã–zellikler:
+- JWT tabanlÄ± kimlik doÄŸrulama
+- ChatGPT benzeri conversation yÃ¶netimi
+- URL bazlÄ± conversation ID yÃ¶netimi
+- GerÃ§ek zamanlÄ± chat arayÃ¼zÃ¼
+- Sidebar ile geÃ§miÅŸ sohbet yÃ¶netimi
 """
 
 import os
@@ -18,24 +33,24 @@ import requests
 import streamlit as st
 import time
 
-# CSS stil dosyasını yükle
+# CSS stil dosyasÄ±nÄ± yÃ¼kle
 try:
     with open(os.path.join(os.path.dirname(__file__), 'static', 'styles.css'), 'r', encoding='utf-8') as f:
         st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 except FileNotFoundError:
-    pass  # CSS dosyası yoksa devam et
+    pass  # CSS dosyasÄ± yoksa devam et
 
-# Yapılandırma Değişkenleri
-# Backend API URL'i - environment değişkeninden alınır veya varsayılan değer kullanılır
+# YapÄ±landÄ±rma DeÄŸiÅŸkenleri
+# Backend API URL'i - environment deÄŸiÅŸkeninden alÄ±nÄ±r veya varsayÄ±lan deÄŸer kullanÄ±lÄ±r
 BACKEND_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:8000").rstrip("/")
 
-# Şirket adı - environment değişkeninden alınır veya varsayılan değer kullanılır
+# Åirket adÄ± - environment deÄŸiÅŸkeninden alÄ±nÄ±r veya varsayÄ±lan deÄŸer kullanÄ±lÄ±r
 COMPANY_NAME = os.getenv("COMPANY_NAME", "Company1")
 
-# Streamlit sayfa yapılandırması
-# layout="wide": Geniş ekran düzeni kullan
-# initial_sidebar_state="expanded": Sidebar varsayılan olarak açık
-# menu_items=None: Menü öğelerini gizle (URL değişikliğini önlemek için)
+# Streamlit sayfa yapÄ±landÄ±rmasÄ±
+# layout="wide": GeniÅŸ ekran dÃ¼zeni kullan
+# initial_sidebar_state="expanded": Sidebar varsayÄ±lan olarak aÃ§Ä±k
+# menu_items=None: MenÃ¼ Ã¶ÄŸelerini gizle (URL deÄŸiÅŸikliÄŸini Ã¶nlemek iÃ§in)
 st.set_page_config(
     page_title=f"{COMPANY_NAME} AI Chat",
     layout="wide",
@@ -44,18 +59,18 @@ st.set_page_config(
 )
 
 # ============================================================================
-# API İŞLEMLERİ - Backend ile iletişim fonksiyonları
+# API Ä°ÅLEMLERÄ° - Backend ile iletiÅŸim fonksiyonlarÄ±
 # ============================================================================
 
 def api_logout(token: str) -> bool:
     """
-    Backend API'ye çıkış yapar ve kullanıcı oturumunu sonlandırır.
+    Backend API'ye Ã§Ä±kÄ±ÅŸ yapar ve kullanÄ±cÄ± oturumunu sonlandÄ±rÄ±r.
     
     Args:
         token: JWT authentication token
         
     Returns:
-        bool: İşlem başarılıysa True, aksi halde False
+        bool: Ä°ÅŸlem baÅŸarÄ±lÄ±ysa True, aksi halde False
     """
     url = f"{BACKEND_URL}/api/logout"
     try:
@@ -70,25 +85,25 @@ def api_logout(token: str) -> bool:
 
 def api_login(username: str, password: str) -> tuple:
     """
-    Backend API'ye kullanıcı girişi yapar ve JWT token alır.
+    Backend API'ye kullanÄ±cÄ± giriÅŸi yapar ve JWT token alÄ±r.
     
     Args:
-        username: Kullanıcı adı
-        password: Kullanıcı şifresi
+        username: KullanÄ±cÄ± adÄ±
+        password: KullanÄ±cÄ± ÅŸifresi
         
     Returns:
-        tuple: (token, error_message) - Başarılıysa token döner, hata varsa error_message döner
+        tuple: (token, error_message) - BaÅŸarÄ±lÄ±ysa token dÃ¶ner, hata varsa error_message dÃ¶ner
     """
     url = f"{BACKEND_URL}/api/login"
     
     try:
-        # Login isteği için payload hazırla
+        # Login isteÄŸi iÃ§in payload hazÄ±rla
         payload = {"username": username, "password": password}
         
-        # POST isteği gönder
+        # POST isteÄŸi gÃ¶nder
         r = requests.post(url, json=payload, timeout=15)
         
-        # Başarılı yanıt kontrolü
+        # BaÅŸarÄ±lÄ± yanÄ±t kontrolÃ¼
         if r.status_code == 200:
             token = r.json().get("token")
             return token, None
@@ -99,35 +114,35 @@ def api_login(username: str, password: str) -> tuple:
         except Exception:
             detail = r.text
         
-        return None, f"Giriş başarısız ({r.status_code}): {detail}"
+        return None, f"GiriÅŸ baÅŸarÄ±sÄ±z ({r.status_code}): {detail}"
         
     except requests.exceptions.ConnectionError:
-        # Backend'e bağlanılamıyor
-        return None, f"Backend'e bağlanılamıyor. Backend'in çalıştığından emin olun: {BACKEND_URL}\nLütfen 'baslat.bat' dosyasını çalıştırın veya backend penceresinin açık olduğunu kontrol edin."
+        # Backend'e baÄŸlanÄ±lamÄ±yor
+        return None, f"Backend'e baÄŸlanÄ±lamÄ±yor. Backend'in Ã§alÄ±ÅŸtÄ±ÄŸÄ±ndan emin olun: {BACKEND_URL}\nLÃ¼tfen 'baslat.bat' dosyasÄ±nÄ± Ã§alÄ±ÅŸtÄ±rÄ±n veya backend penceresinin aÃ§Ä±k olduÄŸunu kontrol edin."
     
     except requests.exceptions.Timeout:
-        # İstek zaman aşımına uğradı
-        return None, "Backend yanıt vermiyor (timeout). Backend'in çalıştığından emin olun."
+        # Ä°stek zaman aÅŸÄ±mÄ±na uÄŸradÄ±
+        return None, "Backend yanÄ±t vermiyor (timeout). Backend'in Ã§alÄ±ÅŸtÄ±ÄŸÄ±ndan emin olun."
     
     except requests.RequestException as e:
-        # Diğer HTTP hataları
-        return None, f"Bağlantı hatası: {e}"
+        # DiÄŸer HTTP hatalarÄ±
+        return None, f"BaÄŸlantÄ± hatasÄ±: {e}"
     
     except Exception as e:
         # Beklenmeyen hatalar
         return None, f"Hata: {str(e)}"
 
-    """
-    Backend API'ye chat mesajı gönderir ve AI yanıtını alır.
-    ChatGPT benzeri conversation yönetimi ile her mesaj bir conversation'a bağlıdır.
+def api_chat(prompt: str, token: str, conversation_id: str = None):
+    Backend API'ye chat mesajï¿½ gï¿½nderir ve AI yanï¿½tï¿½nï¿½ alï¿½r.
+    ChatGPT benzeri conversation yï¿½netimi ile her mesaj bir conversation'a baï¿½lï¿½dï¿½r.
     
     Args:
-        prompt: Kullanıcı mesajı
+        prompt: Kullanï¿½cï¿½ mesajï¿½
         token: JWT authentication token
-        conversation_id: Mevcut conversation ID (opsiyonel, yeni conversation oluşturulabilir)
+        conversation_id: Mevcut conversation ID (opsiyonel, yeni conversation oluï¿½turulabilir)
         
     Returns:
-        tuple: ((response, conversation_id), error_message) - Başarılıysa yanıt ve conversation ID döner
+        tuple: ((response, conversation_id), error_message) - Baï¿½arï¿½lï¿½ysa yanï¿½t ve conversation ID dï¿½ner
     """
     url = f"{BACKEND_URL}/api/chat"
     try:

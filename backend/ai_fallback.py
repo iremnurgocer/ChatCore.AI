@@ -1,6 +1,19 @@
+# -*- coding: utf-8 -*-
 """
 AI Model Fallback Mekanizması
-Bir model başarısız olursa otomatik olarak diğerini dener
+
+Bu modül bir AI model başarısız olursa otomatik olarak diğer bir modele
+geçiş yapar. Böylece sistem kesintisiz çalışmaya devam eder.
+
+Ne İşe Yarar:
+- AI provider başarısızlığında otomatik yedek devreye girme
+- Çoklu AI provider desteği
+- Hata yönetimi ve recovery
+- Kesintisiz servis sağlama
+
+Kullanım:
+- Bir AI provider çalışmazsa otomatik olarak diğerine geçer
+- Yapılandırma: backend/.env dosyasında AI_PROVIDER sırası
 """
 import os
 from typing import Optional, List, Tuple

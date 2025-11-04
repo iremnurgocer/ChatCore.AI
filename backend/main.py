@@ -1,6 +1,21 @@
+# -*- coding: utf-8 -*-
 """
 FastAPI Ana Uygulama - Kurumsal AI Chat API
-Profesyonel, güvenli ve entegrasyona hazır chat uygulamaları için API
+
+Bu modül projenin ana FastAPI uygulamasını içerir. Tüm API endpoint'lerini tanımlar,
+middleware'leri yapılandırır ve request/response işlemlerini yönetir.
+
+Ne İşe Yarar:
+- API endpoint'lerini tanımlar (/api/chat, /api/employees, vb.)
+- JWT token doğrulama ve authentication yönetimi
+- Request logging ve analytics kayıtları
+- Rate limiting ve güvenlik kontrolleri
+- CORS yapılandırması
+- Error handling ve exception yönetimi
+
+Kullanım:
+- Backend'i başlatmak için: uvicorn main:app --reload --host 0.0.0.0 --port 8000
+- API dokümantasyonu: http://localhost:8000/docs
 """
 import time
 import os
@@ -326,7 +341,7 @@ def chat(request: dict, user_id: str = Depends(get_current_user)):
             # Conversation'ın kullanıcıya ait olduğunu kontrol et
             conv = session_manager.get_conversation(conversation_id, user_id)
             if not conv:
-                # Conversation bulunamad� veya kullan�c�ya ait de�il, yeni olu�tur
+                # Conversation bulunamadı veya kullanıcıya ait değil, yeni oluştur
                 conversation_id = session_manager.create_conversation(user_id)
                 session_manager.set_active_conversation(user_id, conversation_id)
             else:
@@ -336,11 +351,11 @@ def chat(request: dict, user_id: str = Depends(get_current_user)):
             # Conversation ID yoksa aktif conversation'ı kullan
             conversation_id = session_manager.get_active_conversation_id(user_id)
             if not conversation_id:
-                # Aktif conversation da yoksa yeni olu�tur
+                # Aktif conversation da yoksa yeni oluştur
                 conversation_id = session_manager.create_conversation(user_id)
                 session_manager.set_active_conversation(user_id, conversation_id)
         
-        # Conversation ge�mi�ini al
+        # Conversation geçmişini al
         conversation_history = session_manager.get_conversation_history(user_id, conversation_id=conversation_id)
 
         # AI yanıtını al (user_id ile kullanıcı bazlı cache)
@@ -380,7 +395,7 @@ def ask_rag(request: dict, user_id: str = Depends(get_current_user)):
         APILogger.log_error("/api/ask", ValueError("Empty query"), user_id, ErrorCategory.VALIDATION_ERROR)
         raise HTTPException(status_code=400, detail="Query cannot be empty")
     
-    # Input do�rulama ve temizleme
+    # Input doğrulama ve temizleme
     ip_address = None
     try:
         query = SecurityValidator.sanitize_input(query, user_id, ip_address)

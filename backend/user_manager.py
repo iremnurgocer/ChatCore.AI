@@ -1,6 +1,21 @@
+# -*- coding: utf-8 -*-
 """
 Kullanıcı Yönetimi Modülü - TinyDB ile Kullanıcı Veritabanı
-Kullanıcı bilgilerini güvenli bir şekilde saklar ve yönetir
+
+Bu modül kullanıcı bilgilerini güvenli bir şekilde saklar ve yönetir.
+TinyDB kullanarak kullanıcı oluşturma, silme, şifre güncelleme gibi işlemleri yapar.
+
+Ne İşe Yarar:
+- Kullanıcı veritabanı yönetimi (TinyDB ile)
+- Şifre hash'leme ve doğrulama
+- Kullanıcı oluşturma, silme, güncelleme
+- Username normalizasyonu (case-insensitive, strip)
+- Varsayılan kullanıcıları otomatik oluşturma (admin, user2, user3)
+
+Kullanım:
+- user_manager.create_user() - Yeni kullanıcı oluştur
+- user_manager.verify_password() - Şifre doğrula
+- user_manager.get_user() - Kullanıcı bilgilerini getir
 """
 from typing import Dict, Optional, List
 from datetime import datetime

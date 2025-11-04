@@ -1,6 +1,23 @@
+# -*- coding: utf-8 -*-
 """
 AI Servis Modeli - Çoklu sağlayıcı AI entegrasyonu RAG desteği ile
-OpenAI, Azure OpenAI, Google Gemini, Ollama ve Hugging Face deste�i
+
+Bu modül OpenAI, Azure OpenAI, Google Gemini, Ollama ve Hugging Face gibi
+farklı AI sağlayıcılarıyla entegrasyonu sağlar. RAG teknolojisi ile şirket
+verilerine dayalı doğru yanıtlar üretir.
+
+Ne İşe Yarar:
+- Çoklu AI sağlayıcı desteği (Gemini, OpenAI, Azure, Ollama)
+- RAG (Retrieval-Augmented Generation) entegrasyonu
+- Vector store yönetimi (FAISS)
+- Context compression ve prompt optimization
+- Fallback mekanizması (bir AI çalışmazsa diğerine geçer)
+- Kullanıcı bazlı cache yönetimi
+
+Kullanım:
+- ask_ai() - Ana AI sorgu fonksiyonu
+- get_vector_store() - RAG için vector store al
+- AI provider seçimi: backend/.env dosyasında AI_PROVIDER değişkeni
 """
 import os
 import json

@@ -1,6 +1,20 @@
+# -*- coding: utf-8 -*-
 """
 Performans Yapılandırma Dosyası
-Hızlı yanıt için optimize edilmiş ayarlar
+
+Bu modül hızlı yanıt için optimize edilmiş ayarları içerir.
+RAG cache, model seçimi ve timeout ayarları gibi performans
+parametrelerini yönetir.
+
+Ne İşe Yarar:
+- Performans optimizasyonu ayarları
+- Cache yapılandırması
+- Timeout ayarları
+- Model seçimi optimizasyonu
+
+Kullanım:
+- Bu dosya performans ayarlarını içerir
+- Diğer modüller bu ayarları kullanır
 """
 
 # RAG Ayarları (Performans için)

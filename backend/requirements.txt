@@ -19,7 +19,7 @@ langchain-core>=0.2.0
 # Google Gemini SDK (Resmi)
 google-generativeai>=0.3.0
 
-# Vector Database (RAG i�in)
+# Vector Database (RAG için)
 faiss-cpu>=1.8.0
 sentence-transformers>=2.2.2
 
@@ -36,12 +36,12 @@ tinydb>=4.8.0
 streamlit>=1.32.0
 
 # ==========================================
-# OPSIYONEL PAKETLER (Yorum sat�r�n� kald�rarak aktif edebilirsiniz)
+# OPSIYONEL PAKETLER (Yorum satırını kaldırarak aktif edebilirsiniz)
 # ==========================================
 
-# Local AI Models (Sadece LOCAL AI provider kullanacaksan�z)
+# Local AI Models (Sadece LOCAL AI provider kullanacaksanız)
 # transformers>=4.37.0
 # torch>=2.2.0
 
-# PDF Generation (Sadece PDF rapor �zelli�i kullan�lacaksa)
+# PDF Generation (Sadece PDF rapor özelliği kullanılacaksa)
 # reportlab==4.0.7

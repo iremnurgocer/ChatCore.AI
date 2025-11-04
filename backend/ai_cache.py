@@ -1,6 +1,21 @@
+# -*- coding: utf-8 -*-
 """
-AI Response Caching Sistemi
-Benzer sorgular için hızlı yanıt döndürür
+AI Cache Modülü - Kullanıcı Bazlı Response Cache
+
+Bu modül AI yanıtlarını cache'ler ve aynı sorular için tekrar sorgu atmadan
+önceden cache'lenmiş yanıtları döndürür. Kullanıcı bazlı cache ile her
+kullanıcının kendi cache'i vardır.
+
+Ne İşe Yarar:
+- AI yanıtlarını cache'leme
+- Kullanıcı bazlı cache izolasyonu
+- Cache invalidation (veri dosyaları değiştiğinde cache'i temizleme)
+- Performans optimizasyonu (tekrar sorgular için hızlı yanıt)
+
+Kullanım:
+- ai_cache.set() - Yanıtı cache'le
+- ai_cache.get() - Cache'den yanıt al
+- ai_cache.clear() - Cache'i temizle
 """
 import hashlib
 import json

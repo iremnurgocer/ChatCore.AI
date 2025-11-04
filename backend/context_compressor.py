@@ -1,5 +1,19 @@
+# -*- coding: utf-8 -*-
 """
-Context Compression - Uzun context'leri optimize eder
+Context Compression Modülü
+
+Bu modül uzun context'leri optimize eder ve AI'nın token limitini
+aşmadan maksimum bilgiyi göndermek için sıkıştırır.
+
+Ne İşe Yarar:
+- Uzun dokümanları özetleme ve sıkıştırma
+- Token limit optimizasyonu
+- Önemli bilgileri koruyarak gereksiz detayları çıkarma
+- RAG context'lerini optimize etme
+
+Kullanım:
+- compress_context() - Context'i sıkıştır
+- summarize_documents() - Dokümanları özetle
 """
 from typing import List, Dict
 from langchain_core.documents import Document

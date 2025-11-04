@@ -1,6 +1,23 @@
+# -*- coding: utf-8 -*-
 """
 Session ve Konuşma Hafızası Yönetimi
-Kullanıcı bazlı konuşma geçmişi yönetimi - TinyDB ile kalıcı depolama
+
+Bu modül kullanıcı bazlı konuşma geçmişi ve session yönetimini yapar.
+ChatGPT benzeri conversation yönetimi ile her kullanıcının ayrı sohbet geçmişi tutulur.
+
+Ne İşe Yarar:
+- Kullanıcı session'larını yönetir (TinyDB ile)
+- Conversation (sohbet) yönetimi - her kullanıcı için ayrı conversation'lar
+- Mesaj geçmişi saklama ve yükleme
+- Aktif conversation takibi
+- Session timeout yönetimi
+- Conversation silme ve temizleme
+
+Kullanım:
+- session_manager.create_conversation() - Yeni conversation oluştur
+- session_manager.add_message() - Mesaj ekle
+- session_manager.get_conversation_history() - Mesaj geçmişini getir
+- session_manager.clear_session() - Session'ı temizle
 """
 from typing import Dict, List, Optional
 from datetime import datetime, timedelta
@@ -314,7 +331,7 @@ class SessionManager:
         if user_id:
             conv_owner = conversation.get("user_id")
             if conv_owner != user_id:
-                # Conversation ba�ka bir kullan�c�ya ait - eri�im reddedildi
+                # Conversation ba�ka bir kullan�c�ya ait - eri�im reddedildi
                 return None
         
         return conversation
@@ -375,7 +392,7 @@ class SessionManager:
         # GÜVENLİK: Conversation'ın kullanıcıya ait olduğunu kontrol et
         conv = self.get_conversation(conversation_id, user_id)
         if not conv:
-            return []  # Bo� liste d�nd�r (g�venlik i�in)
+            return []  # Bo� liste d�nd�r (g�venlik i�in)
         
         # Conversation'a ait mesajları getir
         messages = self.chat_history_table.search(

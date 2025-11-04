@@ -1,5 +1,19 @@
+# -*- coding: utf-8 -*-
 """
-Prompt Optimizer - Few-shot examples ve gelişmiş prompt engineering
+Prompt Optimizer - Few-shot Examples ve Gelişmiş Prompt Engineering
+
+Bu modül AI prompt'larını optimize eder ve few-shot examples ekleyerek
+daha iyi yanıtlar alınmasını sağlar.
+
+Ne İşe Yarar:
+- Few-shot examples ekleme
+- Prompt engineering teknikleri
+- Context-aware prompt oluşturma
+- AI yanıt kalitesini artırma
+
+Kullanım:
+- optimize_prompt() - Prompt'u optimize et
+- add_few_shot_examples() - Örnekler ekle
 """
 from typing import List, Dict, Optional
 

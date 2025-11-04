@@ -1,6 +1,18 @@
+# -*- coding: utf-8 -*-
 """
 Rapor Servis Modülü
-Chat geçmişi için PDF rapor oluşturma
+
+Bu modül chat geçmişi için PDF rapor oluşturma özelliği sunar.
+Kullanıcıların sohbet geçmişlerini PDF formatında indirebilmesini sağlar.
+
+Ne İşe Yarar:
+- Chat geçmişini PDF formatına çevirme
+- Rapor oluşturma ve formatlama
+- PDF indirme özelliği
+
+Kullanım:
+- generate_report() - PDF rapor oluştur
+- export_conversation() - Conversation'ı PDF'e çevir
 """
 from reportlab.lib.pagesizes import A4
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer

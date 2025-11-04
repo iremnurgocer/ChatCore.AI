@@ -1,6 +1,21 @@
+# -*- coding: utf-8 -*-
 """
-Analytics ve istatistik Modülü
-API kullanım istatistiklerini takip eder
+Analytics ve İstatistik Modülü
+
+Bu modül API kullanım istatistiklerini takip eder ve analiz eder.
+Endpoint çağrı sayıları, hata oranları, yanıt süreleri gibi metrikleri kaydeder.
+
+Ne İşe Yarar:
+- API endpoint kullanım istatistikleri
+- Hata oranları ve kategorileri
+- Ortalama yanıt süreleri
+- Başarılı/başarısız istek sayıları
+- Zaman bazlı trend analizi
+
+Kullanım:
+- analytics.record_request() - İstek kaydet
+- analytics.record_error() - Hata kaydet
+- analytics.get_stats() - İstatistikleri getir
 """
 from datetime import datetime, timedelta
 from typing import Dict, List

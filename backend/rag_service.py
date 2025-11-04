@@ -1,6 +1,23 @@
+# -*- coding: utf-8 -*-
 """
 Gelişmiş RAG (Retrieval-Augmented Generation) Servisi
-Multi-query, re-ranking, hybrid search ve query expansion desteği
+
+Bu modül şirket verilerinize dayalı doğru yanıtlar üretmek için gelişmiş
+RAG teknolojilerini kullanır. Multi-query, re-ranking, hybrid search ve
+query expansion gibi özellikler içerir.
+
+Ne İşe Yarar:
+- Vector store'dan ilgili dokümanları bulma
+- Multi-query ile birden fazla sorgu varyasyonu oluşturma
+- Re-ranking ile en alakalı sonuçları seçme
+- Hybrid search (dense + sparse search)
+- Query expansion ile sorgu genişletme
+- Context formatlama ve AI prompt'a hazırlama
+
+Kullanım:
+- get_rag_service() - RAG servis instance'ı al
+- retrieve_context() - İlgili context'i getir
+- format_context_for_ai() - Context'i AI prompt'una uygun formatla
 """
 import json
 import re

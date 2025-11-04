@@ -1,6 +1,21 @@
+# -*- coding: utf-8 -*-
 """
 Loglama Sistemi
-API isteklerini ve hatalar� kategorize �ekilde loglar
+
+Bu modül API isteklerini ve hataları kategorize şekilde loglar.
+Farklı log seviyeleri (INFO, ERROR, WARNING) ve kategorileri kullanır.
+
+Ne İşe Yarar:
+- API isteklerini loglama
+- Hata logları (errors.log)
+- Güvenlik olaylarını loglama (security.log)
+- Genel API logları (api.log)
+- Hata kategorileri (AUTH_ERROR, VALIDATION_ERROR, vb.)
+
+Kullanım:
+- APILogger.log_request() - İstek logla
+- APILogger.log_error() - Hata logla
+- APILogger.log_security_event() - Güvenlik olayı logla
 """
 import logging
 import os
@@ -9,11 +24,11 @@ from pathlib import Path
 from typing import Optional
 from enum import Enum
 
-# Log klas�r�n� olu�tur
+# Log klasörünü oluştur
 logs_dir = Path(__file__).parent / "logs"
 logs_dir.mkdir(exist_ok=True)
 
-# Logger yap�land�rmas�
+# Logger yapılandırması
 log_file = logs_dir / "api.log"
 error_log_file = logs_dir / "errors.log"
 security_log_file = logs_dir / "security.log"
@@ -22,11 +37,11 @@ security_log_file = logs_dir / "security.log"
 logger = logging.getLogger("enterprise_ai_api")
 logger.setLevel(logging.INFO)
 
-# Hata logger'�
+# Hata logger'ı
 error_logger = logging.getLogger("enterprise_ai_api.errors")
 error_logger.setLevel(logging.ERROR)
 
-# G�venlik logger'�
+# Güvenlik logger'ı
 security_logger = logging.getLogger("enterprise_ai_api.security")
 security_logger.setLevel(logging.WARNING)
 
@@ -36,12 +51,12 @@ file_handler.setLevel(logging.INFO)
 file_formatter = logging.Formatter('%(asctime)s | %(levelname)-8s | %(name)s | %(message)s')
 file_handler.setFormatter(file_formatter)
 
-# File handler - Hata loglar�
+# File handler - Hata logları
 error_file_handler = logging.FileHandler(error_log_file, encoding='utf-8')
 error_file_handler.setLevel(logging.ERROR)
 error_file_handler.setFormatter(file_formatter)
 
-# File handler - G�venlik loglar�
+# File handler - Güvenlik logları
 security_file_handler = logging.FileHandler(security_log_file, encoding='utf-8')
 security_file_handler.setLevel(logging.WARNING)
 security_file_handler.setFormatter(file_formatter)
@@ -52,7 +67,7 @@ console_handler.setLevel(logging.INFO)
 console_formatter = logging.Formatter('%(asctime)s | %(levelname)-8s | %(message)s')
 console_handler.setFormatter(console_formatter)
 
-# Handler'lar� ekle
+# Handler'ları ekle
 logger.addHandler(file_handler)
 logger.addHandler(console_handler)
 

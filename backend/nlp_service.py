@@ -1,7 +1,21 @@
+# -*- coding: utf-8 -*-
 """
-Intent ve Entity çıkarım Modülü
-Kullanıcı sorgularını analiz eder ve anlam çıkarır
-Gelişmiş NLP servisi ile entegre
+Intent ve Entity Çıkarım Modülü
+
+Bu modül kullanıcı sorgularını analiz eder ve anlam çıkarır.
+Intent (niyet) ve entity (varlık) çıkarımı yaparak daha doğru
+yanıtlar üretilmesini sağlar.
+
+Ne İşe Yarar:
+- Kullanıcı sorgularını analiz etme
+- Intent (niyet) çıkarımı
+- Entity (varlık) çıkarımı
+- Gelişmiş NLP servisi ile entegrasyon
+
+Kullanım:
+- IntentClassifier.analyze_query() - Sorguyu analiz et
+- extract_intent() - Intent çıkar
+- extract_entities() - Entity'leri çıkar
 """
 import re
 from typing import Dict, List, Optional, Tuple

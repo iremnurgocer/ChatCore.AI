@@ -1,34 +1,16 @@
-<<<<<<< HEAD
-# ChatCore.AI
-=======
 # ChatCore.AI - Kurumsal AI Chat Sistemi
->>>>>>> 71972e75abe17ebc7f0a921ced1a0f114276162b
 
-**Kurumsal AI Chat Sistemi** - Şirket içi bilgilere dayalı RAG teknolojisi destekli AI asistanı
+**Kurumsal AI Chat Sistemi** – Şirket içi bilgilere dayalı RAG teknolojisi destekli AI asistanı
 
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.109.0-green.svg)](https://fastapi.tiangolo.com)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.32.0+-red.svg)](https://streamlit.io)
 [![AI](https://img.shields.io/badge/AI-RAG-orange.svg)](https://github.com/langchain-ai/langchain)
 
-<<<<<<< HEAD
-## Hakkında
-=======
 ## Neden ChatCore.AI?
->>>>>>> 71972e75abe17ebc7f0a921ced1a0f114276162b
 
 ChatCore.AI, şirket içi bilgilerinizi (çalışanlar, projeler, departmanlar, prosedürler) kullanarak soruları yanıtlayan profesyonel bir AI chat sistemidir. RAG (Retrieval-Augmented Generation) teknolojisi ile %100 doğru ve güncel yanıtlar sunar.
 
-<<<<<<< HEAD
-### Özellikler
-
-- **Çoklu AI Desteği**: Gemini (ücretsiz), OpenAI, Azure, Ollama
-- **RAG Teknolojisi**: Şirket verilerinize dayalı doğru yanıtlar
-- **Kalıcı Oturum**: Sohbet geçmişi korunur
-- **Güvenlik**: JWT authentication, rate limiting, input validation
-- **Analytics**: Kullanım istatistikleri ve loglama
-- **Otomatik Fallback**: AI provider çalışmazsa yedek devreye girer
-=======
 ### Ana Avantajlar
 
 - **Hızlı Kurulum**: 2 komut ile çalışır hale gelin (`kurulum.bat` → `baslat.bat`)
@@ -39,7 +21,6 @@ ChatCore.AI, şirket içi bilgilerinizi (çalışanlar, projeler, departmanlar, 
 - **Otomatik Fallback**: AI provider çalışmazsa otomatik yedek devreye girer
 - **Kalıcı Oturum**: Sayfa yenileme sonrası sohbet geçmişiniz korunur
 - **Ölçeklenebilir**: Küçük şirketlerden büyük holdinglere kadar
->>>>>>> 71972e75abe17ebc7f0a921ced1a0f114276162b
 
 ## Hızlı Kurulum
 
@@ -80,10 +61,6 @@ ChatCore.AI, şirket içi bilgilerinizi (çalışanlar, projeler, departmanlar, 
    chmod +x baslat.sh
    ./baslat.sh
    ```
-<<<<<<< HEAD
-
-## Gereksinimler
-=======
    - **ÖNEMLİ:** Backend'in tamamen hazır olması için 5-10 saniye bekleyin
    - Backend hazır olduğunda terminalde "Uvicorn running on http://0.0.0.0:8000" mesajını göreceksiniz
    - Frontend otomatik olarak backend hazır olduktan sonra başlatılır
@@ -103,22 +80,18 @@ baslat.bat    # Windows
 3. Frontend otomatik başlatılır → **3-5 saniye** daha
 4. Toplam başlatma süresi: **~10-15 saniye**
 
-
 **Not:** İlk başlatmada biraz daha uzun sürebilir (Python modülleri yüklenirken). Sonraki başlatmalarda daha hızlı olur.
 
 ## Manuel Kurulum
 
-Script kullanmak istemiyorsanız, aşağıdaki adımları manuel olarak takip edebilirsiniz.
+Script kullanmak istemiyorsanız veya sisteminizde script çalışmıyorsa, aşağıdaki adımları manuel olarak takip edebilirsiniz. Aslında scriptler de temelde bunları yapıyor, sadece adım adım kendiniz yapıyorsunuz.
 
 ### 1. Gereksinimler
->>>>>>> 71972e75abe17ebc7f0a921ced1a0f114276162b
 
 - Python 3.8 veya üzeri
 - pip (Python paket yöneticisi)
 - AI Provider API Key (Gemini, OpenAI, Azure veya Ollama)
 
-<<<<<<< HEAD
-=======
 ### 2. Repository'yi Klonlayın
 
 ```bash
@@ -129,6 +102,8 @@ cd ChatCore.AI
 ### 3. Backend Kurulumu
 
 #### Virtual Environment Oluşturma
+
+Backend için bir virtual environment oluşturmamız gerekiyor. Bu sayede sistem Python'unuzu kirletmeden projeye özel paketler yükleyebiliriz.
 
 **Windows:**
 ```bash
@@ -144,16 +119,22 @@ python3 -m venv venv
 source venv/bin/activate
 ```
 
+Virtual environment aktif olduğunda terminalde `(venv)` yazısını göreceksiniz. Bu işaret görünüyorsa doğru yoldasınız.
+
 #### Bağımlılıkları Yükleme
+
+Projede kullanılan tüm Python paketlerini yüklüyoruz. İlk kez yüklüyorsanız biraz zaman alabilir, normal.
 
 ```bash
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
+Bu işlem tamamlandığında FastAPI, Streamlit, LangChain ve diğer gerekli paketler yüklü olacak.
+
 #### Environment Dosyası Oluşturma
 
-`backend/.env` dosyası oluşturun:
+`backend/.env` dosyası oluşturun veya mevcut dosyayı düzenleyin. Bu dosya tüm yapılandırmayı içerir:
 
 ```env
 # AI Sağlayıcı (GEMINI, OPENAI, AZURE, OLLAMA, HUGGINGFACE)
@@ -187,7 +168,11 @@ BACKEND_URL=http://127.0.0.1:8000
 ALLOWED_ORIGINS=*
 ```
 
+**Önemli:** `GEMINI_API_KEY` değerini mutlaka kendi API anahtarınızla değiştirin. API anahtarı olmadan sistem çalışmaz.
+
 #### Backend'i Başlatma
+
+Backend'i başlatmak için uvicorn kullanıyoruz. Bu FastAPI uygulamalarını çalıştırmak için standart bir yöntem.
 
 ```bash
 cd backend
@@ -195,6 +180,7 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 **ÖNEMLİ:** Backend'in tamamen başlaması için 5-10 saniye bekleyin. Terminalde şu mesajları görmelisiniz:
+
 ```
 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
 INFO:     Started reloader process [...]
@@ -202,6 +188,8 @@ INFO:     Started server process [...]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 ```
+
+"Application startup complete" mesajını gördüğünüzde backend hazır demektir. Bu mesajı görmeden frontend'i başlatmayın, bağlantı hatası alırsınız.
 
 Backend hazır olduktan sonra frontend'i başlatın.
 
@@ -226,6 +214,8 @@ streamlit run app.py
 
 Frontend: http://localhost:8501
 
+**Not:** Backend ve frontend'i aynı virtual environment'ı kullanabilirsiniz. İkisi de aynı Python paketlerini kullanıyor zaten.
+
 ### 5. Veri Dosyalarını Düzenleme
 
 Kendi şirket verilerinizi eklemek için:
@@ -235,7 +225,43 @@ Kendi şirket verilerinizi eklemek için:
 3. `backend/data/projects.json` - Proje detayları
 4. `backend/data/procedures.json` - Şirket prosedürleri
 
-Dosyaları açın, JSON formatında verilerinizi ekleyin.
+Dosyaları açın, JSON formatında verilerinizi ekleyin. Format örnekleri için aşağıdaki "Yapılandırma" bölümüne bakabilirsiniz.
+
+## Kullanım
+
+### Web Arayüzü
+
+1. Servisleri başlatın (`baslat.bat` veya `baslat.sh`)
+2. Tarayıcıda `http://localhost:8501` adresine gidin
+3. Giriş yapın: `admin` / `1234`
+4. Sorularınızı sorun!
+
+### Örnek Sorular
+
+- "Enerji departmanında kimler çalışıyor?"
+- "Hangi projeler devam ediyor?"
+- "Ahmet Yılmaz'ın projeleri neler?"
+- "Yeni prosedürler var mı?"
+- "Turizm departmanının bütçesi nedir?"
+
+### API Kullanımı
+
+```bash
+# Giriş yapma
+curl -X POST "http://localhost:8000/api/login" \
+  -H "Content-Type: application/json" \
+  -d '{"username": "admin", "password": "1234"}'
+
+# Chat sorgusu
+curl -X POST "http://localhost:8000/api/chat" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "Enerji departmanında kimler çalışıyor?"}'
+```
+
+**API Dokümantasyonu:**
+- Swagger UI: http://localhost:8000/docs
+- ReDoc: http://localhost:8000/redoc
 
 ## Yapılandırma
 
@@ -318,55 +344,16 @@ Dosyaları açın, JSON formatında verilerinizi ekleyin.
 
 **Rate Limiting** (`backend/security.py`):
 - Varsayılan: 60 istek/dakika
-- Login: 10 istek/dakika
+- Login: 20 istek/dakika
 - Değiştirmek için: `backend/security.py` dosyasını düzenleyin
 
 **JWT Token Süresi** (`backend/auth.py`):
-- Varsayılan: 2 saat
-- Değiştirmek için: `backend/auth.py` dosyasında `datetime.timedelta(hours=2)` satırını düzenleyin
+- Varsayılan: 24 saat
+- Değiştirmek için: `backend/auth.py` dosyasında `datetime.timedelta(hours=24)` satırını düzenleyin
 
 **Session Timeout** (`backend/session_manager.py`):
 - Varsayılan: 7200 saniye (2 saat)
 - Değiştirmek için: `backend/session_manager.py` dosyasında `session_timeout` parametresini düzenleyin
-
->>>>>>> 71972e75abe17ebc7f0a921ced1a0f114276162b
-## Kullanım
-
-### Web Arayüzü
-
-1. Servisleri başlatın (`baslat.bat` veya `baslat.sh`)
-2. Tarayıcıda `http://localhost:8501` adresine gidin
-3. Giriş yapın: `admin` / `1234`
-4. Sorularınızı sorun!
-
-### Örnek Sorular
-
-- "Enerji departmanında kimler çalışıyor?"
-- "Hangi projeler devam ediyor?"
-- "Ahmet Yılmaz'ın projeleri neler?"
-- "Yeni prosedürler var mı?"
-- "Turizm departmanının bütçesi nedir?"
-
-### API Kullanımı
-
-```bash
-# Giriş yapma
-curl -X POST "http://localhost:8000/api/login" \
-  -H "Content-Type: application/json" \
-  -d '{"username": "admin", "password": "1234"}'
-
-# Chat sorgusu
-curl -X POST "http://localhost:8000/api/chat" \
-  -H "Authorization: Bearer YOUR_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"prompt": "Enerji departmanında kimler çalışıyor?"}'
-```
-
-**API Dokümantasyonu:**
-- Swagger UI: http://localhost:8000/docs
-- ReDoc: http://localhost:8000/redoc
-
-## Yapılandırma
 
 ### AI Sağlayıcı Seçimi
 
@@ -391,33 +378,7 @@ OLLAMA_BASE_URL=http://localhost:11434
 OLLAMA_MODEL=llama3.2
 ```
 
-<<<<<<< HEAD
-### Veri Dosyaları
-=======
 ## AI Sağlayıcıları
->>>>>>> 71972e75abe17ebc7f0a921ced1a0f114276162b
-
-Kendi şirket verilerinizi eklemek için `backend/data/` klasöründeki JSON dosyalarını düzenleyin:
-
-<<<<<<< HEAD
-- `employees.json` - Çalışan listesi
-- `departments.json` - Departman bilgileri
-- `projects.json` - Proje detayları
-- `procedures.json` - Şirket prosedürleri
-
-## AI Sağlayıcıları
-=======
-**Avantajlar:**
-- Ücretsiz katman mevcut
-- Azure/OpenAI benzeri bulut servisi
-- Sadece API key gerekli, kurulum yok
-- Yüksek kaliteli yanıtlar
-
-**Kurulum:**
-1. https://makersuite.google.com/app/apikey adresinden API key alın
-2. `backend/.env` dosyasında `GEMINI_API_KEY` ekleyin
-3. `AI_PROVIDER=GEMINI` ayarlayın
->>>>>>> 71972e75abe17ebc7f0a921ced1a0f114276162b
 
 | Sağlayıcı | Fiyat | Kurulum | Önerilen |
 |-----------|-------|---------|----------|
@@ -432,21 +393,21 @@ Detaylı kurulum rehberleri için:
 - [KURULUM_OPENAI.md](KURULUM_OPENAI.md) - OpenAI kurulumu
 - [KURULUM_AZURE.md](KURULUM_AZURE.md) - Azure kurulumu
 
-<<<<<<< HEAD
-## Proje Yapısı
+### Gemini (Ücretsiz - Önerilen)
 
-```
-ChatCore.AI/
-├── backend/              # FastAPI backend
-│   ├── main.py          # Ana API uygulaması
-│   ├── ai_service.py    # AI sağlayıcı entegrasyonları
-│   ├── data/            # Şirket veri dosyaları (JSON)
-│   └── .env            # Yapılandırma dosyası
-├── frontend/            # Streamlit frontend
-│   └── app.py          # Web arayüzü
-├── kurulum.bat/sh       # Otomatik kurulum
-└── baslat.bat/sh        # Servis başlatma
-=======
+**Avantajlar:**
+- Ücretsiz katman mevcut
+- Azure/OpenAI benzeri bulut servisi
+- Sadece API key gerekli, kurulum yok
+- Yüksek kaliteli yanıtlar
+
+**Kurulum:**
+1. https://makersuite.google.com/app/apikey adresinden API key alın
+2. `backend/.env` dosyasında `GEMINI_API_KEY` ekleyin
+3. `AI_PROVIDER=GEMINI` ayarlayın
+
+### OpenAI (Ücretli - En İyi Kalite)
+
 **Avantajlar:**
 - En gelişmiş AI modelleri
 - Çok hızlı yanıt
@@ -459,14 +420,10 @@ kurulum_openai.bat
 
 # macOS/Linux
 ./kurulum_openai.sh
->>>>>>> 71972e75abe17ebc7f0a921ced1a0f114276162b
 ```
 
-## Sorun Giderme
+**Detaylı Rehber:** `KURULUM_OPENAI.md`
 
-<<<<<<< HEAD
-### Backend başlamıyor
-=======
 ### Azure OpenAI (Ücretli - Kurumsal)
 
 **Avantajlar:**
@@ -555,20 +512,19 @@ kurulum_ollama.bat
 ### Çalıştırma Sorunları
 
 **"Backend başlamıyor" Hatası:**
->>>>>>> 71972e75abe17ebc7f0a921ced1a0f114276162b
 - `backend/.env` dosyasının var olduğundan emin olun
 - API key'in doğru olduğunu kontrol edin
 - Backend loglarını kontrol edin: `backend/logs/errors.log`
 
-### Frontend başlamıyor
+**"Frontend başlamıyor" Hatası:**
 - Backend'in çalıştığını kontrol edin: http://localhost:8000/api/status
 - Streamlit'in yüklü olduğunu kontrol edin
 
-### Port zaten kullanılıyor
+**"Port zaten kullanılıyor" Hatası:**
 - Çalışan eski servisleri durdurun
 - Farklı port kullanın veya port'u kullanan uygulamayı bulun
 
-### AI yanıt vermiyor
+**"AI yanıt vermiyor" Hatası:**
 - API key'in doğru olduğunu kontrol edin
 - `AI_PROVIDER` değerinin doğru olduğunu kontrol edin
 - Backend loglarını kontrol edin

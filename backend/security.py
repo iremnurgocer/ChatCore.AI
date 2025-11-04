@@ -1,5 +1,21 @@
+# -*- coding: utf-8 -*-
 """
 Güvenlik Modülü - Rate Limiting, Input Doğrulama, XSS Koruması
+
+Bu modül API'nin güvenliğini sağlamak için rate limiting, input validation
+ve XSS koruması gibi özellikler sunar.
+
+Ne İşe Yarar:
+- Rate limiting (IP ve kullanıcı bazlı)
+- Input sanitization ve validation
+- XSS (Cross-Site Scripting) koruması
+- SQL injection koruması
+- Güvenli string karşılaştırma
+
+Kullanım:
+- SecurityValidator.sanitize_input() - Input temizleme
+- SecurityValidator.validate_username() - Username doğrulama
+- RateLimiter.is_allowed() - Rate limit kontrolü
 """
 import re
 import time
