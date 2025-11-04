@@ -719,4 +719,4 @@ Sorularınız veya önerileriniz için issue açabilirsiniz.
 
 ---
 
-**Son Güncelleme:** 2024
+**Son Güncelleme:** 11/2025
