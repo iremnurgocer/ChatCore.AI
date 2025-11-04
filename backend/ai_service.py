@@ -241,6 +241,8 @@ def ask_ai(prompt: str, conversation_history: Optional[List] = None, use_advance
             if cached_response:
                 return cached_response
         except Exception as e:
+            # Cache kontrolü başarısız olursa devam et
+            pass
 
     try:
         response = None

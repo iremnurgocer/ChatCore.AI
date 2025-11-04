@@ -35,10 +35,14 @@ import time
 
 # CSS stil dosyasını yükle
 try:
-    with open(os.path.join(os.path.dirname(__file__), 'static', 'styles.css'), 'r', encoding='utf-8') as f:
-        st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+    css_path = os.path.join(os.path.dirname(__file__), 'static', 'styles.css')
+    if os.path.exists(css_path):
+        with open(css_path, 'r', encoding='utf-8', errors='ignore') as f:
+            st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 except FileNotFoundError:
     pass  # CSS dosyası yoksa devam et
+except Exception:
+    pass  # CSS yükleme hatası durumunda devam et
 
 # Yapılandırma Değişkenleri
 # Backend API URL'i - environment değişkeninden alınır veya varsayılan değer kullanılır
@@ -133,16 +137,17 @@ def api_login(username: str, password: str) -> tuple:
         return None, f"Hata: {str(e)}"
 
 def api_chat(prompt: str, token: str, conversation_id: str = None):
-    Backend API'ye chat mesaj� g�nderir ve AI yan�t�n� al�r.
-    ChatGPT benzeri conversation y�netimi ile her mesaj bir conversation'a ba�l�d�r.
+    """
+    Backend API'ye chat mesajı gönderir ve AI yanıtını alır.
+    ChatGPT benzeri conversation yönetimi ile her mesaj bir conversation'a bağlıdır.
     
     Args:
-        prompt: Kullan�c� mesaj�
+        prompt: Kullanıcı mesajı
         token: JWT authentication token
-        conversation_id: Mevcut conversation ID (opsiyonel, yeni conversation olu�turulabilir)
+        conversation_id: Mevcut conversation ID (opsiyonel, yeni conversation oluşturulabilir)
         
     Returns:
-        tuple: ((response, conversation_id), error_message) - Ba�ar�l�ysa yan�t ve conversation ID d�ner
+        tuple: ((response, conversation_id), error_message) - Başarılıysa yanıt ve conversation ID döner
     """
     url = f"{BACKEND_URL}/api/chat"
     try:

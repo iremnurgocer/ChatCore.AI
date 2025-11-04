@@ -1,6 +1,6 @@
-/* ChatCore.AI - Profesyonel Kurumsal Tasarým */
+/* ChatCore.AI - Profesyonel Kurumsal TasarÄ±m */
 
-/* Genel Stil Ayarlarý */
+/* Genel Stil AyarlarÄ± */
 :root {
     --primary-color: #2563eb;
     --primary-hover: #1d4ed8;
@@ -27,7 +27,7 @@
     margin: 0 auto;
 }
 
-/* Baþlýk Stilleri */
+/* BaÅŸlÄ±k Stilleri */
 h1 {
     color: var(--text-primary);
     font-weight: 700;
@@ -49,7 +49,7 @@ h3 {
     margin-bottom: 0.75rem;
 }
 
-/* Buton Ýyileþtirmeleri */
+/* Buton Ä°yileÅŸtirmeleri */
 button {
     border-radius: var(--radius);
     transition: var(--transition);
@@ -61,7 +61,7 @@ button:hover {
     box-shadow: var(--shadow-md);
 }
 
-/* Sidebar Ýyileþtirmeleri */
+/* Sidebar Ä°yileÅŸtirmeleri */
 [data-testid="stSidebar"] {
     background: var(--surface);
     border-right: 1px solid var(--border-color);
@@ -80,7 +80,7 @@ button:hover {
     box-shadow: var(--shadow-sm);
 }
 
-/* Input Alanlarý */
+/* Input AlanlarÄ± */
 input[type="text"],
 input[type="password"] {
     border-radius: var(--radius);
@@ -105,7 +105,7 @@ input[type="password"]:focus {
     border: 1px solid var(--border-color);
 }
 
-/* Aktif Conversation Ýþareti */
+/* Aktif Conversation Ä°ÅŸareti */
 .active-conversation-indicator {
     width: 8px;
     height: 8px;
@@ -125,7 +125,7 @@ input[type="password"]:focus {
     }
 }
 
-/* Örnek Sorular Butonlarý */
+/* Ã–rnek Sorular ButonlarÄ± */
 .example-question-button {
     background: var(--surface);
     border: 1px solid var(--border-color);
@@ -145,33 +145,33 @@ input[type="password"]:focus {
     transform: translateX(4px);
 }
 
-/* Spinner ve Yükleme Göstergeleri */
+/* Spinner ve YÃ¼kleme GÃ¶stergeleri */
 .stSpinner {
     color: var(--primary-color);
 }
 
-/* Hata Mesajlarý */
+/* Hata MesajlarÄ± */
 .stAlert {
     border-radius: var(--radius);
     padding: 1rem;
     border-left: 4px solid var(--danger-color);
 }
 
-/* Baþarý Mesajlarý */
+/* BaÅŸarÄ± MesajlarÄ± */
 .stSuccess {
     background-color: rgba(16, 185, 129, 0.1);
     color: var(--success-color);
     border-left: 4px solid var(--success-color);
 }
 
-/* Bilgi Mesajlarý */
+/* Bilgi MesajlarÄ± */
 .stInfo {
     background-color: rgba(37, 99, 235, 0.1);
     color: var(--primary-color);
     border-left: 4px solid var(--primary-color);
 }
 
-/* Divider Ýyileþtirmeleri */
+/* Divider Ä°yileÅŸtirmeleri */
 hr {
     border: none;
     border-top: 1px solid var(--border-color);
@@ -188,7 +188,7 @@ footer {
     margin-top: 3rem;
 }
 
-/* Responsive Tasarým */
+/* Responsive TasarÄ±m */
 @media (max-width: 768px) {
     .main {
         padding: 1rem 0.5rem;
@@ -203,7 +203,7 @@ footer {
     }
 }
 
-/* Karanlýk Mod Desteði (Opsiyonel) */
+/* KaranlÄ±k Mod DesteÄŸi (Opsiyonel) */
 @media (prefers-color-scheme: dark) {
     :root {
         --background: #1e293b;
@@ -214,7 +214,7 @@ footer {
     }
 }
 
-/* Scrollbar Ýyileþtirmeleri */
+/* Scrollbar Ä°yileÅŸtirmeleri */
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -249,7 +249,7 @@ footer {
     animation: fadeIn 0.3s ease-in-out;
 }
 
-/* Özel Komponentler */
+/* Ã–zel Komponentler */
 .badge {
     display: inline-block;
     padding: 0.25rem 0.75rem;
@@ -278,4 +278,3 @@ footer {
     color: var(--warning-color);
     border-color: var(--warning-color);
 }
-
