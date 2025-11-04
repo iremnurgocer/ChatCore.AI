@@ -20,7 +20,7 @@ ChatCore.AI, şirket içi bilgilerinizi (çalışanlar, projeler, departmanlar, 
 - **RAG Teknolojisi**: Şirket verilerinize dayalı %100 doğru yanıtlar
 - **Otomatik Fallback**: AI provider çalışmazsa otomatik yedek devreye girer
 - **Kalıcı Oturum**: Sayfa yenileme sonrası sohbet geçmişiniz korunur
-- **Ölçeklenebilir**: Küçük şirketlerden büyük holdinglere kadar
+- **Ölçeklenebilir**: Küçük şirketlerden büyük şirketlere kadar
 
 ## Hızlı Kurulum
 
