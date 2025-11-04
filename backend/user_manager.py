@@ -73,7 +73,7 @@ class UserManager:
             existing = self.users_table.search(self.Query.username == normalized_username)
             
             if not existing:
-                # Yeni kullanıcı oluştur (normalize edilmiş username ile)
+                # Yeni kullanıcı oluştur (hash'lenmiş şifre ile)
                 self.create_user(username, password)
             else:
                 # Kullanıcı var, hash ve salt kontrolü yap
@@ -81,21 +81,21 @@ class UserManager:
                 stored_hash = user_data.get("password_hash")
                 stored_salt = user_data.get("salt")
                 
-                # Hash ve salt eksikse ekle
+                # Hash ve salt eksikse veya yanlışsa yeniden oluştur
                 if not stored_hash or not stored_salt:
                     password_hash, salt = self._hash_password(password)
                     self.users_table.update(
-                        {"password_hash": password_hash, "salt": salt},
+                        {"password_hash": password_hash, "salt": salt, "updated_at": datetime.now().isoformat()},
                         self.Query.username == normalized_username
                     )
+                    print(f"[USER_MANAGER] User {username}: Hash ve salt oluşturuldu")
                 else:
-                    # Hash ve salt var, format kontrolü yap
-                    # Mevcut hash'i doğrula - eğer doğrulama başarısızsa yeniden oluştur
+                    # Hash ve salt var, doğrulama testi yap
                     password_valid = False
                     try:
                         password_valid = self.verify_password(username, password)
-                    except Exception:
-                        # Doğrulama hatası → hash formatı yanlış
+                    except Exception as e:
+                        print(f"[USER_MANAGER] User {username}: Doğrulama hatası: {e}")
                         password_valid = False
                     
                     if not password_valid:
@@ -109,6 +109,9 @@ class UserManager:
                             },
                             self.Query.username == normalized_username
                         )
+                        print(f"[USER_MANAGER] User {username}: Hash ve salt yeniden oluşturuldu")
+                    else:
+                        print(f"[USER_MANAGER] User {username}: Hash doğrulama başarılı")
     
     def hash_password(self, password: str, salt: Optional[str] = None) -> tuple:
         """
@@ -199,6 +202,7 @@ class UserManager:
         }
         
         self.users_table.insert(user_data)
+        print(f"[USER_MANAGER] User {username} ({normalized_username}) created with hash")
         return True
     
     def get_user(self, username: str) -> Optional[Dict]:
@@ -245,20 +249,31 @@ class UserManager:
         # Username'i normalize et (standart fonksiyon kullan)
         normalized_username = self.normalize_username(username)
         if not normalized_username:
+            print(f"[VERIFY_PASSWORD] Normalized username boş: '{username}'")
             return False
         
         if not password:
+            print(f"[VERIFY_PASSWORD] Password boş")
             return False
         
         user = self.get_user(normalized_username)
         if not user:
+            print(f"[VERIFY_PASSWORD] User bulunamadı: '{normalized_username}'")
+            # Tüm kullanıcıları listele
+            all_users = self.users_table.all()
+            print(f"[VERIFY_PASSWORD] Tüm kullanıcılar: {[u.get('username') for u in all_users]}")
             return False
+        
+        print(f"[VERIFY_PASSWORD] User bulundu: '{user.get('username')}'")
         
         stored_hash = user.get("password_hash")
         salt_hex = user.get("salt")
         
         if not stored_hash or not salt_hex:
+            print(f"[VERIFY_PASSWORD] Hash veya salt eksik: hash={bool(stored_hash)}, salt={bool(salt_hex)}")
             return False
+        
+        print(f"[VERIFY_PASSWORD] Hash length: {len(stored_hash)}, Salt length: {len(salt_hex)}")
         
         # Şifreyi hash'le ve karşılaştır
         try:
@@ -275,10 +290,18 @@ class UserManager:
             
             hashed_input = password_hash.hex()
             
+            print(f"[VERIFY_PASSWORD] Input hash length: {len(hashed_input)}")
+            print(f"[VERIFY_PASSWORD] Stored hash length: {len(stored_hash)}")
+            print(f"[VERIFY_PASSWORD] Hashes match: {hashed_input == stored_hash}")
+            
             # Güvenli karşılaştırma (timing attack'a karşı)
             result = secrets.compare_digest(hashed_input, stored_hash)
+            print(f"[VERIFY_PASSWORD] Final result: {result}")
             return result
         except Exception as e:
+            print(f"[VERIFY_PASSWORD] Exception: {e}")
+            import traceback
+            traceback.print_exc()
             return False
     
     def update_password(self, username: str, new_password: str) -> bool:

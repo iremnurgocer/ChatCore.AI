@@ -18,11 +18,24 @@ Kullanım:
 - APILogger.log_security_event() - Güvenlik olayı logla
 """
 import logging
+import json
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Dict, Any
 from enum import Enum
+
+# Config import'u - lazy import (circular import'u önlemek için)
+def get_settings():
+    try:
+        from config import get_settings as _get_settings
+        return _get_settings()
+    except ImportError:
+        # Fallback - config modülü henüz yüklenmemişse
+        class DummySettings:
+            LOG_FORMAT = "text"
+            LOG_LEVEL = "INFO"
+        return DummySettings()
 
 # Log klasörünü oluştur
 logs_dir = Path(__file__).parent / "logs"
@@ -35,7 +48,12 @@ security_log_file = logs_dir / "security.log"
 
 # Ana logger
 logger = logging.getLogger("enterprise_ai_api")
-logger.setLevel(logging.INFO)
+try:
+    settings = get_settings()
+    log_level = getattr(logging, settings.LOG_LEVEL.upper(), logging.INFO)
+    logger.setLevel(log_level)
+except Exception:
+    logger.setLevel(logging.INFO)
 
 # Hata logger'ı
 error_logger = logging.getLogger("enterprise_ai_api.errors")
@@ -45,10 +63,47 @@ error_logger.setLevel(logging.ERROR)
 security_logger = logging.getLogger("enterprise_ai_api.security")
 security_logger.setLevel(logging.WARNING)
 
+# JSON Formatter (opsiyonel)
+class JSONFormatter(logging.Formatter):
+    """JSON formatında log formatter"""
+    
+    def format(self, record: logging.LogRecord) -> str:
+        log_data = {
+            "timestamp": datetime.now().isoformat(),
+            "level": record.levelname,
+            "logger": record.name,
+            "message": record.getMessage(),
+            "module": record.module,
+            "function": record.funcName,
+            "line": record.lineno
+        }
+        
+        # Extra fields ekle
+        if hasattr(record, "extra"):
+            log_data.update(record.extra)
+        
+        # Exception bilgisi varsa ekle
+        if record.exc_info:
+            log_data["exception"] = self.formatException(record.exc_info)
+        
+        return json.dumps(log_data, ensure_ascii=False)
+
 # File handler - Genel loglar
 file_handler = logging.FileHandler(log_file, encoding='utf-8')
 file_handler.setLevel(logging.INFO)
-file_formatter = logging.Formatter('%(asctime)s | %(levelname)-8s | %(name)s | %(message)s')
+
+# Log formatı ayarı (JSON veya text)
+try:
+    settings = get_settings()
+    log_format = settings.LOG_FORMAT if hasattr(settings, 'LOG_FORMAT') else "text"
+except Exception:
+    log_format = "text"
+
+if log_format == "json":
+    file_formatter = JSONFormatter()
+else:
+    file_formatter = logging.Formatter('%(asctime)s | %(levelname)-8s | %(name)s | %(message)s')
+
 file_handler.setFormatter(file_formatter)
 
 # File handler - Hata logları

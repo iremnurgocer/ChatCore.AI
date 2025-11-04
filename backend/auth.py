@@ -207,14 +207,54 @@ def login(user: dict, request: Request):
         # Şifreler hash'lenmiş olarak saklanır ve güvenli bir şekilde kontrol edilir
         
         # Username'i normalize et (user_manager'ın normalize fonksiyonunu kullan)
-        username = user_manager.normalize_username(username.strip())
+        original_username = username.strip()
+        normalized_username = user_manager.normalize_username(original_username)
+        
+        # Debug logging
+        print(f"[LOGIN] Original username: '{original_username}'")
+        print(f"[LOGIN] Normalized username: '{normalized_username}'")
         
         # Kullanıcıyı TinyDB'den kontrol et (user_manager kullanarak)
-        user_exists = user_manager.user_exists(username)
+        user_exists = user_manager.user_exists(normalized_username)
+        print(f"[LOGIN] User exists: {user_exists}")
         
         if user_exists:
+            # Kullanıcı bilgilerini al
+            user_data = user_manager.get_user(normalized_username)
+            if user_data:
+                print(f"[LOGIN] User found in DB: {user_data.get('username')}")
+                print(f"[LOGIN] Has password_hash: {bool(user_data.get('password_hash'))}")
+                print(f"[LOGIN] Has salt: {bool(user_data.get('salt'))}")
+            
             # Şifreyi doğrula (user_manager kullanarak)
-            password_valid = user_manager.verify_password(username, password)
+            password_valid = user_manager.verify_password(normalized_username, password)
+            print(f"[LOGIN] Password verification result: {password_valid}")
+            
+            # Şifre doğrulama başarısızsa detaylı log
+            if not password_valid:
+                print(f"[LOGIN] Password verification failed!")
+                print(f"[LOGIN] Attempting to verify manually...")
+                stored_hash = user_data.get("password_hash")
+                stored_salt = user_data.get("salt")
+                if stored_hash and stored_salt:
+                    print(f"[LOGIN] Stored hash length: {len(stored_hash)}")
+                    print(f"[LOGIN] Stored salt length: {len(stored_salt)}")
+                    # Manuel doğrulama dene
+                    try:
+                        import binascii
+                        import hashlib
+                        salt_bytes = binascii.unhexlify(stored_salt)
+                        test_hash = hashlib.pbkdf2_hmac(
+                            'sha256',
+                            password.encode('utf-8'),
+                            salt_bytes,
+                            100000
+                        )
+                        test_hash_hex = test_hash.hex()
+                        import secrets
+                        print(f"[LOGIN] Test hash matches: {secrets.compare_digest(test_hash_hex, stored_hash)}")
+                    except Exception as e:
+                        print(f"[LOGIN] Manual verification error: {e}")
             
             if password_valid:
                 # Başarılı login sonrası rate limiter'ı reset et

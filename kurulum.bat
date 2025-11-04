@@ -222,9 +222,9 @@ echo.
 REM Backend modül kontrolü
 echo Backend modülleri test ediliyor...
 cd backend
-%PYTHON_CMD% -c "from dotenv import load_dotenv; load_dotenv(); from ai_service import ask_ai, AI_PROVIDER; print('OK - AI service yuklu')" 2>nul
+%PYTHON_CMD% -c "from dotenv import load_dotenv; load_dotenv(); from user_manager import user_manager; print('OK - User manager yuklu')" 2>nul
 if errorlevel 1 (
-    echo UYARI: AI service modulu test edilemedi, ama devam ediliyor...
+    echo UYARI: User manager modulu test edilemedi, ama devam ediliyor...
 ) else (
     echo Backend modülleri hazir!
 )

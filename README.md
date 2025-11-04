@@ -24,54 +24,183 @@ ChatCore.AI, şirket içi bilgilerinizi (çalışanlar, projeler, departmanlar, 
 
 ## Hızlı Kurulum
 
-### Windows
+### Windows (Otomatik - Bat Dosyaları ile)
 
-1. **Kurulum:**
-   ```batch
-   kurulum.bat
-   ```
+#### 1. Kurulum
 
-2. **API Key Ekleme:**
-   - `backend\.env` dosyasını açın
-   - `GEMINI_API_KEY=your-gemini-api-key-here` satırını bulun
-   - API anahtarınızı yapıştırın
-   - API Key almak için: https://makersuite.google.com/app/apikey
+Proje dizininde `kurulum.bat` dosyasına çift tıklayın veya komut satırından çalıştırın:
 
-3. **Servisleri Başlatma:**
-   ```batch
-   baslat.bat
-   ```
-   - Tarayıcıda: http://localhost:8501
-   - Giriş: `admin` / `1234`
+```batch
+kurulum.bat
+```
 
-### macOS / Linux
+**Kurulum Scripti Ne Yapar?**
+- Python kontrolü yapar (python veya py komutunu test eder)
+- Virtual environment oluşturur (`backend\venv`)
+- Pip'i günceller
+- Tüm bağımlılıkları yükler (`requirements.txt`'den)
+- Backend modüllerini test eder
+- `.env` dosyası yoksa şablon oluşturur
 
-1. **Kurulum:**
+**Kurulum Süresi:** İlk kurulum 2-5 dakika sürebilir (internet hızına bağlı).
+
+#### 2. API Key Ekleme
+
+Kurulum tamamlandıktan sonra:
+
+1. `backend\.env` dosyasını açın (Notepad veya herhangi bir metin editörü ile)
+2. `GEMINI_API_KEY=your-gemini-api-key-here` satırını bulun
+3. `your-gemini-api-key-here` yerine kendi API anahtarınızı yapıştırın
+4. Dosyayı kaydedin (Ctrl+S)
+
+**API Key Nasıl Alınır?**
+- https://makersuite.google.com/app/apikey adresine gidin
+- Google hesabınızla giriş yapın
+- "Create API Key" butonuna tıklayın
+- Oluşturulan key'i kopyalayıp `.env` dosyasına yapıştırın
+
+#### 3. Servisleri Başlatma
+
+Proje dizininde `baslat.bat` dosyasına çift tıklayın veya komut satırından çalıştırın:
+
+```batch
+baslat.bat
+```
+
+**Başlatma Scripti Ne Yapar?**
+- Python kontrolü yapar
+- `.env` dosyasının varlığını kontrol eder
+- Virtual environment'ın varlığını kontrol eder
+- Backend'i yeni bir pencerede başlatır (Port 8000)
+- 5 saniye bekler (backend'in hazır olması için)
+- Frontend'i yeni bir pencerede başlatır (Port 8501)
+
+**ÖNEMLİ:** Script çalıştığında iki yeni pencere açılacak:
+- **"ChatCore Backend"** penceresi: Backend servisi (Port 8000)
+- **"ChatCore Frontend"** penceresi: Frontend servisi (Port 8501)
+
+**Başlatma Süresi:**
+- Backend başlatma: 5-10 saniye
+- Frontend başlatma: 3-5 saniye
+- Toplam: ~10-15 saniye
+
+**Hazır Olma Kontrolü:**
+- Backend hazır olduğunda terminalde şu mesajı göreceksiniz:
+  ```
+  INFO:     Application startup complete.
+  INFO:     Uvicorn running on http://0.0.0.0:8000
+  ```
+- Frontend hazır olduğunda tarayıcıda açılır veya şu adrese gidebilirsiniz:
+  ```
+  http://localhost:8501
+  ```
+
+**Giriş Bilgileri:**
+- Kullanıcı adı: `admin`
+- Şifre: `1234`
+
+**Servisleri Durdurma:**
+- Açılan "ChatCore Backend" ve "ChatCore Frontend" pencerelerini kapatın
+- Veya pencerelerde Ctrl+C tuşlarına basın
+
+### macOS / Linux (Otomatik - Shell Scriptleri ile)
+
+#### 1. Kurulum
+
+Terminal'de proje dizinine gidin ve şu komutları çalıştırın:
+
+```bash
+chmod +x kurulum.sh
+./kurulum.sh
+```
+
+**Kurulum Scripti Ne Yapar?**
+- Python kontrolü yapar (python3 veya python komutunu test eder)
+- Virtual environment oluşturur (`backend/venv`)
+- Pip'i günceller
+- Tüm bağımlılıkları yükler (`requirements.txt`'den)
+- Backend modüllerini test eder
+- `.env` dosyası yoksa şablon oluşturur
+
+**Kurulum Süresi:** İlk kurulum 2-5 dakika sürebilir (internet hızına bağlı).
+
+#### 2. API Key Ekleme
+
+Kurulum tamamlandıktan sonra:
+
+1. `backend/.env` dosyasını düzenleyin:
    ```bash
-   chmod +x kurulum.sh
-   ./kurulum.sh
+   nano backend/.env
+   # veya
+   vim backend/.env
    ```
+2. `GEMINI_API_KEY=your-gemini-api-key-here` satırını bulun
+3. `your-gemini-api-key-here` yerine kendi API anahtarınızı yapıştırın
+4. Dosyayı kaydedin (nano: Ctrl+X, Y, Enter | vim: Esc, :wq, Enter)
 
-2. **API Key Ekleme:**
-   - `backend/.env` dosyasını düzenleyin
-   - `GEMINI_API_KEY` değerini güncelleyin
+**API Key Nasıl Alınır?**
+- https://makersuite.google.com/app/apikey adresine gidin
+- Google hesabınızla giriş yapın
+- "Create API Key" butonuna tıklayın
+- Oluşturulan key'i kopyalayıp `.env` dosyasına yapıştırın
 
-3. **Servisleri Başlatma:**
-   ```bash
-   chmod +x baslat.sh
-   ./baslat.sh
-   ```
-   - **ÖNEMLİ:** Backend'in tamamen hazır olması için 5-10 saniye bekleyin
-   - Backend hazır olduğunda terminalde "Uvicorn running on http://0.0.0.0:8000" mesajını göreceksiniz
-   - Frontend otomatik olarak backend hazır olduktan sonra başlatılır
+#### 3. Servisleri Başlatma
+
+Terminal'de proje dizininde şu komutları çalıştırın:
+
+```bash
+chmod +x baslat.sh
+./baslat.sh
+```
+
+**Başlatma Scripti Ne Yapar?**
+- Python kontrolü yapar
+- `.env` dosyasının varlığını kontrol eder
+- Virtual environment'ın varlığını kontrol eder
+- Backend'i yeni bir terminal penceresinde başlatır (Port 8000)
+- 5 saniye bekler (backend'in hazır olması için)
+- Frontend'i yeni bir terminal penceresinde başlatır (Port 8501)
+
+**ÖNEMLİ:** Script çalıştığında iki yeni terminal penceresi açılacak:
+- **Backend terminali**: Backend servisi (Port 8000)
+- **Frontend terminali**: Frontend servisi (Port 8501)
+
+**Başlatma Süresi:**
+- Backend başlatma: 5-10 saniye
+- Frontend başlatma: 3-5 saniye
+- Toplam: ~10-15 saniye
+
+**Hazır Olma Kontrolü:**
+- Backend hazır olduğunda terminalde şu mesajı göreceksiniz:
+  ```
+  INFO:     Application startup complete.
+  INFO:     Uvicorn running on http://0.0.0.0:8000
+  ```
+- Frontend hazır olduğunda tarayıcıda açılır veya şu adrese gidebilirsiniz:
+  ```
+  http://localhost:8501
+  ```
+
+**Giriş Bilgileri:**
+- Kullanıcı adı: `admin`
+- Şifre: `1234`
+
+**Servisleri Durdurma:**
+- Terminal pencerelerinde Ctrl+C tuşlarına basın
+- Veya pencereleri kapatın
 
 ### Günlük Kullanım
 
-İlk kurulumdan sonra sadece:
+İlk kurulumdan sonra her gün sadece:
+
+**Windows:**
 ```batch
-baslat.bat    # Windows
-# veya
-./baslat.sh   # macOS/Linux
+baslat.bat
+```
+
+**macOS/Linux:**
+```bash
+./baslat.sh
 ```
 
 **Başlatma Sırası ve Bekleme Süreleri:**
@@ -81,6 +210,10 @@ baslat.bat    # Windows
 4. Toplam başlatma süresi: **~10-15 saniye**
 
 **Not:** İlk başlatmada biraz daha uzun sürebilir (Python modülleri yüklenirken). Sonraki başlatmalarda daha hızlı olur.
+
+**Servisleri Durdurma:**
+- Windows: Açılan pencereleri kapatın veya Ctrl+C
+- macOS/Linux: Terminal pencerelerinde Ctrl+C veya pencereleri kapatın
 
 ## Manuel Kurulum
 
@@ -387,11 +520,25 @@ OLLAMA_MODEL=llama3.2
 | **OpenAI** | Ücretli | 5/5 | En iyi kalite |
 | **Azure** | Ücretli | 4/5 | Kurumsal |
 
-Detaylı kurulum rehberleri için:
-- [KURULUM_REHBERI.md](KURULUM_REHBERI.md) - Genel rehber
-- [KURULUM_OLLAMA.md](KURULUM_OLLAMA.md) - Ollama kurulumu
-- [KURULUM_OPENAI.md](KURULUM_OPENAI.md) - OpenAI kurulumu
-- [KURULUM_AZURE.md](KURULUM_AZURE.md) - Azure kurulumu
+**Özel AI Sağlayıcı Kurulumu:**
+
+Farklı bir AI sağlayıcı kullanmak istiyorsanız, özel kurulum scriptlerini kullanabilirsiniz:
+
+**Windows:**
+```batch
+kurulum_openai.bat   # OpenAI için
+kurulum_azure.bat    # Azure OpenAI için
+kurulum_ollama.bat   # Ollama için
+```
+
+**macOS/Linux:**
+```bash
+chmod +x kurulum_openai.sh && ./kurulum_openai.sh   # OpenAI için
+chmod +x kurulum_azure.sh && ./kurulum_azure.sh      # Azure OpenAI için
+chmod +x kurulum_ollama.sh && ./kurulum_ollama.sh    # Ollama için
+```
+
+**Not:** Bu scriptler önce normal kurulumu (`kurulum.bat` veya `kurulum.sh`) yapmanızı bekler. Sadece `.env` dosyasındaki AI sağlayıcı ayarlarını değiştirirler.
 
 ### Gemini (Ücretsiz - Önerilen)
 
@@ -419,10 +566,15 @@ Detaylı kurulum rehberleri için:
 kurulum_openai.bat
 
 # macOS/Linux
+chmod +x kurulum_openai.sh
 ./kurulum_openai.sh
 ```
 
-**Detaylı Rehber:** `KURULUM_OPENAI.md`
+**Nasıl Çalışır?**
+1. `.env` dosyasının varlığını kontrol eder
+2. OpenAI API Key'inizi ister
+3. Model seçimi yapmanızı sağlar (gpt-4o-mini, gpt-4o, gpt-3.5-turbo)
+4. `.env` dosyasını otomatik olarak günceller
 
 ### Azure OpenAI (Ücretli - Kurumsal)
 
@@ -437,10 +589,16 @@ kurulum_openai.bat
 kurulum_azure.bat
 
 # macOS/Linux
+chmod +x kurulum_azure.sh
 ./kurulum_azure.sh
 ```
 
-**Detaylı Rehber:** `KURULUM_AZURE.md`
+**Nasıl Çalışır?**
+1. `.env` dosyasının varlığını kontrol eder
+2. Azure OpenAI API Key'inizi ister
+3. Azure OpenAI Endpoint'inizi ister
+4. Deployment adınızı ister (varsayılan: gpt-4o-mini)
+5. `.env` dosyasını otomatik olarak günceller
 
 ### Ollama (Yerel - Ücretsiz)
 
@@ -455,10 +613,17 @@ kurulum_azure.bat
 kurulum_ollama.bat
 
 # macOS/Linux
+chmod +x kurulum_ollama.sh
 ./kurulum_ollama.sh
 ```
 
-**Detaylı Rehber:** `KURULUM_OLLAMA.md`
+**Nasıl Çalışır?**
+1. Ollama'nın kurulu olduğunu kontrol eder
+2. Model'in (llama3.2) indirilip indirilmediğini kontrol eder
+3. Model yoksa otomatik olarak indirir (5-15 dakika sürebilir)
+4. `.env` dosyasını otomatik olarak günceller
+
+**ÖNEMLİ:** Ollama kurulumu için önce https://ollama.ai adresinden Ollama'yı indirip kurmanız gerekir.
 
 ## API Dokümantasyonu
 

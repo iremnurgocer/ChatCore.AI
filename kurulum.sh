@@ -180,9 +180,9 @@ echo ""
 # Backend modül kontrolü
 echo "Backend modülleri test ediliyor..."
 cd backend
-$PYTHON_CMD -c "from dotenv import load_dotenv; load_dotenv(); from ai_service import ask_ai, AI_PROVIDER; print('OK - AI service yüklü')" 2>/dev/null
+$PYTHON_CMD -c "from dotenv import load_dotenv; load_dotenv(); from user_manager import user_manager; print('OK - User manager yüklü')" 2>/dev/null
 if [ $? -ne 0 ]; then
-    echo "UYARI: AI service modülü test edilemedi, ama devam ediliyor..."
+    echo "UYARI: User manager modülü test edilemedi, ama devam ediliyor..."
 else
     echo "Backend modülleri hazır!"
 fi
