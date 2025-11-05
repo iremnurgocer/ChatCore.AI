@@ -1,13 +1,6 @@
 @echo off
-REM Script'in kapanmamasini saglamak icin
-if "%1"=="" (
-    start cmd /k "%~f0" keepopen
-    exit /b
-)
-
 chcp 65001 >nul
 cls
-
 echo ========================================
 echo ChatCore.AI - Servisleri Baslatma
 echo ========================================
@@ -15,83 +8,77 @@ echo.
 
 cd /d "%~dp0"
 
-REM Python komutunu bul (python ve py test et)
+REM Python kontrolu
 set PYTHON_CMD=
-echo Python komutu araniyor...
-
-REM python komutunu test et
 python --version >nul 2>&1
-set PYTHON_TEST=%errorlevel%
-if %PYTHON_TEST% equ 0 (
+if %errorlevel% equ 0 (
     set PYTHON_CMD=python
-    echo Python bulundu: python
     goto :python_found
 )
-
-REM py komutunu test et
 py --version >nul 2>&1
-set PY_TEST=%errorlevel%
-if %PY_TEST% equ 0 (
+if %errorlevel% equ 0 (
     set PYTHON_CMD=py
-    echo Python bulundu: py
     goto :python_found
 )
 
-REM Python bulunamadi
-echo.
-echo ========================================
-echo [HATA] Python bulunamadi!
-echo ========================================
-echo.
-echo Hem "python" hem de "py" komutlari test edildi.
-echo Python kurulu olmali ve PATH'te olmali.
-echo.
-echo Cozum:
-echo 1. Python kurun: https://www.python.org/downloads/
-echo 2. Kurulum sirasinda "Add Python to PATH" secenegini isaretleyin
-echo 3. Windows'u yeniden baslatin
-echo.
+echo HATA: Python bulunamadi!
+echo Once kurulum.bat dosyasini calistirin.
 pause
 exit /b 1
 
 :python_found
 
 REM .env dosyasi kontrolu
-echo .env dosyasi kontrol ediliyor...
 if not exist "backend\.env" (
     echo.
-    echo [UYARI] .env dosyasi bulunamadi!
-    echo.
+    echo HATA: .env dosyasi bulunamadi!
     echo Once kurulum.bat dosyasini calistirin.
-    echo.
     pause
     exit /b 1
 )
 
 REM Virtual environment kontrolu
-if not exist "backend\venv\Scripts\activate.bat" (
+if not exist "venv\Scripts\activate.bat" (
     echo.
-    echo [UYARI] Virtual environment bulunamadi!
-    echo.
+    echo HATA: Virtual environment bulunamadi!
     echo Once kurulum.bat dosyasini calistirin.
-    echo.
     pause
     exit /b 1
 )
 
+REM Docker servislerini kontrol et ve baslat
+echo Database servisleri kontrol ediliyor...
+docker ps --filter "name=chatcore_postgres" --format "{{.Names}}" | findstr /C:"chatcore_postgres" >nul 2>&1
+if errorlevel 1 (
+    echo PostgreSQL ve Redis baslatiliyor...
+    docker compose up -d postgres redis
+    if errorlevel 1 (
+        echo.
+        echo HATA: Database servisleri baslatilamadi!
+        echo Docker Desktop'un calistigindan emin olun.
+        pause
+        exit /b 1
+    )
+    echo Database servisleri baslatildi!
+    echo Servislerin hazir olmasi bekleniyor...
+    timeout /t 10 /nobreak >nul
+) else (
+    echo Database servisleri zaten calisiyor.
+)
+echo.
+
 REM Backend'i baslat
 echo [1/2] Backend baslatiliyor (Port 8000)...
-start "ChatCore Backend" cmd /k "cd /d %~dp0backend && call venv\Scripts\activate.bat && %PYTHON_CMD% -m uvicorn main:app --reload --host 0.0.0.0 --port 8000"
+start "ChatCore Backend" cmd /k "cd /d %~dp0backend && call ..\venv\Scripts\activate.bat && %PYTHON_CMD% -m uvicorn main:app --reload --host 0.0.0.0 --port 8000"
 
-REM Backend'in baslamasi ve hazir olmasi icin bekle
+REM Backend'in baslamasi icin bekle
 echo Backend'in hazir olmasi bekleniyor...
-echo NOT: Bu islem 5-10 saniye surebilir...
 timeout /t 5 /nobreak >nul
 echo.
 
 REM Frontend'i baslat
 echo [2/2] Frontend baslatiliyor (Port 8501)...
-start "ChatCore Frontend" cmd /k "cd /d %~dp0 && call backend\venv\Scripts\activate.bat && cd frontend && %PYTHON_CMD% -m streamlit run app.py --server.headless true"
+start "ChatCore Frontend" cmd /k "cd /d %~dp0 && call venv\Scripts\activate.bat && cd frontend && %PYTHON_CMD% -m streamlit run app.py --server.headless true"
 
 timeout /t 2 /nobreak >nul
 
@@ -104,17 +91,12 @@ echo Iki pencere acildi:
 echo   - Backend (Port 8000)
 echo   - Frontend (Port 8501)
 echo.
-echo HATA DURUMUNDA:
-echo   - Backend penceresindeki hata mesajlarini kontrol edin
-echo   - Frontend penceresindeki hata mesajlarini kontrol edin
-echo   - Hatalar kategorize sekilde backend\logs\ klasorunde loglanir:
-echo     * errors.log - Tum hatalar (kategori bazli)
-echo     * security.log - Guvenlik olaylari
-echo     * api.log - Genel API loglari
-echo.
 echo Tarayicinizda: http://localhost:8501
 echo API Docs: http://localhost:8000/docs
-echo Giris: admin / 1234
+echo.
+echo Default Giris:
+echo   Username: admin
+echo   Password: 1234
 echo.
 echo Servisleri durdurmak icin acilan pencereleri kapatin.
 echo.

@@ -109,7 +109,11 @@ def api_login(username: str, password: str) -> tuple:
         
         # Başarılı yanıt kontrolü
         if r.status_code == 200:
-            token = r.json().get("token")
+            data = r.json()
+            # Backend 'access_token' döndürüyor, 'token' değil
+            token = data.get("access_token") or data.get("token")
+            if not token:
+                return None, "Backend'den token alınamadı. Yanıt: " + str(data)
             return token, None
         
         # Hata durumunda detay bilgisini al
@@ -266,18 +270,32 @@ def ensure_state():
     if "token_check_time" not in st.session_state:
         st.session_state["token_check_time"] = None
     
-    # Token varsa ve henüz doğrulanmamışsa hızlı kontrol et
-    if st.session_state.get("token") and not st.session_state.get("token_verified"):
-        token_valid = verify_token(st.session_state["token"])
-        if token_valid:
+    # Token varsa ve username varsa, token'ı geçerli kabul et (sayfa yenileme durumunda)
+    # Sadece açıkça geçersizse (401 dönerse) temizle
+    if st.session_state.get("token") and st.session_state.get("username"):
+        # Token ve username varsa, token_verified'i True yap
+        if not st.session_state.get("token_verified"):
+            # Hızlı kontrol yap ama hata olursa token'ı geçerli kabul et
+            try:
+                token_valid = verify_token(st.session_state["token"])
+                if token_valid is False:
+                    # Token gerçekten geçersizse temizle
+                    st.session_state["token"] = None
+                    st.session_state["username"] = None
+                    st.session_state["messages"] = []
+                    st.session_state["current_conversation_id"] = None
+                    st.session_state["token_verified"] = False
+                else:
+                    # Token geçerli veya kontrol edilemedi
+                    st.session_state["token_verified"] = True
+                    st.session_state["token_check_time"] = time.time()
+            except Exception:
+                # Hata durumunda token'ı geçerli kabul et (backend henüz hazır olmayabilir)
+                st.session_state["token_verified"] = True
+                st.session_state["token_check_time"] = time.time()
+        else:
+            # Token zaten doğrulanmış, token_verified'i True olarak koru
             st.session_state["token_verified"] = True
-            st.session_state["token_check_time"] = time.time()
-        elif token_valid is False:
-            # Token gerçekten geçersizse temizle
-            st.session_state["token"] = None
-            st.session_state["username"] = None
-            st.session_state["messages"] = []
-            st.session_state["current_conversation_id"] = None
 
 def add_message(role, content):
     """Geçmişe mesaj ekler"""
@@ -289,10 +307,43 @@ def switch_conversation(conv_id: str):
     
     ChatGPT gibi conversation'lar arasında geçiş yapar.
     Her conversation kullanıcıya özeldir ve izole edilmiştir.
+    Boş conversation'ları otomatik temizler.
     """
     if not conv_id:
         st.error("Geçersiz sohbet ID'si")
         return
+    
+    # Önceki boş conversation'ı temizle (sadece gerçekten boşsa - message_count == 0)
+    current_conv_id = st.session_state.get("current_conversation_id")
+    current_messages = st.session_state.get("messages", [])
+    
+    # Sadece frontend'de mesaj yoksa VE backend'de de mesaj yoksa sil
+    if current_conv_id and len(current_messages) == 0:
+        # Backend'den conversation bilgisini kontrol et
+        try:
+            convs_r = requests.get(
+                f"{BACKEND_URL}/api/conversations",
+                headers={"Authorization": f"Bearer {st.session_state['token']}"},
+                timeout=5
+            )
+            if convs_r.status_code == 200:
+                convs_data = convs_r.json()
+                conversations = convs_data.get("conversations", [])
+                for conv in conversations:
+                    if conv.get("conversation_id") == current_conv_id:
+                        # Mesaj sayısı 0 ise sil
+                        if conv.get("message_count", 0) == 0:
+                            try:
+                                requests.delete(
+                                    f"{BACKEND_URL}/api/conversations/{current_conv_id}",
+                                    headers={"Authorization": f"Bearer {st.session_state['token']}"},
+                                    timeout=5
+                                )
+                            except:
+                                pass
+                        break
+        except:
+            pass  # Kontrol başarısız olsa bile devam et
     
     try:
         # Conversation'ı aktif yap
@@ -309,9 +360,8 @@ def switch_conversation(conv_id: str):
             # Yeni conversation'ın mesajlarını yükle
             try:
                 r2 = requests.get(
-                    f"{BACKEND_URL}/api/sessions/{st.session_state['username']}",
+                    f"{BACKEND_URL}/api/conversation/{conv_id}/restore",
                     headers={"Authorization": f"Bearer {st.session_state['token']}"},
-                    params={"conversation_id": conv_id},
                     timeout=10
                 )
                 if r2.status_code == 200:
@@ -561,35 +611,29 @@ if len(st.session_state.get("messages", [])) == 0 and st.session_state.get("toke
                 st.rerun()
     st.markdown("---")
 
-# Giriş Ekranı - Sadece token yoksa veya geçersizse göster
-if not st.session_state.get("token") or not st.session_state.get("token_verified"):
+# Giriş Ekranı - Sadece token yoksa veya açıkça geçersizse göster
+# Token varsa ve token_verified False ise, ensure_state zaten kontrol etti ve True yaptı
+# Burada sadece gerçekten token yoksa veya açıkça geçersizse giriş ekranını göster
+if not st.session_state.get("token"):
+    # Token yoksa giriş ekranını göster
     # Giriş ekranına girildiğinde URL'de conversation ID varsa temizle
-    # (Giriş yapmadan chat geçmişine erişilmesini önlemek için)
     if url_conversation_id:
         clear_conversation_id_from_url()
     
-    # Token varsa ama geçersizse temizle
-    if st.session_state.get("token"):
-        token_valid = verify_token(st.session_state["token"])
-        if token_valid is False:
-            # Token geçersiz, session state'i temizle
-            for k in list(st.session_state.keys()):
-                del st.session_state[k]
-            clear_conversation_id_from_url()
-    else:
-        # Token yoksa, session state'i temizle (logout sonrası veya ilk giriş)
-        # Sadece giriş ekranına özgü değerleri temizle, diğerlerini koru
-        if "token" not in st.session_state:
-            st.session_state["token"] = None
-        if "username" not in st.session_state:
-            st.session_state["username"] = None
-        if "messages" not in st.session_state:
-            st.session_state["messages"] = []
-        if "current_conversation_id" not in st.session_state:
-            st.session_state["current_conversation_id"] = None
-        if "token_verified" not in st.session_state:
-            st.session_state["token_verified"] = False
+    # Token yoksa, session state'i temizle (logout sonrası veya ilk giriş)
+    # Sadece giriş ekranına özgü değerleri temizle, diğerlerini koru
+    if "token" not in st.session_state:
+        st.session_state["token"] = None
+    if "username" not in st.session_state:
+        st.session_state["username"] = None
+    if "messages" not in st.session_state:
+        st.session_state["messages"] = []
+    if "current_conversation_id" not in st.session_state:
+        st.session_state["current_conversation_id"] = None
+    if "token_verified" not in st.session_state:
+        st.session_state["token_verified"] = False
     
+    # Giriş ekranını göster
     with st.container():
         st.subheader("Giriş", divider="gray")
         col1, col2 = st.columns([1, 1])
@@ -605,7 +649,7 @@ if not st.session_state.get("token") or not st.session_state.get("token_verified
                 "Şifre",
                 type="password",
                 value="",
-                placeholder="????",
+                placeholder="******",
                 key="login_password"
             )
 
@@ -620,23 +664,11 @@ if not st.session_state.get("token") or not st.session_state.get("token_verified
                 st.session_state["token_verified"] = True
                 st.session_state["token_check_time"] = time.time()
                 st.session_state["messages"] = []
-                st.session_state["current_conversation_id"] = None
+                st.session_state["current_conversation_id"] = None  # Mesaj gönderilene kadar None
                 
-                # Yeni conversation oluştur ve URL'e ekle
-                try:
-                    r = requests.post(
-                        f"{BACKEND_URL}/api/conversations/new",
-                        headers={"Authorization": f"Bearer {token}"},
-                        timeout=10
-                    )
-                    if r.status_code == 200:
-                        data = r.json()
-                        new_conv_id = data.get("conversation_id")
-                        if new_conv_id:
-                            st.session_state["current_conversation_id"] = new_conv_id
-                            set_conversation_id_in_url(new_conv_id)
-                except:
-                    pass
+                # Yeni conversation oluşturma - sadece ilk mesaj gönderildiğinde oluşturulacak
+                # URL'yi temizle
+                clear_conversation_id_from_url()
                 
                 st.rerun()
             else:
@@ -682,37 +714,43 @@ with st.sidebar:
     
     # Yeni Sohbet butonu
     if st.button("Yeni Sohbet", use_container_width=True, type="primary"):
-        # Yeni conversation oluştur (ChatGPT gibi)
-        try:
-            with st.spinner("Yeni sohbet oluşturuluyor..."):
-                r = requests.post(
-                    f"{BACKEND_URL}/api/conversations/new",
+        # Önceki boş conversation'ı temizle (sadece gerçekten boşsa - message_count == 0)
+        current_conv_id = st.session_state.get("current_conversation_id")
+        current_messages = st.session_state.get("messages", [])
+        
+        # Sadece frontend'de mesaj yoksa VE backend'de de mesaj yoksa sil
+        if current_conv_id and len(current_messages) == 0:
+            # Backend'den conversation bilgisini kontrol et
+            try:
+                convs_r = requests.get(
+                    f"{BACKEND_URL}/api/conversations",
                     headers={"Authorization": f"Bearer {st.session_state['token']}"},
-                    timeout=10
+                    timeout=5
                 )
-                if r.status_code == 200:
-                    data = r.json()
-                    new_conv_id = data.get("conversation_id")
-                    if new_conv_id:
-                        st.session_state["messages"] = []
-                        st.session_state["current_conversation_id"] = new_conv_id
-                        set_conversation_id_in_url(new_conv_id)
-                        print(f"[FRONTEND] Yeni conversation oluşturuldu: {new_conv_id}")
-                        st.rerun()
-                    else:
-                        st.error("Yeni sohbet oluşturulamadı: Geçersiz yanıt")
-                else:
-                    try:
-                        error_detail = r.json().get("detail") or r.json().get("error", "Bilinmeyen hata")
-                        st.error(f"Sohbet oluşturulamadı: {error_detail}")
-                    except:
-                        st.error(f"Sohbet oluşturulamadı (HTTP {r.status_code})")
-        except requests.exceptions.Timeout:
-            st.error("Bağlantı zaman aşımına uğradı. Lütfen tekrar deneyin.")
-        except requests.exceptions.ConnectionError:
-            st.error("Backend'e bağlanılamıyor. Backend'in çalıştığından emin olun.")
-        except Exception as e:
-            st.error(f"Sohbet oluşturulamadı: {str(e)}")
+                if convs_r.status_code == 200:
+                    convs_data = convs_r.json()
+                    conversations = convs_data.get("conversations", [])
+                    for conv in conversations:
+                        if conv.get("conversation_id") == current_conv_id:
+                            # Mesaj sayısı 0 ise sil
+                            if conv.get("message_count", 0) == 0:
+                                try:
+                                    requests.delete(
+                                        f"{BACKEND_URL}/api/conversations/{current_conv_id}",
+                                        headers={"Authorization": f"Bearer {st.session_state['token']}"},
+                                        timeout=5
+                                    )
+                                except:
+                                    pass
+                            break
+            except:
+                pass  # Kontrol başarısız olsa bile devam et
+        
+        # Yeni boş conversation başlat (backend'e kaydetmeden)
+        st.session_state["messages"] = []
+        st.session_state["current_conversation_id"] = None  # Mesaj gönderilene kadar None
+        clear_conversation_id_from_url()
+        st.rerun()
     
     st.divider()
     
@@ -853,10 +891,11 @@ if "example_question" in st.session_state:
                 st.markdown(response or "")
                 add_message("assistant", response or "")
                 
-                # Conversation ID'yi güncelle (yeni oluşturulduysa)
-                if new_conv_id and new_conv_id != conv_id:
+                # Conversation ID'yi güncelle (yeni oluşturulduysa veya ilk mesaj gönderildiyse)
+                if new_conv_id:
                     st.session_state["current_conversation_id"] = new_conv_id
                     set_conversation_id_in_url(new_conv_id)
+                    print(f"[FRONTEND] Conversation ID güncellendi: {new_conv_id}")
     
     st.rerun()
 
@@ -895,11 +934,11 @@ if user_prompt:
                 st.markdown(response or "")
                 add_message("assistant", response or "")
                 
-                # Conversation ID'yi güncelle (yeni oluşturulduysa)
-                if new_conv_id and new_conv_id != conv_id:
+                # Conversation ID'yi güncelle (yeni oluşturulduysa veya ilk mesaj gönderildiyse)
+                if new_conv_id:
                     st.session_state["current_conversation_id"] = new_conv_id
                     set_conversation_id_in_url(new_conv_id)
-                    print(f"[FRONTEND] Yeni conversation ID alındı: {new_conv_id}")
+                    print(f"[FRONTEND] Conversation ID güncellendi: {new_conv_id}")
     
     # Sayfayı yenile - örnek soruların kaybolması için
     st.rerun()

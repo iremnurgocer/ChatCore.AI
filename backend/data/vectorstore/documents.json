@@ -1,0 +1,224 @@
+[
+  {
+    "content": "Çalışan: John Doe - Departman: Energy - Pozisyon: Project Manager - Email: john.doe@company1.com",
+    "metadata": {
+      "doc_type": "employees",
+      "doc_id": 1,
+      "source": "employees.json",
+      "name": "John Doe",
+      "department": "Energy"
+    }
+  },
+  {
+    "content": "Çalışan: Jane Smith - Departman: Tourism - Pozisyon: Business Development Analyst - Email: jane.smith@company1.com",
+    "metadata": {
+      "doc_type": "employees",
+      "doc_id": 2,
+      "source": "employees.json",
+      "name": "Jane Smith",
+      "department": "Tourism"
+    }
+  },
+  {
+    "content": "Çalışan: Robert Johnson - Departman: Construction - Pozisyon: Construction Manager - Email: robert.johnson@company1.com",
+    "metadata": {
+      "doc_type": "employees",
+      "doc_id": 3,
+      "source": "employees.json",
+      "name": "Robert Johnson",
+      "department": "Construction"
+    }
+  },
+  {
+    "content": "Çalışan: Emily Davis - Departman: Manufacturing - Pozisyon: Production Manager - Email: emily.davis@company1.com",
+    "metadata": {
+      "doc_type": "employees",
+      "doc_id": 4,
+      "source": "employees.json",
+      "name": "Emily Davis",
+      "department": "Manufacturing"
+    }
+  },
+  {
+    "content": "Çalışan: Michael Wilson - Departman: Infrastructure - Pozisyon: Technical Manager - Email: michael.wilson@company1.com",
+    "metadata": {
+      "doc_type": "employees",
+      "doc_id": 5,
+      "source": "employees.json",
+      "name": "Michael Wilson",
+      "department": "Infrastructure"
+    }
+  },
+  {
+    "content": "Çalışan: Sarah Brown - Departman: Energy - Pozisyon: Energy Systems Specialist - Email: sarah.brown@company1.com",
+    "metadata": {
+      "doc_type": "employees",
+      "doc_id": 6,
+      "source": "employees.json",
+      "name": "Sarah Brown",
+      "department": "Energy"
+    }
+  },
+  {
+    "content": "Çalışan: David Lee - Departman: Tourism - Pozisyon: Hotel Operations Manager - Email: david.lee@company1.com",
+    "metadata": {
+      "doc_type": "employees",
+      "doc_id": 7,
+      "source": "employees.json",
+      "name": "David Lee",
+      "department": "Tourism"
+    }
+  },
+  {
+    "content": "Çalışan: Lisa Anderson - Departman: Construction - Pozisyon: Architectural Design Specialist - Email: lisa.anderson@company1.com",
+    "metadata": {
+      "doc_type": "employees",
+      "doc_id": 8,
+      "source": "employees.json",
+      "name": "Lisa Anderson",
+      "department": "Construction"
+    }
+  },
+  {
+    "content": "Departman: Energy - Açıklama: Renewable energy production, energy distribution, and energy efficiency projects",
+    "metadata": {
+      "doc_type": "departments",
+      "doc_id": 1,
+      "source": "departments.json"
+    }
+  },
+  {
+    "content": "Departman: Tourism - Açıklama: Luxury hotel operations, resorts, and tourism consulting services",
+    "metadata": {
+      "doc_type": "departments",
+      "doc_id": 2,
+      "source": "departments.json"
+    }
+  },
+  {
+    "content": "Departman: Construction - Açıklama: Urban renewal, residential and commercial building projects, infrastructure development",
+    "metadata": {
+      "doc_type": "departments",
+      "doc_id": 3,
+      "source": "departments.json"
+    }
+  },
+  {
+    "content": "Departman: Manufacturing - Açıklama: Production, automation systems, and industrial solutions",
+    "metadata": {
+      "doc_type": "departments",
+      "doc_id": 4,
+      "source": "departments.json"
+    }
+  },
+  {
+    "content": "Departman: Infrastructure - Açıklama: Bridge, tunnel, road and other infrastructure projects",
+    "metadata": {
+      "doc_type": "departments",
+      "doc_id": 5,
+      "source": "departments.json"
+    }
+  },
+  {
+    "content": "Proje: Solar Power Plant - California - Durum: In Progress - Açıklama: 100 MW capacity solar power plant installation and commissioning project",
+    "metadata": {
+      "doc_type": "projects",
+      "doc_id": 1,
+      "source": "projects.json",
+      "project_name": "Solar Power Plant - California"
+    }
+  },
+  {
+    "content": "Proje: Wind Farm - Texas - Durum: Planning Phase - Açıklama: 150 MW capacity wind energy farm installation project",
+    "metadata": {
+      "doc_type": "projects",
+      "doc_id": 2,
+      "source": "projects.json",
+      "project_name": "Wind Farm - Texas"
+    }
+  },
+  {
+    "content": "Proje: Luxury Resort Project - Miami - Durum: In Progress - Açıklama: 5-star luxury resort and vacation complex construction project",
+    "metadata": {
+      "doc_type": "projects",
+      "doc_id": 3,
+      "source": "projects.json",
+      "project_name": "Luxury Resort Project - Miami"
+    }
+  },
+  {
+    "content": "Proje: Urban Renewal Project - Chicago - Durum: In Progress - Açıklama: 500-unit urban renewal and renovation project",
+    "metadata": {
+      "doc_type": "projects",
+      "doc_id": 4,
+      "source": "projects.json",
+      "project_name": "Urban Renewal Project - Chicago"
+    }
+  },
+  {
+    "content": "Proje: Bridge Project - New York - Durum: Completed - Açıklama: Suspension bridge construction and infrastructure development project",
+    "metadata": {
+      "doc_type": "projects",
+      "doc_id": 5,
+      "source": "projects.json",
+      "project_name": "Bridge Project - New York"
+    }
+  },
+  {
+    "content": "Proje: Automation Systems - Durum: In Progress - Açıklama: Industrial production line automation systems installation",
+    "metadata": {
+      "doc_type": "projects",
+      "doc_id": 6,
+      "source": "projects.json",
+      "project_name": "Automation Systems"
+    }
+  },
+  {
+    "content": "Prosedür: Güvenlik Protokolü 2024 - Açıklama: Şirket genelinde uygulanacak yeni güvenlik protokolleri ve kuralları - Adımlar: ",
+    "metadata": {
+      "doc_type": "procedures",
+      "doc_id": 1,
+      "source": "procedures.json"
+    }
+  },
+  {
+    "content": "Prosedür: Uzaktan Çalışma Politikası - Açıklama: Uzaktan çalışma düzenlemeleri ve kuralları - Adımlar: ",
+    "metadata": {
+      "doc_type": "procedures",
+      "doc_id": 2,
+      "source": "procedures.json"
+    }
+  },
+  {
+    "content": "Prosedür: Bütçe Onay Süreci - Açıklama: Proje bütçelerinin onay süreci ve gereksinimleri - Adımlar: ",
+    "metadata": {
+      "doc_type": "procedures",
+      "doc_id": 3,
+      "source": "procedures.json"
+    }
+  },
+  {
+    "content": "Prosedür: Yeni Veri Koruma Düzenlemesi - Açıklama: KVKK ve GDPR uyumlu yeni veri koruma düzenlemeleri - Adımlar: ",
+    "metadata": {
+      "doc_type": "procedures",
+      "doc_id": 4,
+      "source": "procedures.json"
+    }
+  },
+  {
+    "content": "Prosedür: Proje Raporlama Standartları - Açıklama: Proje ilerleme raporlarının formatı ve sunum gereksinimleri - Adımlar: ",
+    "metadata": {
+      "doc_type": "procedures",
+      "doc_id": 5,
+      "source": "procedures.json"
+    }
+  },
+  {
+    "content": "Prosedür: Yeni İşe Alım Süreci - Açıklama: İşe alım süreçlerinde yeni standartlar ve adımlar - Adımlar: ",
+    "metadata": {
+      "doc_type": "procedures",
+      "doc_id": 6,
+      "source": "procedures.json"
+    }
+  }
+]
