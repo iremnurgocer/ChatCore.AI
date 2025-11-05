@@ -17,7 +17,18 @@ ChatCore.AI is a production-ready AI assistant platform that combines Retrieval-
 - **Analytics**: Usage statistics, knowledge gap detection, intent distribution
 - **Per-Department Indexes**: Separate FAISS indexes for department-specific documents
 
+<<<<<<< HEAD
 ## Project Structure
+=======
+- **Hızlı Kurulum**: 2 komut ile çalışır hale gelin (`kurulum.bat` → `baslat.bat`)
+- **Çoklu AI Desteği**: Gemini, OpenAI, Azure, Ollama - hangisini isterseniz
+- **Ücretsiz Kullanım**: Gemini ücretsiz katmanı veya tamamen yerel Ollama
+- **Güvenli**: JWT authentication, input validation, rate limiting
+- **RAG Teknolojisi**: Şirket verilerinize dayalı %100 doğru yanıtlar
+- **Otomatik Fallback**: AI provider çalışmazsa otomatik yedek devreye girer
+- **Kalıcı Oturum**: Sayfa yenileme sonrası sohbet geçmişiniz korunur
+- **Ölçeklenebilir**: Küçük şirketlerden büyük şirketlere kadar
+>>>>>>> f72cf5adf7e438dc35b754d69227265ac771f5e7
 
 ```
 ChatCore.AI/
@@ -337,6 +348,7 @@ mypy backend/
 
 ### Database Migrations
 
+<<<<<<< HEAD
 Create new migration:
 ```bash
 cd backend
@@ -380,3 +392,16 @@ REDIS_HOST=redis-host
 ChatCore.AI - Enterprise RAG-Powered AI Assistant
 
 Built with FastAPI, Streamlit, PostgreSQL, Redis, and FAISS.
+=======
+<img width="1227" height="672" alt="ChatCore AI_1" src="https://github.com/user-attachments/assets/36043071-932c-4ef1-b1bc-92667e63710c" />
+
+---
+
+<img width="1410" height="786" alt="ChatCore AI_2" src="https://github.com/user-attachments/assets/6a408abb-6503-41be-8970-0aaea300828d" />
+
+---
+
+
+
+**Son Güncelleme:** 11/2025
+>>>>>>> f72cf5adf7e438dc35b754d69227265ac771f5e7
