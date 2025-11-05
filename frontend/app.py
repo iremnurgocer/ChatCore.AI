@@ -273,7 +273,8 @@ def ensure_state():
     # Token varsa ve username varsa, token'ı geçerli kabul et (sayfa yenileme durumunda)
     # Sadece açıkça geçersizse (401 dönerse) temizle
     if st.session_state.get("token") and st.session_state.get("username"):
-        # Token ve username varsa, token_verified'i True yap
+        # Token ve username varsa, token_verified'i mutlaka True yap
+        # Sayfa yenileme durumunda token'ı geçerli kabul et
         if not st.session_state.get("token_verified"):
             # Hızlı kontrol yap ama hata olursa token'ı geçerli kabul et
             try:
@@ -508,6 +509,7 @@ url_conversation_id = get_conversation_id_from_url()
 # (Bu durumda restore değil, sadece conversation'a geçiş yapılır - aşağıda conversation yönetimi kısmında)
 
 # Conversation yönetimi - URL'den veya backend'den conversation ID'yi al
+# Sadece token ve token_verified True ise conversation yönetimi yap
 if st.session_state.get("token") and st.session_state.get("token_verified"):
     # URL'den conversation ID varsa onu kullan
     if url_conversation_id:
@@ -524,9 +526,8 @@ if st.session_state.get("token") and st.session_state.get("token_verified"):
                     st.session_state["current_conversation_id"] = url_conversation_id
                     # Conversation mesajlarını yükle
                     r2 = requests.get(
-                        f"{BACKEND_URL}/api/sessions/{st.session_state['username']}",
+                        f"{BACKEND_URL}/api/conversation/{url_conversation_id}/restore",
                         headers={"Authorization": f"Bearer {st.session_state['token']}"},
-                        params={"conversation_id": url_conversation_id},
                         timeout=10
                     )
                     if r2.status_code == 200:
@@ -540,38 +541,9 @@ if st.session_state.get("token") and st.session_state.get("token_verified"):
                             })
             except:
                 pass
-    else:
-        # URL'de conversation ID yoksa backend'den aktif conversation'ı al
-        if not st.session_state.get("current_conversation_id"):
-            try:
-                r = requests.get(
-                    f"{BACKEND_URL}/api/conversations",
-                    headers={"Authorization": f"Bearer {st.session_state['token']}"},
-                    timeout=5
-                )
-                if r.status_code == 200:
-                    data = r.json()
-                    active_conv_id = data.get("active_conversation_id")
-                    if active_conv_id:
-                        st.session_state["current_conversation_id"] = active_conv_id
-                        set_conversation_id_in_url(active_conv_id)
-                        # Mesajları yükle
-                        r2 = requests.get(
-                            f"{BACKEND_URL}/api/sessions/{st.session_state['username']}",
-                            headers={"Authorization": f"Bearer {st.session_state['token']}"},
-                            timeout=10
-                        )
-                        if r2.status_code == 200:
-                            data2 = r2.json()
-                            messages = data2.get("messages", [])
-                            st.session_state["messages"] = []
-                            for msg in messages:
-                                st.session_state["messages"].append({
-                                    "role": msg.get("role"),
-                                    "content": msg.get("content")
-                                })
-            except:
-                pass
+    # URL'de conversation ID yoksa ve current_conversation_id None ise
+    # Backend'den aktif conversation'ı yükleme (sadece sayfa yenileme durumunda)
+    # Yeni sohbet oluşturulduğunda current_conversation_id None olacak ve hiçbir conversation yüklenmeyecek
 
 # Yeni prosedür bildirimi kontrolü (giriş yapılmışsa)
 if st.session_state.get("token"):
@@ -783,8 +755,18 @@ with st.sidebar:
                     msg_count = conv.get("message_count", 0)
                     created_at = conv.get("created_at", "")
                     
-                    # Aktif conversation kontrolü - URL'deki conversation ID veya backend'deki aktif conversation
-                    is_active = conv_id == (url_conversation_id or active_conv_id or st.session_state.get("current_conversation_id"))
+                    # Aktif conversation kontrolü - current_conversation_id varsa onu kullan
+                    # current_conversation_id None ise hiçbir conversation aktif değil
+                    current_conv_id = st.session_state.get("current_conversation_id")
+                    if current_conv_id:
+                        # current_conversation_id varsa onu kullan
+                        is_active = conv_id == current_conv_id
+                    elif url_conversation_id:
+                        # current_conversation_id yoksa URL'deki conversation ID'yi kullan
+                        is_active = conv_id == url_conversation_id
+                    else:
+                        # Ne current_conversation_id ne de URL'de conversation ID yoksa aktif değil
+                        is_active = False
                     
                     # Başlık kısaltma (uzun başlıklar için)
                     display_title = title[:30] + "..." if len(title) > 30 else title
