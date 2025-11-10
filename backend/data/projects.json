@@ -6,28 +6,35 @@
     "status": "In Progress",
     "start_date": "2023-01-15",
     "expected_end_date": "2024-12-31",
-    "budget": "50000000",
-    "spent": "32000000",
+    "budget": "50.000.000 USD",
+    "spent": "32.000.000 USD",
     "progress": 65,
     "location": "California",
     "project_manager": "John Doe",
-    "team_members": ["John Doe", "Sarah Brown"],
-    "description": "100 MW capacity solar power plant installation and commissioning project",
+    "team_members": ["John Doe", "Sarah Brown", "Maya Chen"],
+    "description": "100 MW kapasiteli güneş enerjisi santralinin kurulumu ve devreye alınması.",
+    "risk_level": "Orta",
+    "time_remaining_days": 120,
     "milestones": [
       {
         "date": "2023-06-30",
-        "title": "Permits and Licenses Completed",
+        "title": "İzinler ve Lisanslar Tamamlandı",
         "status": "Completed"
       },
       {
         "date": "2024-03-31",
-        "title": "Physical Construction Started",
+        "title": "Fiziksel İnşaat Başladı",
         "status": "Completed"
       },
       {
         "date": "2024-09-30",
-        "title": "Equipment Installation",
+        "title": "Ekipman Montajı",
         "status": "In Progress"
+      },
+      {
+        "date": "2024-12-31",
+        "title": "Operasyonel Test",
+        "status": "Pending"
       }
     ]
   },
@@ -38,122 +45,215 @@
     "status": "Planning Phase",
     "start_date": "2024-06-01",
     "expected_end_date": "2026-06-30",
-    "budget": "85000000",
-    "spent": "5000000",
+    "budget": "85.000.000 USD",
+    "spent": "5.000.000 USD",
     "progress": 12,
     "location": "Texas",
     "project_manager": "John Doe",
-    "team_members": ["John Doe"],
-    "description": "150 MW capacity wind energy farm installation project",
+    "team_members": ["John Doe", "Sarah Brown"],
+    "description": "150 MW kapasiteli rüzgar çiftliği kurulumu için planlama ve saha hazırlıkları.",
+    "risk_level": "Yüksek",
+    "time_remaining_days": 660,
     "milestones": [
       {
         "date": "2024-08-31",
-        "title": "Environmental Impact Assessment Approval",
+        "title": "Çevresel Etki Değerlendirmesi Onayı",
         "status": "Pending"
+      },
+      {
+        "date": "2025-03-31",
+        "title": "Saha Hazırlığı",
+        "status": "Planned"
       }
     ]
   },
   {
     "id": 3,
-    "name": "Luxury Resort Project - Miami",
-    "department": "Tourism",
+    "name": "Bodrum Yenilenebilir Entegrasyon",
+    "department": "Energy",
     "status": "In Progress",
-    "start_date": "2022-09-01",
-    "expected_end_date": "2025-05-31",
-    "budget": "120000000",
-    "spent": "85000000",
-    "progress": 72,
-    "location": "Miami",
-    "project_manager": "David Lee",
-    "team_members": ["Jane Smith", "David Lee"],
-    "description": "5-star luxury resort and vacation complex construction project",
+    "start_date": "2023-09-01",
+    "expected_end_date": "2025-03-31",
+    "budget": "28.000.000 USD",
+    "spent": "15.500.000 USD",
+    "progress": 54,
+    "location": "Bodrum",
+    "project_manager": "Ahmet Yılmaz",
+    "team_members": ["Ahmet Yılmaz", "Sarah Brown"],
+    "description": "Bodrum bölgesindeki resort tesislerine yenilenebilir enerji entegrasyonu ve akıllı şebeke altyapısı.",
+    "risk_level": "Orta",
+    "time_remaining_days": 210,
     "milestones": [
       {
-        "date": "2023-12-31",
-        "title": "Construction Completed",
+        "date": "2024-02-15",
+        "title": "Altyapı Haritalama",
         "status": "Completed"
       },
       {
-        "date": "2024-12-31",
-        "title": "Interior Design and Furnishing",
+        "date": "2024-11-30",
+        "title": "Akıllı Sayaç Kurulumları",
         "status": "In Progress"
+      },
+      {
+        "date": "2025-03-31",
+        "title": "Tam Entegrasyon",
+        "status": "Planned"
       }
     ]
   },
   {
     "id": 4,
-    "name": "Urban Renewal Project - Chicago",
-    "department": "Construction",
+    "name": "Luxury Resort Project - Miami",
+    "department": "Tourism",
     "status": "In Progress",
-    "start_date": "2023-03-01",
-    "expected_end_date": "2025-08-31",
-    "budget": "300000000",
-    "spent": "180000000",
-    "progress": 58,
-    "location": "Chicago",
-    "project_manager": "Robert Johnson",
-    "team_members": ["Robert Johnson", "Lisa Anderson"],
-    "description": "500-unit urban renewal and renovation project",
+    "start_date": "2022-09-01",
+    "expected_end_date": "2025-05-31",
+    "budget": "120.000.000 USD",
+    "spent": "85.000.000 USD",
+    "progress": 72,
+    "location": "Miami",
+    "project_manager": "David Lee",
+    "team_members": ["David Lee", "Jane Smith", "Selin Kaya"],
+    "description": "5 yıldızlı lüks resort ve tatil kompleksinin inşaatı ve operasyon hazırlığı.",
+    "risk_level": "Orta",
+    "time_remaining_days": 240,
     "milestones": [
       {
-        "date": "2024-01-31",
-        "title": "Demolition and Cleanup Completed",
+        "date": "2023-12-31",
+        "title": "İnşaat Tamamlandı",
         "status": "Completed"
       },
       {
         "date": "2024-12-31",
-        "title": "Construction 70% Complete",
+        "title": "İç Tasarım ve Dekorasyon",
         "status": "In Progress"
+      },
+      {
+        "date": "2025-03-31",
+        "title": "Operasyonel Hazırlık",
+        "status": "Planned"
       }
     ]
   },
   {
     "id": 5,
+    "name": "Urban Renewal Project - Chicago",
+    "department": "Construction",
+    "status": "In Progress",
+    "start_date": "2023-03-01",
+    "expected_end_date": "2025-08-31",
+    "budget": "300.000.000 USD",
+    "spent": "180.000.000 USD",
+    "progress": 58,
+    "location": "Chicago",
+    "project_manager": "Robert Johnson",
+    "team_members": ["Robert Johnson", "Lisa Anderson"],
+    "description": "500 konutluk kentsel dönüşüm ve sosyal alan rehabilitasyonu.",
+    "risk_level": "Yüksek",
+    "time_remaining_days": 330,
+    "milestones": [
+      {
+        "date": "2024-01-31",
+        "title": "Yıkım ve Temizlik Tamamlandı",
+        "status": "Completed"
+      },
+      {
+        "date": "2024-12-31",
+        "title": "İnşaat %70 Tamamlandı",
+        "status": "In Progress"
+      },
+      {
+        "date": "2025-08-31",
+        "title": "Teslimat",
+        "status": "Planned"
+      }
+    ]
+  },
+  {
+    "id": 6,
     "name": "Bridge Project - New York",
     "department": "Infrastructure",
     "status": "Completed",
     "start_date": "2021-01-10",
     "expected_end_date": "2023-12-31",
     "actual_end_date": "2023-11-15",
-    "budget": "450000000",
-    "spent": "435000000",
+    "budget": "450.000.000 USD",
+    "spent": "435.000.000 USD",
     "progress": 100,
     "location": "New York",
     "project_manager": "Michael Wilson",
-    "team_members": ["Michael Wilson"],
-    "description": "Suspension bridge construction and infrastructure development project",
+    "team_members": ["Michael Wilson", "Nora Petrova"],
+    "description": "Çelik asma köprü inşaatı ve altyapı güçlendirmesi.",
+    "risk_level": "Düşük",
+    "time_remaining_days": 0,
     "milestones": [
       {
         "date": "2023-11-15",
-        "title": "Project Completed",
+        "title": "Proje Tamamlandı",
         "status": "Completed"
       }
     ]
   },
   {
-    "id": 6,
+    "id": 7,
     "name": "Automation Systems",
     "department": "Manufacturing",
     "status": "In Progress",
     "start_date": "2024-01-15",
     "expected_end_date": "2024-12-31",
-    "budget": "25000000",
-    "spent": "15000000",
+    "budget": "25.000.000 USD",
+    "spent": "15.000.000 USD",
     "progress": 60,
     "location": "Detroit",
     "project_manager": "Emily Davis",
-    "team_members": ["Emily Davis"],
-    "description": "Industrial production line automation systems installation",
+    "team_members": ["Emily Davis", "Aisha Rahman"],
+    "description": "Endüstriyel üretim hattına tam otomasyon sistemlerinin entegrasyonu.",
+    "risk_level": "Orta",
+    "time_remaining_days": 150,
     "milestones": [
       {
         "date": "2024-06-30",
-        "title": "Pilot System Installation",
+        "title": "Pilot Sistem Kurulumu",
         "status": "Completed"
       },
       {
-        "date": "2024-12-31",
-        "title": "Full-Scale System",
+        "date": "2024-10-31",
+        "title": "Tüm Hatlarda Otomasyon",
         "status": "In Progress"
+      },
+      {
+        "date": "2024-12-31",
+        "title": "Performans Testleri",
+        "status": "Planned"
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "name": "Ege Bölgesi Lojistik Koridoru",
+    "department": "Infrastructure",
+    "status": "Planning Phase",
+    "start_date": "2024-04-01",
+    "expected_end_date": "2026-01-31",
+    "budget": "220.000.000 USD",
+    "spent": "12.000.000 USD",
+    "progress": 10,
+    "location": "İzmir",
+    "project_manager": "Levent Arslan",
+    "team_members": ["Levent Arslan", "Nora Petrova"],
+    "description": "Ege bölgesindeki lojistik merkezlerini birbirine bağlayan otoyol ve demiryolu altyapısının geliştirilmesi.",
+    "risk_level": "Orta",
+    "time_remaining_days": 600,
+    "milestones": [
+      {
+        "date": "2024-09-30",
+        "title": "Ön Fizibilite Tamamlandı",
+        "status": "In Progress"
+      },
+      {
+        "date": "2025-02-28",
+        "title": "Yatırım Onayı",
+        "status": "Planned"
       }
     ]
   }

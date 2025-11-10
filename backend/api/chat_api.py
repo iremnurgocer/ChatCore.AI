@@ -160,7 +160,7 @@ async def get_conversations(
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_async_session)
 ):
-    """Get all user conversations sorted by updated_at desc"""
+    """Get all user conversations - active conversation first, then by updated_at desc"""
     conversations = await session_service.get_user_conversations(user.id, session=session)
     
     # Get active conversation ID
@@ -203,6 +203,16 @@ async def create_conversation(
         "message_count": conversation.message_count,
         "created_at": conversation.created_at.isoformat()
     }
+
+
+@router.post("/conversations/deactivate-all")
+async def deactivate_all_conversations(
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_async_session)
+):
+    """Deactivate all conversations (for new chat)"""
+    success = await session_service.deactivate_all_conversations(user.id, session=session)
+    return {"success": success}
 
 
 @router.post("/conversations/{conversation_id}/switch")

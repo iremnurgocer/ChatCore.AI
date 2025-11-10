@@ -32,6 +32,7 @@ import json
 import requests
 import streamlit as st
 import time
+from datetime import datetime
 
 # CSS stil dosyasını yükle
 try:
@@ -269,7 +270,17 @@ def ensure_state():
         st.session_state["token_verified"] = False
     if "token_check_time" not in st.session_state:
         st.session_state["token_check_time"] = None
-    
+    if "conversations_synced" not in st.session_state:
+        st.session_state["conversations_synced"] = False
+    if "conversation_list" not in st.session_state:
+        st.session_state["conversation_list"] = []
+    if "backend_active_conversation_id" not in st.session_state:
+        st.session_state["backend_active_conversation_id"] = None
+    if "initial_messages_loaded" not in st.session_state:
+        st.session_state["initial_messages_loaded"] = False
+    if "pending_new_chat" not in st.session_state:
+        st.session_state["pending_new_chat"] = False
+
     # Token varsa ve username varsa, token'ı geçerli kabul et (sayfa yenileme durumunda)
     # Sadece açıkça geçersizse (401 dönerse) temizle
     if st.session_state.get("token") and st.session_state.get("username"):
@@ -314,6 +325,11 @@ def switch_conversation(conv_id: str):
         st.error("Geçersiz sohbet ID'si")
         return
     
+    # Sync flag'lerini temizle (yeni conversation için sync yapılabilir)
+    for key in list(st.session_state.keys()):
+        if key.startswith("sync_conversation_"):
+            del st.session_state[key]
+    
     # Önceki boş conversation'ı temizle (sadece gerçekten boşsa - message_count == 0)
     current_conv_id = st.session_state.get("current_conversation_id")
     current_messages = st.session_state.get("messages", [])
@@ -356,6 +372,9 @@ def switch_conversation(conv_id: str):
         
         if r.status_code == 200:
             st.session_state["current_conversation_id"] = conv_id
+            st.session_state["backend_active_conversation_id"] = conv_id
+            st.session_state["initial_messages_loaded"] = True
+            st.session_state["pending_new_chat"] = False
             set_conversation_id_in_url(conv_id)
             
             # Yeni conversation'ın mesajlarını yükle
@@ -374,15 +393,16 @@ def switch_conversation(conv_id: str):
                             "role": msg.get("role"),
                             "content": msg.get("content")
                         })
-                    print(f"[FRONTEND] Conversation {conv_id} yüklendi, {len(messages)} mesaj")
-                else:
-                    # Mesajlar yüklenemedi ama conversation değişti
-                    st.session_state["messages"] = []
-                    print(f"[FRONTEND] UYARI: Conversation mesajları yüklenemedi (HTTP {r2.status_code})")
             except Exception as e:
                 # Mesajlar yüklenemedi ama conversation değişti
                 st.session_state["messages"] = []
-                print(f"[FRONTEND] UYARI: Conversation mesajları yüklenirken hata: {e}")
+            
+            # Cache içindeki aktif işaretini güncelle (sıralamayı değiştirmeden)
+            cached_list = st.session_state.get("conversation_list", [])
+            for cached in cached_list:
+                cid = cached.get("conversation_id") or cached.get("id")
+                cached["is_active"] = cid == conv_id
+            st.session_state["conversation_list"] = cached_list
             
             st.rerun()
         elif r.status_code == 404:
@@ -404,6 +424,81 @@ def switch_conversation(conv_id: str):
         st.error(f"Bağlantı hatası: {str(e)}")
     except Exception as e:
         st.error(f"Sohbet değiştirilemedi: {str(e)}")
+
+
+def delete_conversation(conv_id: str):
+    """Delete a conversation and refresh the sidebar list."""
+    if not st.session_state.get("token"):
+        st.error("Please log in to manage chats.")
+        return
+
+    try:
+        r = requests.delete(
+            f"{BACKEND_URL}/api/conversations/{conv_id}",
+            headers={"Authorization": f"Bearer {st.session_state['token']}"},
+            timeout=10
+        )
+
+        if r.status_code == 200:
+            if st.session_state.get("current_conversation_id") == conv_id:
+                st.session_state["current_conversation_id"] = None
+                st.session_state["messages"] = []
+                st.session_state["initial_messages_loaded"] = False
+                st.session_state["pending_new_chat"] = False
+                clear_conversation_id_from_url()
+
+            st.session_state["conversations_synced"] = False
+            st.success("Conversation deleted.")
+            st.rerun()
+        elif r.status_code == 404:
+            st.warning("Conversation not found.")
+        elif r.status_code == 403:
+            st.error("You do not have permission to delete this conversation.")
+        else:
+            try:
+                detail = r.json().get("detail") or r.json().get("error", "")
+            except Exception:
+                detail = ""
+            extra = f" ({detail})" if detail else ""
+            st.error(f"Conversation could not be deleted: HTTP {r.status_code}{extra}")
+    except requests.exceptions.Timeout:
+        st.error("Delete request timed out.")
+    except requests.exceptions.ConnectionError:
+        st.error("Cannot reach the backend. Please check the server status.")
+    except requests.exceptions.RequestException as e:
+        st.error(f"Delete request failed: {str(e)}")
+    except Exception as e:
+        st.error(f"Unexpected error while deleting: {str(e)}")
+
+
+def fetch_conversation_list(force: bool = False):
+    """Fetch and cache the conversation list from the backend."""
+    if not st.session_state.get("token"):
+        return st.session_state.get("conversation_list", [])
+
+    if not force and st.session_state.get("conversations_synced") and st.session_state.get("conversation_list"):
+        return st.session_state.get("conversation_list")
+
+    try:
+        r = requests.get(
+            f"{BACKEND_URL}/api/conversations",
+            headers={"Authorization": f"Bearer {st.session_state['token']}"},
+            timeout=10
+        )
+        if r.status_code == 200:
+            data = r.json()
+            st.session_state["conversation_list"] = data.get("conversations", [])
+            st.session_state["backend_active_conversation_id"] = data.get("active_conversation_id")
+            st.session_state["conversations_synced"] = True
+        else:
+            st.session_state["conversation_list"] = st.session_state.get("conversation_list", [])
+    except requests.exceptions.RequestException:
+        pass
+    except Exception:
+        pass
+
+    return st.session_state.get("conversation_list", [])
+
 
 # Prosedür bildirim kontrolü
 def check_new_procedures():
@@ -496,6 +591,53 @@ def restore_session_from_conversation(conversation_id: str):
     except Exception as e:
         return None, None, f"Error: {str(e)}"
 
+def load_initial_conversation():
+    """
+    Aktif conversation'ı backend'den yükler ve mesaj geçmişini senkronize eder.
+    Eski app.py davranışını koruyarak sayfa yenilemelerinde sıralama ve aktif sohbet
+    durumunun doğru görünmesini sağlar.
+    """
+    if not st.session_state.get("token"):
+        return
+
+    conversations = fetch_conversation_list()
+
+    if st.session_state.get("pending_new_chat"):
+        return
+
+    active_conv_id = st.session_state.get("current_conversation_id")
+    if not active_conv_id:
+        active_conv_id = st.session_state.get("backend_active_conversation_id")
+        if active_conv_id:
+            st.session_state["current_conversation_id"] = active_conv_id
+
+    if not active_conv_id:
+        return
+
+    if st.session_state.get("messages"):
+        return
+
+    if st.session_state.get("initial_messages_loaded"):
+        return
+
+    try:
+        r2 = requests.get(
+            f"{BACKEND_URL}/api/conversation/{active_conv_id}/restore",
+            headers={"Authorization": f"Bearer {st.session_state['token']}"},
+            timeout=10
+        )
+        if r2.status_code == 200:
+            data2 = r2.json()
+            messages = data2.get("messages", [])
+            st.session_state["messages"] = [
+                {"role": msg.get("role"), "content": msg.get("content")}
+                for msg in messages
+            ]
+    except Exception:
+        pass
+
+    st.session_state["initial_messages_loaded"] = True
+
 # UI başlatma
 import time
 ensure_state()
@@ -541,9 +683,8 @@ if st.session_state.get("token") and st.session_state.get("token_verified"):
                             })
             except:
                 pass
-    # URL'de conversation ID yoksa ve current_conversation_id None ise
-    # Backend'den aktif conversation'ı yükleme (sadece sayfa yenileme durumunda)
-    # Yeni sohbet oluşturulduğunda current_conversation_id None olacak ve hiçbir conversation yüklenmeyecek
+
+    load_initial_conversation()
 
 # Yeni prosedür bildirimi kontrolü (giriş yapılmışsa)
 if st.session_state.get("token"):
@@ -637,6 +778,11 @@ if not st.session_state.get("token"):
                 st.session_state["token_check_time"] = time.time()
                 st.session_state["messages"] = []
                 st.session_state["current_conversation_id"] = None  # Mesaj gönderilene kadar None
+                st.session_state["conversations_synced"] = False
+                st.session_state["conversation_list"] = []
+                st.session_state["backend_active_conversation_id"] = None
+                st.session_state["initial_messages_loaded"] = False
+                st.session_state["pending_new_chat"] = False
                 
                 # Yeni conversation oluşturma - sadece ilk mesaj gönderildiğinde oluşturulacak
                 # URL'yi temizle
@@ -686,41 +832,17 @@ with st.sidebar:
     
     # Yeni Sohbet butonu
     if st.button("Yeni Sohbet", use_container_width=True, type="primary"):
-        # Önceki boş conversation'ı temizle (sadece gerçekten boşsa - message_count == 0)
-        current_conv_id = st.session_state.get("current_conversation_id")
-        current_messages = st.session_state.get("messages", [])
-        
-        # Sadece frontend'de mesaj yoksa VE backend'de de mesaj yoksa sil
-        if current_conv_id and len(current_messages) == 0:
-            # Backend'den conversation bilgisini kontrol et
-            try:
-                convs_r = requests.get(
-                    f"{BACKEND_URL}/api/conversations",
-                    headers={"Authorization": f"Bearer {st.session_state['token']}"},
-                    timeout=5
-                )
-                if convs_r.status_code == 200:
-                    convs_data = convs_r.json()
-                    conversations = convs_data.get("conversations", [])
-                    for conv in conversations:
-                        if conv.get("conversation_id") == current_conv_id:
-                            # Mesaj sayısı 0 ise sil
-                            if conv.get("message_count", 0) == 0:
-                                try:
-                                    requests.delete(
-                                        f"{BACKEND_URL}/api/conversations/{current_conv_id}",
-                                        headers={"Authorization": f"Bearer {st.session_state['token']}"},
-                                        timeout=5
-                                    )
-                                except:
-                                    pass
-                            break
-            except:
-                pass  # Kontrol başarısız olsa bile devam et
-        
-        # Yeni boş conversation başlat (backend'e kaydetmeden)
         st.session_state["messages"] = []
-        st.session_state["current_conversation_id"] = None  # Mesaj gönderilene kadar None
+        st.session_state["current_conversation_id"] = None
+        st.session_state["initial_messages_loaded"] = False
+        st.session_state["backend_active_conversation_id"] = None
+        st.session_state["pending_new_chat"] = True
+        
+        cached_list = st.session_state.get("conversation_list", [])
+        for cached in cached_list:
+            cached["is_active"] = False
+        st.session_state["conversation_list"] = cached_list
+        
         clear_conversation_id_from_url()
         st.rerun()
     
@@ -728,80 +850,37 @@ with st.sidebar:
     
     # Geçmiş Sohbetler
     st.markdown("### Geçmiş Sohbetler")
-    
-    # Conversation'ları getir
-    try:
-        r = requests.get(
-            f"{BACKEND_URL}/api/conversations",
-            headers={"Authorization": f"Bearer {st.session_state['token']}"},
-            timeout=10
-        )
-        if r.status_code == 200:
-            data = r.json()
-            conversations = data.get("conversations", [])
-            active_conv_id = data.get("active_conversation_id")
-            
-            # URL'deki conversation ID ile aktif conversation ID'yi senkronize et
-            if url_conversation_id and url_conversation_id != active_conv_id:
-                # URL'deki conversation ID aktif conversation değilse, backend'den aktif conversation'ı kullan
-                # Ama URL'deki conversation ID'yi de kontrol et
-                pass
-            
-            # Conversation listesi göster
-            if conversations:
-                for conv in conversations[:10]:  # İlk 10'u göster
-                    conv_id = conv.get("conversation_id")
-                    title = conv.get("title", "Başlıksız")
-                    msg_count = conv.get("message_count", 0)
-                    created_at = conv.get("created_at", "")
-                    
-                    # Aktif conversation kontrolü - current_conversation_id varsa onu kullan
-                    # current_conversation_id None ise hiçbir conversation aktif değil
-                    current_conv_id = st.session_state.get("current_conversation_id")
-                    if current_conv_id:
-                        # current_conversation_id varsa onu kullan
-                        is_active = conv_id == current_conv_id
-                    elif url_conversation_id:
-                        # current_conversation_id yoksa URL'deki conversation ID'yi kullan
-                        is_active = conv_id == url_conversation_id
-                    else:
-                        # Ne current_conversation_id ne de URL'de conversation ID yoksa aktif değil
-                        is_active = False
-                    
-                    # Başlık kısaltma (uzun başlıklar için)
-                    display_title = title[:30] + "..." if len(title) > 30 else title
-                    
-                    # Aktif conversation için yeşil işaret ve stil
-                    if is_active:
-                        # Yeşil nokta ile aktif conversation göster
-                        col1, col2 = st.columns([0.1, 0.9])
-                        with col1:
-                            st.markdown(
-                                """
-                                <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
-                                    <div style="width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; margin-top: 10px;"></div>
-                                </div>
-                                """,
-                                unsafe_allow_html=True
-                            )
-                        with col2:
-                            label = f"{display_title} ({msg_count})"
-                            if st.button(label, key=f"conv_{conv_id}", use_container_width=True, type="primary"):
-                                switch_conversation(conv_id)
-                    else:
-                        # Pasif conversation için normal buton
-                        label = f"{display_title} ({msg_count})"
-                        if st.button(label, key=f"conv_{conv_id}", use_container_width=True):
-                            switch_conversation(conv_id)
-            else:
-                st.caption("Henüz sohbet yok. 'Yeni Sohbet' butonuna tıklayarak başlayabilirsiniz.")
-        else:
-            st.caption(f"Sohbetler yüklenemedi (HTTP {r.status_code})")
-    except requests.exceptions.RequestException as e:
-        st.caption(f"Sohbetler yüklenemedi: Bağlantı hatası")
-    except Exception as e:
-        st.caption(f"Sohbetler yüklenemedi: {str(e)}")
-    
+
+    conversations = fetch_conversation_list()
+    backend_active_conv_id = st.session_state.get("backend_active_conversation_id")
+
+    if backend_active_conv_id and not st.session_state.get("current_conversation_id") and not st.session_state.get("pending_new_chat"):
+        st.session_state["current_conversation_id"] = backend_active_conv_id
+        set_conversation_id_in_url(backend_active_conv_id)
+
+    if conversations:
+        delete_icon = "\U0001F5D1"
+        for conv in conversations[:10]:
+            conv_id = conv.get("conversation_id") or conv.get("id")
+            title = conv.get("title", "Basliksiz")
+            msg_count = conv.get("message_count", 0)
+
+            display_title = title[:50] + "..." if len(title) > 50 else title
+            label = f"{display_title} ({msg_count})"
+
+            button_kwargs = {"use_container_width": True}
+            if conv_id and conv_id == st.session_state.get("current_conversation_id"):
+                button_kwargs["type"] = "primary"
+
+            row_cols = st.columns([0.8, 0.2])
+            if row_cols[0].button(label, key=f"conv_{conv_id}", **button_kwargs):
+                switch_conversation(conv_id)
+
+            if row_cols[1].button(delete_icon, key=f"conv_delete_{conv_id}", use_container_width=True, help="Sohbeti sil"):
+                delete_conversation(conv_id)
+    else:
+        st.caption("Henuz sohbet yok")
+
     st.divider()
     
     # Yeni prosedür bildirimi
@@ -872,12 +951,16 @@ if "example_question" in st.session_state:
                 response, new_conv_id = result
                 st.markdown(response or "")
                 add_message("assistant", response or "")
+                st.session_state["conversations_synced"] = False
+                st.session_state["pending_new_chat"] = False
                 
                 # Conversation ID'yi güncelle (yeni oluşturulduysa veya ilk mesaj gönderildiyse)
                 if new_conv_id:
                     st.session_state["current_conversation_id"] = new_conv_id
+                    st.session_state["backend_active_conversation_id"] = new_conv_id
                     set_conversation_id_in_url(new_conv_id)
-                    print(f"[FRONTEND] Conversation ID güncellendi: {new_conv_id}")
+                else:
+                    st.session_state["backend_active_conversation_id"] = st.session_state.get("current_conversation_id")
     
     st.rerun()
 
@@ -920,7 +1003,6 @@ if user_prompt:
                 if new_conv_id:
                     st.session_state["current_conversation_id"] = new_conv_id
                     set_conversation_id_in_url(new_conv_id)
-                    print(f"[FRONTEND] Conversation ID güncellendi: {new_conv_id}")
     
     # Sayfayı yenile - örnek soruların kaybolması için
     st.rerun()

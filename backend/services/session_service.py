@@ -44,6 +44,21 @@ class SessionService:
             )
             conv = result.scalars().first()
             if conv:
+                # Conversation bulundu, aktifleştir (updated_at'i güncelleme - ChatGPT gibi)
+                if not conv.is_active:
+                    # Diğer conversation'ları deaktif et
+                    other_convs_result = await session.execute(
+                        select(Conversation).where(
+                            Conversation.user_id == user_id,
+                            Conversation.id != conv.id
+                        )
+                    )
+                    for other_conv in other_convs_result.scalars().all():
+                        other_conv.is_active = False
+
+                    # Bu conversation'ı aktifleştir (updated_at'i güncelleme - sadece mesaj gönderildiğinde güncellenecek)
+                    conv.is_active = True
+                    await session.commit()
                 return conv
         
         # Create new conversation
@@ -52,7 +67,8 @@ class SessionService:
             conversation_id=new_conv_id,
             user_id=user_id,
             title=title or "Yeni Sohbet",
-            is_active=True
+            is_active=True,
+            updated_at=datetime.utcnow()  # Yeni conversation için updated_at'i ayarla
         )
         session.add(conversation)
         await session.flush()
@@ -66,7 +82,8 @@ class SessionService:
         )
         for conv in other_convs_result.scalars().all():
             conv.is_active = False
-        
+            # Diğer conversation'ları deaktif ederken updated_at'i güncelleme (sadece aktifleştirildiğinde güncelle)
+
         await session.commit()
         return conversation
     
@@ -193,15 +210,20 @@ class SessionService:
         user_id: int,
         session: Optional[AsyncSession] = None
     ) -> List[Conversation]:
-        """Get all user conversations"""
+        """Get all user conversations - active conversation first, then by updated_at desc"""
         if session is None:
             async for db_session in get_async_session():
                 return await self.get_user_conversations(user_id, db_session)
         
+        # Önce aktif conversation'ı bul, sonra diğerlerini updated_at'e göre sırala
+        # Aktif conversation her zaman en üstte olmalı
         result = await session.execute(
             select(Conversation).where(
                 Conversation.user_id == user_id
-            ).order_by(Conversation.updated_at.desc())
+            ).order_by(
+                Conversation.is_active.desc(),  # Aktif conversation önce (True > False)
+                Conversation.updated_at.desc()  # Sonra updated_at'e göre
+            )
         )
         return result.scalars().all()
     
@@ -238,6 +260,29 @@ class SessionService:
         
         return True
     
+    async def deactivate_all_conversations(
+        self,
+        user_id: int,
+        session: Optional[AsyncSession] = None
+    ) -> bool:
+        """Deactivate all conversations for a user"""
+        if session is None:
+            async for db_session in get_async_session():
+                return await self.deactivate_all_conversations(user_id, db_session)
+
+        result = await session.execute(
+            select(Conversation).where(
+                Conversation.user_id == user_id,
+                Conversation.is_active == True
+            )
+        )
+        conversations = result.scalars().all()
+        for conv in conversations:
+            conv.is_active = False
+
+        await session.commit()
+        return True
+
     async def get_active_conversation_id(
         self,
         user_id: int,

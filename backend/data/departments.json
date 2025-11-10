@@ -5,15 +5,46 @@
     "code": "ENERGY",
     "director": "John Doe",
     "location": "New York",
-    "employee_count": 45,
-    "description": "Renewable energy production, energy distribution, and energy efficiency projects",
+    "employee_count": 47,
+    "description": "Yenilenebilir enerji üretimi, dağıtımı ve enerji verimliliği projeleri",
     "projects": [
       "Solar Power Plant - California",
       "Wind Farm - Texas",
-      "Energy Efficiency Project"
+      "Bodrum Yenilenebilir Entegrasyon",
+      "Bodrum Akıllı Şebeke"
     ],
-    "budget_2024": "250000000",
-    "status": "Active"
+    "budget_2024": "250.000.000 USD",
+    "status": "Active",
+    "key_contacts": [
+      {
+        "name": "John Doe",
+        "role": "Direktör",
+        "email": "john.doe@company1.com"
+      },
+      {
+        "name": "Ahmet Yılmaz",
+        "role": "Bodrum Bölgesi Koordinatörü",
+        "email": "ahmet.yilmaz@company1.com"
+      }
+    ],
+    "active_procedures": ["SEC-2024-001", "ENERGY-OPS-2024", "ENERGY-BODRUM-001"],
+    "quarter_kpis": {
+      "2024_Q3": {
+        "carbon_reduction_target": "%18 emisyon azaltımı",
+        "renewable_share": "%62 yenilenebilir enerji payı",
+        "network_reliability": "%99,2 şebeke sürekliliği",
+        "current_status": {
+          "carbon_reduction": "%15 gerçekleşti",
+          "renewable_share": "%58 gerçekleşti",
+          "network_reliability": "%98,7 gerçekleşti"
+        }
+      }
+    },
+    "initiatives": [
+      "Enerji verimliliği denetimleri",
+      "Bodrum sahası akıllı şebeke adaptasyonu",
+      "Karbon ayak izi azaltım programı"
+    ]
   },
   {
     "id": 2,
@@ -21,15 +52,44 @@
     "code": "TOURISM",
     "director": "David Lee",
     "location": "Los Angeles",
-    "employee_count": 120,
-    "description": "Luxury hotel operations, resorts, and tourism consulting services",
+    "employee_count": 122,
+    "description": "Lüks otel işletmeleri, tatil köyleri ve turizm danışmanlığı hizmetleri",
     "projects": [
       "Luxury Resort Project - Miami",
       "Cultural Tourism Development",
-      "Customer Satisfaction Program"
+      "Customer Satisfaction Program",
+      "İstanbul Kültür Rotası"
     ],
-    "budget_2024": "180000000",
-    "status": "Active"
+    "budget_2024": "180.000.000 USD",
+    "status": "Active",
+    "key_contacts": [
+      {
+        "name": "David Lee",
+        "role": "Direktör",
+        "email": "david.lee@company1.com"
+      },
+      {
+        "name": "Jane Smith",
+        "role": "İş Geliştirme Analisti",
+        "email": "jane.smith@company1.com"
+      }
+    ],
+    "active_procedures": ["SEC-2024-001", "HR-2024-002", "TOURISM-GUEST-2024"],
+    "quarter_kpis": {
+      "2024_Q3": {
+        "occupancy_rate_target": "%84 doluluk",
+        "customer_satisfaction_target": "%92 memnuniyet",
+        "current_status": {
+          "occupancy_rate": "%81 gerçekleşti",
+          "customer_satisfaction": "%90 gerçekleşti"
+        }
+      }
+    },
+    "initiatives": [
+      "Misafir deneyimi dijitalleşme",
+      "Yeni kültür rotası lansmanı",
+      "Personel eğitim programı"
+    ]
   },
   {
     "id": 3,
@@ -38,14 +98,42 @@
     "director": "Robert Johnson",
     "location": "Chicago",
     "employee_count": 200,
-    "description": "Urban renewal, residential and commercial building projects, infrastructure development",
+    "description": "Kentsel dönüşüm, konut ve ticari bina projeleri, altyapı geliştirme",
     "projects": [
       "Urban Renewal Project - Chicago",
       "Infrastructure Development - Houston",
       "Sustainable Building Design"
     ],
-    "budget_2024": "450000000",
-    "status": "Active"
+    "budget_2024": "450.000.000 USD",
+    "status": "Active",
+    "key_contacts": [
+      {
+        "name": "Robert Johnson",
+        "role": "Direktör",
+        "email": "robert.johnson@company1.com"
+      },
+      {
+        "name": "Lisa Anderson",
+        "role": "Mimari Tasarım Uzmanı",
+        "email": "lisa.anderson@company1.com"
+      }
+    ],
+    "active_procedures": ["SEC-2024-001", "CONSTR-SITE-2024"],
+    "quarter_kpis": {
+      "2024_Q3": {
+        "project_completion_target": "%68 ilerleme",
+        "safety_incident_target": "<=2 olay",
+        "current_status": {
+          "project_completion": "%63 gerçekleşti",
+          "safety_incidents": "1 olay"
+        }
+      }
+    },
+    "initiatives": [
+      "Dijital şantiye izleme",
+      "Yeşil malzeme kullanımı",
+      "Taşeron performans programı"
+    ]
   },
   {
     "id": 4,
@@ -54,14 +142,42 @@
     "director": "Emily Davis",
     "location": "Detroit",
     "employee_count": 85,
-    "description": "Production, automation systems, and industrial solutions",
+    "description": "Üretim, otomasyon sistemleri ve endüstriyel çözümler",
     "projects": [
       "Automation Systems",
       "Quality Management Project",
       "Digital Transformation Project"
     ],
-    "budget_2024": "120000000",
-    "status": "Active"
+    "budget_2024": "120.000.000 USD",
+    "status": "Active",
+    "key_contacts": [
+      {
+        "name": "Emily Davis",
+        "role": "Direktör",
+        "email": "emily.davis@company1.com"
+      },
+      {
+        "name": "Aisha Rahman",
+        "role": "Tedarik Zinciri Uzmanı",
+        "email": "aisha.rahman@company1.com"
+      }
+    ],
+    "active_procedures": ["SEC-2024-001", "PM-2024-005", "MFG-LEAN-2024"],
+    "quarter_kpis": {
+      "2024_Q3": {
+        "line_efficiency_target": "%88",
+        "scrap_reduction_target": "%12",
+        "current_status": {
+          "line_efficiency": "%85 gerçekleşti",
+          "scrap_reduction": "%9 gerçekleşti"
+        }
+      }
+    },
+    "initiatives": [
+      "Endüstri 4.0 sensörleştirme",
+      "Tedarik zinciri optimizasyonu",
+      "Kalite akademisi programı"
+    ]
   },
   {
     "id": 5,
@@ -70,13 +186,42 @@
     "director": "Michael Wilson",
     "location": "New York",
     "employee_count": 150,
-    "description": "Bridge, tunnel, road and other infrastructure projects",
+    "description": "Köprü, tünel, yol ve diğer altyapı projeleri",
     "projects": [
       "Bridge Project - New York",
       "Tunnel Project - Chicago",
-      "Highway Expansion Project"
+      "Highway Expansion Project",
+      "Ege Bölgesi Lojistik Koridoru"
     ],
-    "budget_2024": "600000000",
-    "status": "Active"
+    "budget_2024": "600.000.000 USD",
+    "status": "Active",
+    "key_contacts": [
+      {
+        "name": "Michael Wilson",
+        "role": "Direktör",
+        "email": "michael.wilson@company1.com"
+      },
+      {
+        "name": "Nora Petrova",
+        "role": "Planlama Mühendisi",
+        "email": "nora.petrova@company1.com"
+      }
+    ],
+    "active_procedures": ["SEC-2024-001", "INFRA-SAFETY-2024"],
+    "quarter_kpis": {
+      "2024_Q3": {
+        "critical_milestone_target": "%70 tamamlanma",
+        "maintenance_closure_target": "%95 kapanış",
+        "current_status": {
+          "critical_milestone": "%66 gerçekleşti",
+          "maintenance_closure": "%93 gerçekleşti"
+        }
+      }
+    },
+    "initiatives": [
+      "Akıllı altyapı sensörleme",
+      "Bölgesel lojistik planlama",
+      "Ulaşım güvenliği kampanyası"
+    ]
   }
 ]
