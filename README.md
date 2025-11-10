@@ -1,407 +1,230 @@
 # ChatCore.AI
 
-Enterprise-grade RAG-powered AI assistant built with FastAPI and Streamlit.
+Kurumsal veriler üzerinde çalışan, RAG (Retrieval-Augmented Generation) destekli yapay zekâ asistanı. Backend FastAPI, frontend Streamlit ile geliştirilmiştir ve şirket içi dokümanlarınızı güvenli biçimde indeksleyip ChatGPT benzeri bir arayüzle sunar.
 
-## Overview
+---
 
-ChatCore.AI is a production-ready AI assistant platform that combines Retrieval-Augmented Generation (RAG) with enterprise security, multi-provider AI support, and document management. It provides a ChatGPT-like interface for querying company knowledge bases with persistent conversations, document uploads, and advanced analytics.
+## İçindekiler
+- [Öz Bakış](#öz-bakış)
+- [Temel Özellikler](#temel-özellikler)
+- [Mimari Genel Bakış](#mimari-genel-bakış)
+- [Hızlı Başlangıç (Otomatik Kurulum)](#hızlı-başlangıç-otomatik-kurulum)
+- [Manuel Kurulum Adımları](#manuel-kurulum-adımları)
+- [Konfigürasyon & Özelleştirme](#konfigürasyon--özelleştirme)
+- [Başlatma ve Kullanım](#başlatma-ve-kullanım)
+- [Bakım İşlemleri](#bakım-işlemleri)
+- [Sorun Giderme](#sorun-giderme)
+- [Geliştirme Notları](#geliştirme-notları)
+- [Lisans](#lisans)
 
-## Features
+---
 
-- **RAG Pipeline**: Hybrid retrieval (FAISS + BM25) with cross-encoder re-ranking
-- **Multi-Provider AI**: Support for Gemini, OpenAI, Azure OpenAI, Ollama, and Hugging Face
-- **Document Management**: Upload and index PDF, DOCX, XLSX, TXT files
-- **Conversation Memory**: Persistent conversations with auto-summarization
-- **Persona System**: Customizable AI personas (Finance, IT, HR, Legal)
-- **Security**: JWT authentication, refresh token rotation, MFA support, rate limiting
-- **Analytics**: Usage statistics, knowledge gap detection, intent distribution
-- **Per-Department Indexes**: Separate FAISS indexes for department-specific documents
+## Öz Bakış
+ChatCore.AI, şirketlerin kendi veri kaynaklarına dayalı akıllı sohbet asistanları kurmasını sağlar. Proje; kalıcı sohbet geçmişi, departman bazlı veri yönetimi, rol bazlı güvenlik, çoklu yapay zekâ sağlayıcısı desteği ve RAG pipeline’ı ile uçtan uca bir çözüm sunar.
 
-<<<<<<< HEAD
-## Project Structure
-=======
-- **Hızlı Kurulum**: 2 komut ile çalışır hale gelin (`kurulum.bat` → `baslat.bat`)
-- **Çoklu AI Desteği**: Gemini, OpenAI, Azure, Ollama - hangisini isterseniz
-- **Ücretsiz Kullanım**: Gemini ücretsiz katmanı veya tamamen yerel Ollama
-- **Güvenli**: JWT authentication, input validation, rate limiting
-- **RAG Teknolojisi**: Şirket verilerinize dayalı %100 doğru yanıtlar
-- **Otomatik Fallback**: AI provider çalışmazsa otomatik yedek devreye girer
-- **Kalıcı Oturum**: Sayfa yenileme sonrası sohbet geçmişiniz korunur
-- **Ölçeklenebilir**: Küçük şirketlerden büyük şirketlere kadar
->>>>>>> f72cf5adf7e438dc35b754d69227265ac771f5e7
+---
 
+## Temel Özellikler
+- **RAG Pipeline**: FAISS + BM25 hibrit arama, gerektiğinde cross-encoder yeniden sıralama.
+- **Çoklu AI Sağlayıcısı**: Gemini (varsayılan), OpenAI, Azure OpenAI, Ollama, HuggingFace.
+- **Kalıcı Sohbetler**: Oturumlar ve mesajlar PostgreSQL üzerinde saklanır, token yenileme desteği vardır.
+- **Doküman Yönetimi**: PDF, DOCX, XLSX, TXT dosyalarını yükleyip indeksleyin.
+- **Departman Bazlı Veri**: Enerji, Turizm, İnşaat, Üretim ve Altyapı departmanlarına ait örnek veri seti.
+- **Saha Prosedürleri**: Güvenlik, operasyon, misafir deneyimi gibi örnek prosedürler sisteme dahil.
+- **KPI & Proje Takibi**: Çeyreklik hedefler, kilometre taşları ve kalan süre bilgileri sunulur.
+- **Otomatik Betikler**: Tek tuşla kurulum (Windows `kurulum.bat`) ve başlatma (`baslat.bat`).
+
+---
+
+## Mimari Genel Bakış
 ```
 ChatCore.AI/
-├── backend/                    # FastAPI backend
-│   ├── api/                    # API route modules
-│   │   ├── auth_api.py        # Authentication endpoints
-│   │   ├── chat_api.py        # Chat endpoints
-│   │   ├── files_api.py       # File upload endpoints
-│   │   ├── search_api.py      # Search endpoints
-│   │   ├── user_api.py        # User preferences endpoints
-│   │   └── analytics_api.py   # Analytics endpoints
-│   ├── core/                   # Core infrastructure
-│   │   ├── config.py          # Configuration management
-│   │   ├── database.py        # PostgreSQL async setup
-│   │   ├── redis_client.py    # Redis client
-│   │   ├── logger.py          # Structured logging
-│   │   └── security.py        # Rate limiting, validation
-│   ├── models/                 # SQLModel database models
-│   │   ├── user_model.py
-│   │   ├── conversation_model.py
-│   │   ├── message_model.py
-│   │   ├── document_model.py
-│   │   └── ...
-│   ├── services/               # Business logic services
-│   │   ├── ai_service.py      # AI provider integration
-│   │   ├── rag_service.py     # RAG pipeline
-│   │   ├── document_service.py # Document parsing
-│   │   ├── session_service.py  # Session management
-│   │   └── ...
-│   ├── scripts/                # Utility scripts
-│   │   ├── seed_users.py      # User seeding
-│   │   └── migrate_tinydb_to_postgresql.py
-│   ├── workers/                # Celery workers
-│   │   └── index_rebuild_worker.py
-│   ├── alembic/                # Database migrations
-│   ├── data/                   # Data files and uploads
-│   ├── main.py                 # FastAPI application
-│   └── requirements-refactored.txt
-├── frontend/                   # Streamlit frontend
-│   ├── app.py                  # Main Streamlit app
-│   ├── components/             # UI components
-│   │   ├── file_uploader.py
-│   │   ├── summary_panel.py
-│   │   ├── suggestion_box.py
-│   │   └── persona_selector.py
-│   └── static/
-├── docker-compose.yml          # Docker services (PostgreSQL, Redis)
-├── install.bat                 # Windows installation script
-├── install.sh                  # Linux/Mac installation script
-├── start.bat                   # Windows startup script
-├── start.sh                    # Linux/Mac startup script
-└── README.md                   # This file
+├── backend/           # FastAPI uygulaması
+│   ├── api/           # REST API uçları (auth, chat, files, analytics ...)
+│   ├── core/          # Config, DB, Redis, logging, security
+│   ├── models/        # SQLModel veritabanı modelleri
+│   ├── services/      # İş mantığı (AI, RAG, session, document ...)
+│   ├── scripts/       # Yardımcı scriptler (seed, migrate, test ...)
+│   ├── data/          # JSON veri setleri + vectorstore
+│   └── main.py        # FastAPI giriş noktası
+├── frontend/          # Streamlit arayüzü (app.py + bileşenler)
+├── *.bat / *.sh       # Kurulum ve başlatma betikleri
+└── docker-compose.yml # PostgreSQL, Redis servisleri
 ```
 
-## Installation
+Backend PostgreSQL (kalıcı veri) ve Redis (cache) ile çalışır. RAG pipeline’ı LangChain + FAISS üzerinden yönetilir. Frontend; Streamlit chat bileşenleri, kalıcı session-state ve yönetim paneli içerir.
 
-### Prerequisites
+---
 
-- Python 3.8 or higher
-- PostgreSQL 15+ (or Docker)
-- Redis 7+ (or Docker)
-- Git
+## Hızlı Başlangıç (Otomatik Kurulum)
+### Windows
+1. **Kurulum**: `kurulum.bat`
+   - Python sanal ortamı kurar
+   - Gerekli paketleri yükler
+   - Örnek veritabanını hazırlar
+2. **Başlatma**: `baslat.bat`
+   - PostgreSQL/Redis Docker konteynerlerini çalıştırır (varsa)
+   - Backend FastAPI uygulaması (8000)
+   - Frontend Streamlit uygulaması (8501)
 
-### Quick Install (Windows)
+### Linux / macOS
+1. `chmod +x install.sh start.sh`
+2. `./install.sh`
+3. `./start.sh`
 
-```batch
-install.bat
-```
+> Not: Otomatik betikler Docker gereksinimlerini kontrol eder. Docker kullanmak istemezseniz “Manuel Kurulum” bölümüne geçin.
 
-### Quick Install (Linux/Mac)
+---
 
+## Manuel Kurulum Adımları
+### 1. Depoyu Klonlayın
 ```bash
-chmod +x install.sh start.sh
-./install.sh
+git clone <repo-url>
+cd ChatCore.AI
 ```
 
-### Manual Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd ChatCore.AI
-   ```
-
-2. **Create virtual environment**
-   ```bash
-   python -m venv venv
-   
-   # Windows
-   venv\Scripts\activate
-   
-   # Linux/Mac
-   source venv/bin/activate
-   ```
-
-3. **Install dependencies**
-   ```bash
-   pip install --upgrade pip
-   pip install -r backend/requirements-refactored.txt
-   ```
-
-4. **Configure environment**
-   ```bash
-   cp backend/.env.example backend/.env
-   # Edit backend/.env with your settings
-   ```
-
-## Configuration
-
-Edit `backend/.env` with your configuration:
-
-```env
-# Database
-DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5432/chatcore
-
-# Redis
-REDIS_HOST=localhost
-REDIS_PORT=6379
-
-# Security
-SECRET_KEY=your-secret-key-here
-ACCESS_TOKEN_EXPIRE_MINUTES=15
-REFRESH_TOKEN_EXPIRE_DAYS=30
-
-# AI Provider
-AI_PROVIDER=GEMINI
-GEMINI_API_KEY=your-gemini-api-key
-
-# CORS
-ALLOWED_ORIGINS=http://localhost:8501,http://127.0.0.1:8501
-
-# Application
-COMPANY_NAME=YourCompany
-ENVIRONMENT=development
-```
-
-### Environment Variables
-
-- `DATABASE_URL`: PostgreSQL connection string (asyncpg format)
-- `REDIS_HOST`: Redis host address
-- `REDIS_PORT`: Redis port number
-- `SECRET_KEY`: JWT secret key (change in production)
-- `ACCESS_TOKEN_EXPIRE_MINUTES`: Access token expiry (default: 15)
-- `REFRESH_TOKEN_EXPIRE_DAYS`: Refresh token expiry (default: 30)
-- `AI_PROVIDER`: AI provider (GEMINI, OPENAI, AZURE, OLLAMA, HUGGINGFACE)
-- `GEMINI_API_KEY`: Google Gemini API key
-- `OPENAI_API_KEY`: OpenAI API key (if using OpenAI)
-- `AZURE_OPENAI_API_KEY`: Azure OpenAI API key (if using Azure)
-- `AZURE_OPENAI_ENDPOINT`: Azure OpenAI endpoint URL
-- `ALLOWED_ORIGINS`: Comma-separated list of allowed CORS origins
-- `COMPANY_NAME`: Company name for AI prompts
-- `ENVIRONMENT`: Environment (development, staging, production)
-
-## Startup
-
-### Using Helper Scripts
-
-**Windows:**
-```batch
-start.bat
-```
-
-**Linux/Mac:**
+### 2. Sanal Ortam Oluşturun
 ```bash
-./start.sh
+python -m venv venv
+# Windows
+env\Scripts\activate
+# Linux/Mac
+source venv/bin/activate
 ```
 
-### Manual Startup
+### 3. Bağımlılıkları Yükleyin
+```bash
+pip install --upgrade pip
+pip install -r backend/requirements-refactored.txt
+```
 
-1. **Start PostgreSQL and Redis (Docker)**
-   ```bash
-   docker compose up -d postgres redis
-   ```
+### 4. Veritabanı & Cache Servisleri
+- Docker ile:
+  ```bash
+  docker compose up -d postgres redis
+  ```
+- Manuel kurulum: PostgreSQL 15+, Redis 7+ servislerini yerelde çalıştırın.
 
-2. **Run database migrations**
+### 5. Konfigürasyon Dosyaları
+```bash
+cd backend
+cp .env.example .env
+# .env dosyasını ihtiyaçlarınıza göre düzenleyin
+```
+Zorunlu alanlar: `DATABASE_URL`, `SECRET_KEY`, `AI_PROVIDER`, `GEMINI_API_KEY` (veya seçtiğiniz sağlayıcı anahtarı).
+
+### 6. Veritabanı Migrasyonları ve Örnek Veri
+```bash
+alembic upgrade head
+python scripts/seed_users.py
+```
+Opsiyonel: `python scripts/seed_data.py` ile geniş veri seti yüklenebilir.
+
+### 7. Sunucuları Başlatın
+- **Backend**: `uvicorn main:app --host 0.0.0.0 --port 8000`
+- **Frontend**: `streamlit run app.py` (frontend klasörü içinde)
+
+---
+
+## Konfigürasyon & Özelleştirme
+### Ortam Değişkenleri (`backend/.env`)
+| Anahtar | Açıklama |
+|--------|----------|
+| `DATABASE_URL` | PostgreSQL bağlantı dizgesi (asyncpg) |
+| `REDIS_HOST`, `REDIS_PORT` | Redis adresi |
+| `SECRET_KEY` | JWT imzalama anahtarı |
+| `AI_PROVIDER` | `GEMINI`, `OPENAI`, `AZURE`, `OLLAMA`, `HUGGINGFACE` |
+| `GEMINI_API_KEY` | Gemini anahtarı (varsayılan sağlayıcı) |
+| `OPENAI_API_KEY`, `AZURE_*` | Alternatif sağlayıcılar için anahtarlar |
+| `COMPANY_NAME` | Prompta yansıtılan şirket adı |
+| `ENVIRONMENT` | `development` / `production` |
+
+### Veri Seti Özelleştirme
+- **Çalışanlar**: `backend/data/employees.json`
+- **Departmanlar & KPI’lar**: `backend/data/departments.json`
+- **Projeler**: `backend/data/projects.json`
+- **Prosedürler**: `backend/data/procedures.json`
+
+Bu dosyaları güncelledikten sonra RAG indeksini yeniden inşa edin: 
+```bash
+python scripts/rag_rebuild.py  # varsa
+# veya backend içinde
+python -c "import asyncio; from services.rag_service import rag_service; asyncio.run(rag_service.initialize(force_rebuild=True))"
+```
+
+### AI Sağlayıcısı Seçimi
+1. `AI_PROVIDER=GEMINI` (varsayılan) ve `GEMINI_API_KEY` ayarlayın.
+2. Başka sağlayıcıya geçmek için ilgili anahtarları `.env` dosyasına ekleyin.
+3. Streamlit arayüzü üzerinden de sağlanan seçeneklerle değişiklik yapılabilir (gerekirse).
+
+---
+
+## Başlatma ve Kullanım
+### Otomatik Betikler
+- `baslat.bat` (Windows) veya `start.sh` (Linux/Mac) iki terminal penceresi açarak backend/frontendi çalıştırır.
+
+### Manuel Başlatma
+1. Backend (FastAPI):
    ```bash
    cd backend
-   alembic upgrade head
+   uvicorn main:app --host 0.0.0.0 --port 8000
    ```
-
-3. **Seed default users**
-   ```bash
-   python scripts/seed_users.py
-   ```
-
-4. **Start backend**
-   ```bash
-   uvicorn main:app --reload --host 0.0.0.0 --port 8000
-   ```
-
-5. **Start frontend** (new terminal)
+2. Frontend (Streamlit):
    ```bash
    cd frontend
    streamlit run app.py
    ```
 
-6. **Access the application**
-   - Frontend: http://localhost:8501
-   - Backend API: http://localhost:8000
-   - API Docs: http://localhost:8000/docs
+### Varsayılan Giriş Bilgileri
+- Kullanıcı adı: `admin`
+- Şifre: `1234`
+> Güvenlik için üretimde mutlaka değiştirin.
 
-## Docker Usage
-
-Start PostgreSQL and Redis:
-```bash
-docker compose up -d
-```
-
-View logs:
-```bash
-docker compose logs -f
-```
-
-Stop services:
-```bash
-docker compose down
-```
-
-## Default Users
-
-After seeding, the following users are available:
-
-- Username: `admin`, Password: `1234` (Admin)
-- Username: `user2`, Password: `1234` (User)
-- Username: `user3`, Password: `12345` (User)
-
-**Security Note**: Change default passwords in production!
-
-## API Endpoints
-
-### Authentication
-- `POST /api/login` - User login
-- `POST /api/token/refresh` - Refresh access token
-- `POST /api/logout` - User logout
-- `GET /api/me` - Get current user info
-
-### Chat
-- `POST /api/chat` - Send chat message
-- `GET /api/conversations` - List conversations
-- `POST /api/conversations/new` - Create conversation
-- `DELETE /api/conversations/{id}` - Delete conversation
-
-### Files (V2)
-- `POST /api/v2/files/upload` - Upload document
-- `GET /api/v2/files` - List files
-- `DELETE /api/v2/files/{id}` - Delete file
-
-### Search (V2)
-- `GET /api/v2/search` - Search documents/conversations
-- `GET /api/v2/search/suggestions` - Autocomplete
-
-### User (V2)
-- `GET /api/v2/user/profile` - Get profile
-- `PUT /api/v2/user/preferences` - Update preferences
-- `POST /api/v2/user/mfa/setup` - Setup MFA
-
-### Analytics (V2)
-- `GET /api/v2/analytics/stats` - Admin analytics
-- `GET /api/v2/analytics/user` - User analytics
-
-Full API documentation: http://localhost:8000/docs
-
-## Troubleshooting
-
-### Database Connection Error
-
-Ensure PostgreSQL is running and `DATABASE_URL` is correct:
-```bash
-docker compose up -d postgres
-```
-
-### Redis Connection Error
-
-Ensure Redis is running:
-```bash
-docker compose up -d redis
-```
-
-### Migration Errors
-
-Reset database (development only):
-```bash
-cd backend
-alembic downgrade base
-alembic upgrade head
-```
-
-### Port Already in Use
-
-Change ports in startup commands or stop conflicting services.
-
-### Import Errors
-
-Ensure virtual environment is activated and dependencies are installed:
-```bash
-pip install -r backend/requirements-refactored.txt
-```
-
-## Development
-
-### Running Tests
-
-```bash
-cd backend
-pytest tests/
-```
-
-### Code Quality
-
-```bash
-# Linting
-ruff check backend/
-
-# Type checking
-mypy backend/
-```
-
-### Database Migrations
-
-<<<<<<< HEAD
-Create new migration:
-```bash
-cd backend
-alembic revision --autogenerate -m "description"
-```
-
-Apply migrations:
-```bash
-alembic upgrade head
-```
-
-## Production Deployment
-
-### Security Checklist
-
-1. Change `SECRET_KEY` to a strong random value
-2. Set `ENVIRONMENT=production` in `.env`
-3. Configure `ALLOWED_ORIGINS` (no wildcards)
-4. Enable HTTPS/TLS
-5. Use strong database passwords
-6. Enable MFA for admin users
-7. Configure firewall rules
-8. Set up monitoring and logging
-
-### Environment Variables for Production
-
-```env
-ENVIRONMENT=production
-SECRET_KEY=<strong-random-key>
-ALLOWED_ORIGINS=https://yourdomain.com
-DATABASE_URL=postgresql+asyncpg://user:pass@db-host:5432/chatcore
-REDIS_HOST=redis-host
-```
-
-## License
-
-[Add your license information here]
-
-## Credits
-
-ChatCore.AI - Enterprise RAG-Powered AI Assistant
-
-Built with FastAPI, Streamlit, PostgreSQL, Redis, and FAISS.
-=======
-<img width="1227" height="672" alt="ChatCore AI_1" src="https://github.com/user-attachments/assets/36043071-932c-4ef1-b1bc-92667e63710c" />
+### Arayüzde Yapabilecekleriniz
+- **Yeni Sohbet**: Soldaki butonla yeni oturum başlatın (mesaj atana kadar kayıt oluşmaz).
+- **Geçmiş Sohbetler**: İlk 10 kayıt listelenir; seçin, silin veya yenisini açın.
+- **Örnek Sorular**: Enerji KPI’ları, Bodrum projeleri, prosedürlerle ilgili hazır sorular.
+- **Prosedür Bildirimleri**: Backend’den gelen yeni prosedürler sağ sidebar’da listelenir.
 
 ---
 
-<img width="1410" height="786" alt="ChatCore AI_2" src="https://github.com/user-attachments/assets/6a408abb-6503-41be-8970-0aaea300828d" />
+## Bakım İşlemleri
+- **RAG İndeksini Yenileme**: Veri JSON’larını güncelledikten sonra `rag_service.initialize(force_rebuild=True)` çağırın.
+- **Sohbetleri Temizleme**: `python backend/scripts/clear_conversations.py`
+- **Veritabanı Yedekleme**: PostgreSQL dump alın (`pg_dump`), `backend/data/` klasöründeki JSON ve `vectorstore/` klasörünü arşivleyin.
+- **Loglar**: `backend/logs/` klasöründe API, hata ve güvenlik günlükleri tutulur.
 
 ---
 
+## Sorun Giderme
+| Belirti | Çözüm |
+|---------|-------|
+| `Database connection refused` | PostgreSQL servisinin çalıştığını ve `DATABASE_URL` değerinin doğru olduğunu kontrol edin. |
+| `Redis unavailable` | `docker compose up -d redis` veya servis durumunu kontrol edin. |
+| `ModuleNotFoundError` | Sanal ortamın aktif olduğundan ve `pip install -r backend/requirements-refactored.txt` çalıştırdığınızdan emin olun. |
+| Streamlit sayfası boş / hatalı | `streamlit run app.py` komutunu doğru dizinde çalıştırdığınızdan emin olun; konsoldaki hataları kontrol edin. |
+| RAG sonuç üretmiyor | JSON verilerini güncellediyseniz RAG indeksini yeniden inşa edin. |
 
+---
 
-**Son Güncelleme:** 11/2025
->>>>>>> f72cf5adf7e438dc35b754d69227265ac771f5e7
+## Geliştirme Notları
+- Testler: `cd backend && pytest`
+- Lint: `ruff check backend/`
+- Tip kontrolü: `mypy backend/`
+- Yeni DB migrasyonu: `alembic revision --autogenerate -m "desc"`
+
+### Docker
+```bash
+docker compose up -d        # PostgreSQL + Redis
+docker compose logs -f       # Anlık loglar
+docker compose down          # Servisleri durdur
+```
+
+---
+
+## Lisans
+[Lisans metninizi buraya ekleyin.]
+
+---
+
+ChatCore.AI – Kurumsal RAG Destekli Yapay Zekâ Asistanı. FastAPI + Streamlit + PostgreSQL + Redis + FAISS. Tüm kurulum adımlarını tamamladıktan sonra `http://localhost:8501` üzerinden sisteme erişebilirsiniz. Sorularınız için örnek veri kümesi (çalışan listeleri, departman KPI’ları, projeler, prosedürler) hazır olarak gelir; ihtiyacınıza göre `backend/data/` dizinindeki JSON dosyalarını düzenleyerek kolayca özelleştirebilirsiniz.
